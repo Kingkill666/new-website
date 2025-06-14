@@ -28,6 +28,7 @@ import {
 } from "lucide-react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import { BuyVMFModal } from "@/components/buy-vmf-modal"
 
 const Index = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -35,6 +36,7 @@ const Index = () => {
   const [connectedWallet, setConnectedWallet] = useState<string | null>(null)
   const [walletAddress, setWalletAddress] = useState<string | null>(null)
   const [isConnecting, setIsConnecting] = useState(false)
+  const [isBuyModalOpen, setIsBuyModalOpen] = useState(false)
 
   const walletOptions = [
     {
@@ -358,7 +360,11 @@ const Index = () => {
                     Our Story
                   </Button>
                 </Link>
-                <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 text-sm">
+                <Button
+                  size="sm"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 text-sm"
+                  onClick={() => setIsBuyModalOpen(true)}
+                >
                   Buy VMF
                 </Button>
 
@@ -508,7 +514,15 @@ const Index = () => {
                       Our Story
                     </Button>
                   </Link>
-                  <Button className="bg-blue-600 hover:bg-blue-700 text-white w-full">Buy VMF</Button>
+                  <Button
+                    className="bg-blue-600 hover:bg-blue-700 text-white w-full"
+                    onClick={() => {
+                      setIsBuyModalOpen(true)
+                      setIsMenuOpen(false)
+                    }}
+                  >
+                    Buy VMF
+                  </Button>
 
                   {/* Mobile Officers Club Button */}
                   <Link href="/officers-club">
@@ -628,6 +642,7 @@ const Index = () => {
                     <Button
                       size="lg"
                       className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-semibold shadow-lg"
+                      onClick={() => setIsBuyModalOpen(true)}
                     >
                       Buy VMF
                     </Button>
@@ -895,6 +910,7 @@ const Index = () => {
                 <Button
                   size="lg"
                   className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 text-lg font-semibold shadow-lg"
+                  onClick={() => setIsBuyModalOpen(true)}
                 >
                   Buy VMF Tokens
                   <TrendingUp className="ml-2 h-5 w-5" />
@@ -973,6 +989,9 @@ const Index = () => {
           </div>
         </div>
       </footer>
+
+      {/* Buy VMF Modal */}
+      <BuyVMFModal isOpen={isBuyModalOpen} onClose={() => setIsBuyModalOpen(false)} />
 
       {/* Click outside to close wallet options */}
       {showWalletOptions && <div className="fixed inset-0 z-40" onClick={() => setShowWalletOptions(false)} />}
