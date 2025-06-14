@@ -3,8 +3,7 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { X, Wallet, ChevronDown, ChevronUp, ExternalLink, CheckCircle, Copy, Check, Minus, Plus } from "lucide-react"
+import { X, Wallet, ChevronDown, ChevronUp, CheckCircle, Copy, Check, Minus, Plus } from "lucide-react"
 
 interface BuyVMFModalProps {
   isOpen: boolean
@@ -262,10 +261,6 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
             <CardHeader className="relative pb-4">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-2xl font-bold text-center flex-1">BUY VMF</CardTitle>
-                <Badge className="bg-red-100 text-red-600 border-red-200">
-                  <ExternalLink className="h-3 w-3 mr-1" />
-                  NFT
-                </Badge>
               </div>
               <Button variant="ghost" size="icon" className="absolute top-4 right-4" onClick={handleClose}>
                 <X className="h-4 w-4" />
