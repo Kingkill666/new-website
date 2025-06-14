@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# Install all wallet dependencies
+echo "Installing wallet dependencies..."
+
+# Install core wagmi and wallet dependencies
 npm install @coinbase/wallet-sdk@^4.0.3
 npm install @safe-global/safe-apps-sdk@^9.1.0
 npm install @solana/wallet-adapter-base@^0.9.23
@@ -16,6 +18,8 @@ npm install viem@^2.9.20
 npm install wagmi@^2.5.20
 
 echo "All wallet dependencies installed successfully!"
-echo "Note: Rainbow wallet will use WalletConnect protocol"
-echo "Make sure to set NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID in your .env.local file"
-echo "Run 'npm run dev' to start the development server"
+echo ""
+echo "Next steps:"
+echo "1. Copy .env.example to .env.local"
+echo "2. Add your NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID"
+echo "3. Run 'npm run dev' to start the development server"

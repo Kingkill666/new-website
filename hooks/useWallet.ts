@@ -109,9 +109,6 @@ export function useWallet() {
               throw new Error("Coinbase Wallet not installed. Please install Coinbase Wallet extension.")
             }
             break
-          case "rainbow":
-            // Rainbow uses WalletConnect, so we don't need specific detection
-            break
           case "safe":
             if (!detectedWallets.safe) {
               throw new Error("Safe Wallet not available. Please use within Safe Apps or install Safe extension.")
@@ -189,7 +186,8 @@ export function useWallet() {
 
         // Get Solana balance
         try {
-          const connection = new (await import("@solana/web3.js")).Connection("https://api.mainnet-beta.solana.com")
+          const { Connection } = await import("@solana/web3.js")
+          const connection = new Connection("https://api.mainnet-beta.solana.com")
           const balance = await connection.getBalance(response.publicKey)
           const solBalance = (balance / 1e9).toFixed(4) // Convert lamports to SOL
 
@@ -468,9 +466,8 @@ export function useWallet() {
             : wallet.id === "coinbase"
               ? detected.coinbase
               : wallet.id === "rainbow"
-                ? true
-                : // Rainbow might not be detectable
-                  wallet.id === "safe"
+                ? true // Rainbow uses WalletConnect, so always available
+                : wallet.id === "safe"
                   ? detected.safe
                   : false,
     }))
