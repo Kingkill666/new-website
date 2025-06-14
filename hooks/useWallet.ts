@@ -110,7 +110,7 @@ export function useWallet() {
             }
             break
           case "rainbow":
-            // Rainbow might not be specifically detectable, so we'll try to connect
+            // Rainbow uses WalletConnect, so we don't need specific detection
             break
           case "safe":
             if (!detectedWallets.safe) {
@@ -129,7 +129,8 @@ export function useWallet() {
             connector = connectors.find((c) => c.id === "coinbaseWallet")
             break
           case "rainbow":
-            connector = connectors.find((c) => c.id === "rainbow")
+            // Rainbow uses WalletConnect
+            connector = connectors.find((c) => c.id === "walletConnect")
             break
           case "safe":
             connector = connectors.find((c) => c.id === "safe")

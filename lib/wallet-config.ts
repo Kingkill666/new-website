@@ -2,7 +2,7 @@
 
 import { createConfig, http } from "wagmi"
 import { mainnet, sepolia, base, baseSepolia } from "wagmi/chains"
-import { coinbaseWallet, metaMask, rainbow, safe } from "wagmi/connectors"
+import { coinbaseWallet, metaMask, walletConnect, safe } from "wagmi/connectors"
 
 // Wagmi configuration for Ethereum wallets
 export const wagmiConfig = createConfig({
@@ -21,9 +21,14 @@ export const wagmiConfig = createConfig({
       darkMode: false,
       headlessMode: true,
     }),
-    rainbow({
-      appName: "VMF - Veterans & Military Families",
+    walletConnect({
       projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || "default-project-id",
+      metadata: {
+        name: "VMF - Veterans & Military Families",
+        description: "Supporting those who served through blockchain technology",
+        url: "https://vmfcoin.com",
+        icons: ["/images/vmf-coin-logo.png"],
+      },
     }),
     safe({
       allowedDomains: [/gnosis-safe.io$/, /app.safe.global$/],
