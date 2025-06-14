@@ -19,10 +19,9 @@ export const wagmiConfig = createConfig({
       appName: "VMF - Veterans & Military Families",
       appLogoUrl: "/images/vmf-coin-logo.png",
       darkMode: false,
-      headlessMode: true,
     }),
     walletConnect({
-      projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || "default-project-id",
+      projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || "2f5a6b8c9d1e3f4a5b6c7d8e9f0a1b2c",
       metadata: {
         name: "VMF - Veterans & Military Families",
         description: "Supporting those who served through blockchain technology",
@@ -42,9 +41,6 @@ export const wagmiConfig = createConfig({
     [baseSepolia.id]: http(),
   },
 })
-
-// Solana wallet configuration
-export const solanaWallets = ["phantom", "solflare", "torus", "ledger", "sollet"]
 
 // Network configurations
 export const SUPPORTED_NETWORKS = {

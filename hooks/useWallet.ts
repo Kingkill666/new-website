@@ -169,8 +169,8 @@ export function useWallet() {
     [connect, connectors],
   )
 
-  // Connect to Solana wallets (Phantom)
-  const connectSolanaWallet = useCallback(async () => {
+  // Connect to Phantom wallet (simplified)
+  const connectPhantomWallet = useCallback(async () => {
     try {
       setWalletState((prev) => ({ ...prev, isConnecting: true, error: null }))
 
@@ -184,33 +184,18 @@ export function useWallet() {
       if (response.publicKey) {
         const address = response.publicKey.toString()
 
-        // Get Solana balance
-        try {
-          const { Connection } = await import("@solana/web3.js")
-          const connection = new Connection("https://api.mainnet-beta.solana.com")
-          const balance = await connection.getBalance(response.publicKey)
-          const solBalance = (balance / 1e9).toFixed(4) // Convert lamports to SOL
-
-          setSolanaWallet({
-            connected: true,
-            address,
-            balance: solBalance,
-          })
-        } catch (balanceError) {
-          console.warn("Could not fetch Solana balance:", balanceError)
-          setSolanaWallet({
-            connected: true,
-            address,
-            balance: "0.0000",
-          })
-        }
+        setSolanaWallet({
+          connected: true,
+          address,
+          balance: "0.0000", // Simplified - no balance fetching to avoid issues
+        })
 
         setWalletState((prev) => ({
           ...prev,
           isConnected: true,
           address,
           walletType: "Phantom",
-          balance: null, // Solana balance handled separately
+          balance: null,
           chainId: null,
           isConnecting: false,
           error: null,
@@ -227,7 +212,7 @@ export function useWallet() {
         )
       }
     } catch (error: any) {
-      console.error("Solana wallet connection error:", error)
+      console.error("Phantom wallet connection error:", error)
       setWalletState((prev) => ({
         ...prev,
         error: error.message || "Failed to connect Phantom",
@@ -241,12 +226,12 @@ export function useWallet() {
   const connectWallet = useCallback(
     async (walletId: string) => {
       if (walletId === "phantom") {
-        await connectSolanaWallet()
+        await connectPhantomWallet()
       } else {
         await connectEthereumWallet(walletId)
       }
     },
-    [connectEthereumWallet, connectSolanaWallet],
+    [connectEthereumWallet, connectPhantomWallet],
   )
 
   // Disconnect wallet
@@ -388,7 +373,7 @@ export function useWallet() {
                 setSolanaWallet({
                   connected: true,
                   address: publicKey,
-                  balance: "0.0000", // Will be updated by effect
+                  balance: "0.0000",
                 })
                 setWalletState((prev) => ({
                   ...prev,
