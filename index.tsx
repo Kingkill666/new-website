@@ -23,48 +23,16 @@ import {
   Zap,
   DollarSign,
   Eye,
-  Wallet,
   Crown,
 } from "lucide-react"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Link from "next/link"
 import { BuyVMFModal } from "@/components/buy-vmf-modal"
+import { WalletConnector } from "@/components/wallet-connector"
 
 const Index = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [showWalletOptions, setShowWalletOptions] = useState(false)
-  const [connectedWallet, setConnectedWallet] = useState<string | null>(null)
-  const [walletAddress, setWalletAddress] = useState<string | null>(null)
-  const [isConnecting, setIsConnecting] = useState(false)
   const [isBuyModalOpen, setIsBuyModalOpen] = useState(false)
-
-  const walletOptions = [
-    {
-      name: "Coinbase",
-      logo: "/images/coinbase-logo.png",
-      id: "coinbase",
-    },
-    {
-      name: "MetaMask",
-      logo: "🦊",
-      id: "metamask",
-    },
-    {
-      name: "Phantom",
-      logo: "👻",
-      id: "phantom",
-    },
-    {
-      name: "Rainbow",
-      logo: "🌈",
-      id: "rainbow",
-    },
-    {
-      name: "Safe",
-      logo: "/images/avatar-safe.png",
-      id: "safe",
-    },
-  ]
 
   const socialLinks = [
     {
@@ -194,103 +162,6 @@ const Index = () => {
     }
   }
 
-  const connectWallet = async (walletId: string) => {
-    setIsConnecting(true)
-    try {
-      let provider: any = null
-      let accounts: string[] = []
-
-      switch (walletId) {
-        case "metamask":
-          if (typeof window !== "undefined" && (window as any).ethereum) {
-            provider = (window as any).ethereum
-            accounts = await provider.request({ method: "eth_requestAccounts" })
-            setConnectedWallet("MetaMask")
-            setWalletAddress(accounts[0])
-          } else {
-            throw new Error("MetaMask not installed")
-          }
-          break
-
-        case "coinbase":
-          if (typeof window !== "undefined" && (window as any).ethereum?.isCoinbaseWallet) {
-            provider = (window as any).ethereum
-            accounts = await provider.request({ method: "eth_requestAccounts" })
-            setConnectedWallet("Coinbase")
-            setWalletAddress(accounts[0])
-          } else {
-            // Fallback to WalletLink/Coinbase Wallet SDK
-            throw new Error("Coinbase Wallet not installed")
-          }
-          break
-
-        case "phantom":
-          if (typeof window !== "undefined" && (window as any).solana?.isPhantom) {
-            const resp = await (window as any).solana.connect()
-            setConnectedWallet("Phantom")
-            setWalletAddress(resp.publicKey.toString())
-          } else {
-            throw new Error("Phantom Wallet not installed")
-          }
-          break
-
-        case "rainbow":
-          if (typeof window !== "undefined" && (window as any).ethereum?.isRainbow) {
-            provider = (window as any).ethereum
-            accounts = await provider.request({ method: "eth_requestAccounts" })
-            setConnectedWallet("Rainbow")
-            setWalletAddress(accounts[0])
-          } else {
-            throw new Error("Rainbow Wallet not installed")
-          }
-          break
-
-        case "safe":
-          // Safe wallet connection would typically require Safe Apps SDK
-          throw new Error("Safe Wallet connection requires Safe Apps environment")
-
-        default:
-          throw new Error("Unsupported wallet")
-      }
-
-      setShowWalletOptions(false)
-    } catch (error: any) {
-      console.error("Wallet connection error:", error)
-      alert(`Failed to connect ${walletId}: ${error.message}`)
-    } finally {
-      setIsConnecting(false)
-    }
-  }
-
-  const disconnectWallet = () => {
-    setConnectedWallet(null)
-    setWalletAddress(null)
-  }
-
-  const formatAddress = (address: string) => {
-    return `${address.slice(0, 6)}...${address.slice(-4)}`
-  }
-
-  // Check for existing wallet connections on page load
-  useEffect(() => {
-    const checkWalletConnection = async () => {
-      if (typeof window !== "undefined") {
-        // Check MetaMask
-        if ((window as any).ethereum && (window as any).ethereum.selectedAddress) {
-          setConnectedWallet("MetaMask")
-          setWalletAddress((window as any).ethereum.selectedAddress)
-        }
-        // Check Phantom
-        else if ((window as any).solana?.isConnected) {
-          setConnectedWallet("Phantom")
-          setWalletAddress((window as any).solana.publicKey?.toString())
-        }
-      }
-    }
-
-    checkWalletConnection()
-  }, [])
-
   return (
     <div className="min-h-screen bg-background">
       {/* Skip to main content link for screen readers */}
@@ -386,71 +257,7 @@ const Index = () => {
                 </Link>
 
                 {/* Wallet Connection */}
-                <div className="relative">
-                  {connectedWallet ? (
-                    <div className="flex items-center space-x-2">
-                      <div className="flex items-center space-x-2 bg-green-50 border border-green-200 rounded-lg px-2 py-1">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="text-xs font-medium text-green-700">
-                          {connectedWallet}: {walletAddress && formatAddress(walletAddress)}
-                        </span>
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={disconnectWallet}
-                        className="text-red-600 border-red-200 hover:bg-red-50 px-3 py-1 text-xs"
-                      >
-                        Disconnect
-                      </Button>
-                    </div>
-                  ) : (
-                    <>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="border-red-600 text-red-600 hover:bg-red-50 font-semibold px-4 py-2 text-sm"
-                        onClick={() => setShowWalletOptions(!showWalletOptions)}
-                        disabled={isConnecting}
-                      >
-                        <Wallet className="h-3 w-3 mr-1" />
-                        {isConnecting ? "Connecting..." : "Connect"}
-                      </Button>
-
-                      {/* Wallet Options Dropdown */}
-                      {showWalletOptions && (
-                        <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-                          <div className="px-4 py-2 border-b border-gray-100">
-                            <h3 className="font-semibold text-gray-900">Connect Wallet</h3>
-                            <p className="text-sm text-gray-600">Choose your preferred wallet</p>
-                          </div>
-                          {walletOptions.map((wallet) => (
-                            <button
-                              key={wallet.id}
-                              onClick={() => connectWallet(wallet.id)}
-                              disabled={isConnecting}
-                              className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors disabled:opacity-50"
-                            >
-                              {wallet.logo.startsWith("/") ? (
-                                <img
-                                  src={wallet.logo || "/placeholder.svg"}
-                                  alt={`${wallet.name} logo`}
-                                  className="w-6 h-6 rounded"
-                                />
-                              ) : (
-                                <span className="text-2xl">{wallet.logo}</span>
-                              )}
-                              <span className="font-medium text-gray-900">{wallet.name}</span>
-                              {isConnecting && (
-                                <div className="ml-auto w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                              )}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
+                <WalletConnector size="sm" className="px-4 py-2 text-sm" />
               </div>
             </div>
 
@@ -542,63 +349,7 @@ const Index = () => {
                   </Link>
 
                   {/* Mobile Wallet Connection */}
-                  {connectedWallet ? (
-                    <div className="space-y-2">
-                      <div className="flex items-center space-x-2 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="text-sm font-medium text-green-700">
-                          {connectedWallet}: {walletAddress && formatAddress(walletAddress)}
-                        </span>
-                      </div>
-                      <Button
-                        variant="outline"
-                        onClick={disconnectWallet}
-                        className="w-full text-red-600 border-red-200 hover:bg-red-50"
-                      >
-                        Disconnect Wallet
-                      </Button>
-                    </div>
-                  ) : (
-                    <>
-                      <Button
-                        variant="outline"
-                        className="border-red-600 text-red-600 w-full"
-                        onClick={() => setShowWalletOptions(!showWalletOptions)}
-                        disabled={isConnecting}
-                      >
-                        <Wallet className="h-4 w-4 mr-2" />
-                        {isConnecting ? "Connecting..." : "Connect Wallet"}
-                      </Button>
-
-                      {/* Mobile Wallet Options */}
-                      {showWalletOptions && (
-                        <div className="bg-gray-50 rounded-lg p-3 space-y-2">
-                          {walletOptions.map((wallet) => (
-                            <button
-                              key={wallet.id}
-                              onClick={() => connectWallet(wallet.id)}
-                              disabled={isConnecting}
-                              className="w-full flex items-center space-x-3 px-3 py-2 bg-white rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50"
-                            >
-                              {wallet.logo.startsWith("/") ? (
-                                <img
-                                  src={wallet.logo || "/placeholder.svg"}
-                                  alt={`${wallet.name} logo`}
-                                  className="w-5 h-5 rounded"
-                                />
-                              ) : (
-                                <span className="text-xl">{wallet.logo}</span>
-                              )}
-                              <span className="font-medium text-gray-900">{wallet.name}</span>
-                              {isConnecting && (
-                                <div className="ml-auto w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                              )}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </>
-                  )}
+                  <WalletConnector size="default" className="w-full" />
                 </div>
               </div>
             </div>
@@ -992,9 +743,6 @@ const Index = () => {
 
       {/* Buy VMF Modal */}
       <BuyVMFModal isOpen={isBuyModalOpen} onClose={() => setIsBuyModalOpen(false)} />
-
-      {/* Click outside to close wallet options */}
-      {showWalletOptions && <div className="fixed inset-0 z-40" onClick={() => setShowWalletOptions(false)} />}
 
       {/* CSS for gradient animation */}
       <style jsx>{`

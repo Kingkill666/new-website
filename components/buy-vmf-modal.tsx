@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { X, Wallet, ChevronDown, ChevronUp, CheckCircle, Copy, Check, Minus, Plus } from "lucide-react"
+import { useWallet } from "@/hooks/useWallet"
 
 interface BuyVMFModalProps {
   isOpen: boolean
@@ -89,8 +90,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
   const [charityDistributions, setCharityDistributions] = useState<CharityDistribution[]>([])
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false)
   const [isCharityDropdownOpen, setIsCharityDropdownOpen] = useState(false)
-  const [isConnectedWallet, setIsConnectedWallet] = useState(false)
-  const [connectedAddress, setConnectedAddress] = useState("")
+  const { walletState, isConnecting, connectWallet, formatAddress } = useWallet()
   const [transactionHash, setTransactionHash] = useState("")
   const [vmfAmount, setVmfAmount] = useState("")
   const [fees] = useState("20.0")
@@ -153,31 +153,14 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     return ((Number.parseFloat(amount) * percentage) / 100).toFixed(2)
   }
 
-  const handleConnectWallet = async () => {
-    try {
-      if (typeof window !== "undefined" && (window as any).ethereum) {
-        const accounts = await (window as any).ethereum.request({
-          method: "eth_requestAccounts",
-        })
-        setConnectedAddress(accounts[0])
-        setIsConnectedWallet(true)
-      } else {
-        alert("Please install MetaMask to connect your wallet")
-      }
-    } catch (error) {
-      console.error("Failed to connect wallet:", error)
-      alert("Failed to connect wallet")
-    }
-  }
-
   const handleBuyNext = () => {
-    if (amount && selectedCharities.length > 0 && isConnectedWallet && getTotalPercentage() === 100) {
+    if (amount && selectedCharities.length > 0 && walletState.isConnected && getTotalPercentage() === 100) {
       setCurrentStep("verify")
     }
   }
 
   const executeSmartContract = async () => {
-    if (!isConnectedWallet || !amount) return false
+    if (!walletState.isConnected || !amount) return false
 
     try {
       setIsProcessing(true)
@@ -240,14 +223,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     setAmount("")
     setSelectedCharities([])
     setCharityDistributions([])
-    setIsConnectedWallet(false)
-    setConnectedAddress("")
-    setTransactionHash("")
     onClose()
-  }
-
-  const formatAddress = (address: string) => {
-    return `${address.slice(0, 6)}...${address.slice(-4)}`
   }
 
   if (!isOpen) return null
@@ -269,15 +245,15 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
             <CardContent className="space-y-6">
               {/* Connect Wallet */}
               <Button
-                onClick={handleConnectWallet}
+                onClick={() => connectWallet("metamask")} // Default to MetaMask, or add wallet selection
                 className={`w-full py-3 text-lg font-semibold ${
-                  isConnectedWallet
+                  walletState.isConnected
                     ? "bg-green-600 hover:bg-green-700 text-white"
                     : "bg-blue-600 hover:bg-blue-700 text-white"
                 }`}
               >
                 <Wallet className="h-5 w-5 mr-2" />
-                {isConnectedWallet ? `Connected: ${formatAddress(connectedAddress)}` : "Connect Wallet"}
+                {walletState.isConnected ? `Connected: ${formatAddress(walletState.address!)}` : "Connect Wallet"}
               </Button>
 
               {/* Amount Input */}
@@ -399,7 +375,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
               <Button
                 onClick={handleBuyNext}
                 disabled={
-                  !amount || selectedCharities.length === 0 || !isConnectedWallet || getTotalPercentage() !== 100
+                  !amount || selectedCharities.length === 0 || !walletState.isConnected || getTotalPercentage() !== 100
                 }
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg font-semibold disabled:opacity-50"
               >
@@ -531,7 +507,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                       </div>
                       <div className="flex justify-between">
                         <span>Connected Wallet:</span>
-                        <span className="font-mono">{formatAddress(connectedAddress)}</span>
+                        <span className="font-mono">{formatAddress(walletState.address!)}</span>
                       </div>
                     </div>
                   </div>
