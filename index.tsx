@@ -174,8 +174,8 @@ const Index = () => {
     },
     {
       icon: <Scale className="h-8 w-8 text-white" />,
-      title: "Fair Gas Costs",
-      description: "VMF reimburses voting gas fees while proposers cover submission costs",
+      title: "Gas Free Voting",
+      description: "VMF pays all gas fees to vote. Your voice matters.",
       color: "bg-purple-600",
     },
   ]
