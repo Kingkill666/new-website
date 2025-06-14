@@ -365,7 +365,6 @@ const Index = () => {
                 {/* Officers Club Button */}
                 <Link href="/officers-club">
                   <Button
-                    size="sm"
                     className="relative overflow-hidden text-white font-bold px-4 py-2 text-sm shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                     style={{
                       background:
@@ -373,6 +372,7 @@ const Index = () => {
                       backgroundSize: "200% 200%",
                       animation: "gradient-shift 3s ease infinite",
                     }}
+                    size="sm"
                   >
                     <Crown className="h-3 w-3 mr-1" />
                     <span className="relative z-10 font-extrabold tracking-wide text-xs">OFFICERS CLUB</span>
@@ -517,73 +517,75 @@ const Index = () => {
                       style={{
                         background:
                           "linear-gradient(45deg, #3B82F6 0%, #EF4444 25%, #3B82F6 50%, #EF4444 75%, #3B82F6 100%)",
-                      backgroundSize: "200% 200%",
-                      animation: "gradient-shift 3s ease infinite",
-                    }}
-                  >
-                    <Crown className="h-4 w-4 mr-2" />
-                    <span className="relative z-10 font-extrabold tracking-wide">OFFICERS CLUB</span>
-                  </Button>
-                </Link>
-
-                {/* Mobile Wallet Connection */}
-                {connectedWallet ? (
-                  <div className="space-y-2">
-                    <div className="flex items-center space-x-2 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="text-sm font-medium text-green-700">
-                        {connectedWallet}: {walletAddress && formatAddress(walletAddress)}
-                      </span>
-                    </div>
-                    <Button
-                      variant="outline"
-                      onClick={disconnectWallet}
-                      className="w-full text-red-600 border-red-200 hover:bg-red-50"
+                        backgroundSize: "200% 200%",
+                        animation: "gradient-shift 3s ease infinite",
+                      }}
+                      onClick={() => setIsMenuOpen(false)}
                     >
-                      Disconnect Wallet
+                      <Crown className="h-4 w-4 mr-2" />
+                      <span className="relative z-10 font-extrabold tracking-wide">OFFICERS CLUB</span>
                     </Button>
-                  </div>
-                ) : (
-                  <>
-                    <Button
-                      variant="outline"
-                      className="border-red-600 text-red-600 w-full"
-                      onClick={() => setShowWalletOptions(!showWalletOptions)}
-                      disabled={isConnecting}
-                    >
-                      <Wallet className="h-4 w-4 mr-2" />
-                      {isConnecting ? "Connecting..." : "Connect Wallet"}
-                    </Button>
+                  </Link>
 
-                    {/* Mobile Wallet Options */}
-                    {showWalletOptions && (
-                      <div className="bg-gray-50 rounded-lg p-3 space-y-2">
-                        {walletOptions.map((wallet) => (
-                          <button
-                            key={wallet.id}
-                            onClick={() => connectWallet(wallet.id)}
-                            disabled={isConnecting}
-                            className="w-full flex items-center space-x-3 px-3 py-2 bg-white rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50"
-                          >
-                            {wallet.logo.startsWith("/") ? (
-                              <img
-                                src={wallet.logo || "/placeholder.svg"}
-                                alt={`${wallet.name} logo`}
-                                className="w-5 h-5 rounded"
-                              />
-                            ) : (
-                              <span className="text-xl">{wallet.logo}</span>
-                            )}
-                            <span className="font-medium text-gray-900">{wallet.name}</span>
-                            {isConnecting && (
-                              <div className="ml-auto w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                            )}
-                          </button>
-                        ))}
+                  {/* Mobile Wallet Connection */}
+                  {connectedWallet ? (
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span className="text-sm font-medium text-green-700">
+                          {connectedWallet}: {walletAddress && formatAddress(walletAddress)}
+                        </span>
                       </div>
-                    )}
-                  </>
-                )}
+                      <Button
+                        variant="outline"
+                        onClick={disconnectWallet}
+                        className="w-full text-red-600 border-red-200 hover:bg-red-50"
+                      >
+                        Disconnect Wallet
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      <Button
+                        variant="outline"
+                        className="border-red-600 text-red-600 w-full"
+                        onClick={() => setShowWalletOptions(!showWalletOptions)}
+                        disabled={isConnecting}
+                      >
+                        <Wallet className="h-4 w-4 mr-2" />
+                        {isConnecting ? "Connecting..." : "Connect Wallet"}
+                      </Button>
+
+                      {/* Mobile Wallet Options */}
+                      {showWalletOptions && (
+                        <div className="bg-gray-50 rounded-lg p-3 space-y-2">
+                          {walletOptions.map((wallet) => (
+                            <button
+                              key={wallet.id}
+                              onClick={() => connectWallet(wallet.id)}
+                              disabled={isConnecting}
+                              className="w-full flex items-center space-x-3 px-3 py-2 bg-white rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50"
+                            >
+                              {wallet.logo.startsWith("/") ? (
+                                <img
+                                  src={wallet.logo || "/placeholder.svg"}
+                                  alt={`${wallet.name} logo`}
+                                  className="w-5 h-5 rounded"
+                                />
+                              ) : (
+                                <span className="text-xl">{wallet.logo}</span>
+                              )}
+                              <span className="font-medium text-gray-900">{wallet.name}</span>
+                              {isConnecting && (
+                                <div className="ml-auto w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           )}
