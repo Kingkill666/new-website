@@ -889,7 +889,7 @@ const Index = () => {
             <div className="max-w-4xl mx-auto text-center">
               <h2 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-6">Ready to Make a Difference?</h2>
               <p className="text-xl text-slate-600 mb-10 leading-relaxed">
-                Join thousands of supporters revolutionizing how we honor and support our veterans.
+                Join thousands of supporters worldwide and honor our veterans. We Want You!
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button
