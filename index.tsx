@@ -318,10 +318,10 @@ const Index = () => {
             </div>
 
             {/* Simplified Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
+            <div className="hidden lg:flex items-center space-x-6">
               <a
                 href="#how-it-works"
-                className="text-slate-700 hover:text-blue-600 transition-colors font-medium"
+                className="text-slate-700 hover:text-blue-600 transition-colors font-medium text-sm whitespace-nowrap"
                 onClick={(e) => {
                   e.preventDefault()
                   scrollToSection("how-it-works")
@@ -331,7 +331,7 @@ const Index = () => {
               </a>
               <a
                 href="#charities"
-                className="text-slate-700 hover:text-blue-600 transition-colors font-medium"
+                className="text-slate-700 hover:text-blue-600 transition-colors font-medium text-sm whitespace-nowrap"
                 onClick={(e) => {
                   e.preventDefault()
                   scrollToSection("charities")
@@ -341,7 +341,7 @@ const Index = () => {
               </a>
               <a
                 href="#governance"
-                className="text-slate-700 hover:text-blue-600 transition-colors font-medium"
+                className="text-slate-700 hover:text-blue-600 transition-colors font-medium text-sm whitespace-nowrap"
                 onClick={(e) => {
                   e.preventDefault()
                   scrollToSection("governance")
@@ -349,13 +349,24 @@ const Index = () => {
               >
                 Community
               </a>
-              <div className="flex items-center space-x-3">
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6">Buy VMF</Button>
+              <div className="flex items-center space-x-2">
+                <Link href="/story">
+                  <Button
+                    size="sm"
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 text-sm"
+                  >
+                    Our Story
+                  </Button>
+                </Link>
+                <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 text-sm">
+                  Buy VMF
+                </Button>
 
                 {/* Officers Club Button */}
                 <Link href="/officers-club">
                   <Button
-                    className="relative overflow-hidden text-white font-bold px-6 py-2 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                    size="sm"
+                    className="relative overflow-hidden text-white font-bold px-4 py-2 text-sm shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                     style={{
                       background:
                         "linear-gradient(45deg, #3B82F6 0%, #EF4444 25%, #3B82F6 50%, #EF4444 75%, #3B82F6 100%)",
@@ -363,8 +374,8 @@ const Index = () => {
                       animation: "gradient-shift 3s ease infinite",
                     }}
                   >
-                    <Crown className="h-4 w-4 mr-2" />
-                    <span className="relative z-10 font-extrabold tracking-wide">OFFICERS CLUB</span>
+                    <Crown className="h-3 w-3 mr-1" />
+                    <span className="relative z-10 font-extrabold tracking-wide text-xs">OFFICERS CLUB</span>
                   </Button>
                 </Link>
 
@@ -372,9 +383,9 @@ const Index = () => {
                 <div className="relative">
                   {connectedWallet ? (
                     <div className="flex items-center space-x-2">
-                      <div className="flex items-center space-x-2 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+                      <div className="flex items-center space-x-2 bg-green-50 border border-green-200 rounded-lg px-2 py-1">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="text-sm font-medium text-green-700">
+                        <span className="text-xs font-medium text-green-700">
                           {connectedWallet}: {walletAddress && formatAddress(walletAddress)}
                         </span>
                       </div>
@@ -382,7 +393,7 @@ const Index = () => {
                         variant="outline"
                         size="sm"
                         onClick={disconnectWallet}
-                        className="text-red-600 border-red-200 hover:bg-red-50"
+                        className="text-red-600 border-red-200 hover:bg-red-50 px-3 py-1 text-xs"
                       >
                         Disconnect
                       </Button>
@@ -391,11 +402,12 @@ const Index = () => {
                     <>
                       <Button
                         variant="outline"
-                        className="border-red-600 text-red-600 hover:bg-red-50 font-semibold px-6"
+                        size="sm"
+                        className="border-red-600 text-red-600 hover:bg-red-50 font-semibold px-4 py-2 text-sm"
                         onClick={() => setShowWalletOptions(!showWalletOptions)}
                         disabled={isConnecting}
                       >
-                        <Wallet className="h-4 w-4 mr-2" />
+                        <Wallet className="h-3 w-3 mr-1" />
                         {isConnecting ? "Connecting..." : "Connect"}
                       </Button>
 
@@ -437,7 +449,7 @@ const Index = () => {
             </div>
 
             {/* Mobile menu button */}
-            <div className="md:hidden">
+            <div className="lg:hidden">
               <Button
                 variant="ghost"
                 size="icon"
@@ -452,7 +464,7 @@ const Index = () => {
 
           {/* Mobile Menu */}
           {isMenuOpen && (
-            <div className="md:hidden mt-4 pb-4 border-t border-gray-100">
+            <div className="lg:hidden mt-4 pb-4 border-t border-gray-100">
               <div className="flex flex-col space-y-3 pt-4">
                 <a
                   href="#how-it-works"
@@ -488,6 +500,14 @@ const Index = () => {
                   Community
                 </a>
                 <div className="flex flex-col space-y-2 pt-2">
+                  <Link href="/story">
+                    <Button
+                      className="bg-blue-600 hover:bg-blue-700 text-white w-full"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Our Story
+                    </Button>
+                  </Link>
                   <Button className="bg-blue-600 hover:bg-blue-700 text-white w-full">Buy VMF</Button>
 
                   {/* Mobile Officers Club Button */}
@@ -599,18 +619,17 @@ const Index = () => {
                   </h1>
 
                   <p className="text-xl text-slate-600 mb-8 leading-relaxed max-w-2xl mx-auto lg:mx-0">
-                    Choose your charities. 100% of your donation reaches them with zero fees.
+                    You buy, We match, You choose.
+                    <br />A new way to donate.
                   </p>
 
                   <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8">
-                    <Link href="/story">
-                      <Button
-                        size="lg"
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-semibold shadow-lg"
-                      >
-                        Our Story
-                      </Button>
-                    </Link>
+                    <Button
+                      size="lg"
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-semibold shadow-lg"
+                    >
+                      Buy VMF
+                    </Button>
                   </div>
 
                   {/* Trust Indicators */}
@@ -673,7 +692,7 @@ const Index = () => {
               <div className="text-center mb-16">
                 <h2 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-6">How VMF Works</h2>
                 <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-                  Simple, transparent, and revolutionary. Here's how we're changing veteran support forever.
+                  Simple, transparent, and global. Here's how we're impacting veteran support with real world change.
                 </p>
               </div>
 
@@ -685,8 +704,7 @@ const Index = () => {
                     </div>
                     <h3 className="text-2xl font-bold mb-4 text-slate-800">1. Buy VMF Tokens</h3>
                     <p className="text-slate-600 leading-relaxed">
-                      Purchase VMF tokens through our secure platform. Every token bought triggers an automatic
-                      donation.
+                      Purchase VMF tokens through our secure platform. VMF matches your purchase with USDC donations.
                     </p>
                   </CardContent>
                 </Card>
@@ -698,8 +716,8 @@ const Index = () => {
                     </div>
                     <h3 className="text-2xl font-bold mb-4 text-slate-800">2. Instant Distribution</h3>
                     <p className="text-slate-600 leading-relaxed">
-                      Choose 1, 2, or 3 charities to support. 100% of your purchase goes directly to your selected
-                      organizations.
+                      Choose up to 3 charities to support. Our partnered charities receive 100% of their donations
+                      directly.
                     </p>
                   </CardContent>
                 </Card>
