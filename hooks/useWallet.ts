@@ -1,8 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { useAccount, useConnect, useDisconnect, useBalance, useSwitchChain } from "wagmi"
-import { detectWallets, SUPPORTED_NETWORKS } from "@/lib/wallet-config"
+import { detectWallets, getSpecificProvider, SUPPORTED_NETWORKS } from "@/lib/wallet-config"
 
 export interface WalletInfo {
   name: string
@@ -22,40 +21,13 @@ export interface WalletState {
 }
 
 export const WALLET_OPTIONS: WalletInfo[] = [
-  {
-    name: "MetaMask",
-    logo: "🦊",
-    id: "metamask",
-  },
-  {
-    name: "Coinbase",
-    logo: "/images/coinbase-logo.png",
-    id: "coinbase",
-  },
-  {
-    name: "Rainbow",
-    logo: "🌈",
-    id: "rainbow",
-  },
-  {
-    name: "Phantom",
-    logo: "👻",
-    id: "phantom",
-  },
-  {
-    name: "Safe",
-    logo: "/images/avatar-safe.png",
-    id: "safe",
-  },
+  { name: "MetaMask", logo: "🦊", id: "metamask" },
+  { name: "Coinbase", logo: "/images/coinbase-logo.png", id: "coinbase" },
+  { name: "Rainbow", logo: "🌈", id: "rainbow" },
+  { name: "Phantom", logo: "👻", id: "phantom" },
 ]
 
 export function useWallet() {
-  const { address, isConnected, chainId } = useAccount()
-  const { connect, connectors, isPending } = useConnect()
-  const { disconnect } = useDisconnect()
-  const { switchChain } = useSwitchChain()
-  const { data: balance } = useBalance({ address })
-
   const [walletState, setWalletState] = useState<WalletState>({
     isConnected: false,
     address: null,
@@ -66,110 +38,105 @@ export function useWallet() {
     error: null,
   })
 
-  const [solanaWallet, setSolanaWallet] = useState<{
-    connected: boolean
-    address: string | null
-    balance: string | null
-  }>({
-    connected: false,
-    address: null,
-    balance: null,
-  })
-
   const formatAddress = useCallback((address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`
   }, [])
 
-  const formatBalance = useCallback((balance: bigint | null, decimals = 18) => {
-    if (!balance) return "0.0000"
-    const divisor = BigInt(10 ** decimals)
-    const quotient = balance / divisor
-    const remainder = balance % divisor
-    const fractional = Number(remainder) / Number(divisor)
-    return (Number(quotient) + fractional).toFixed(4)
+  const formatBalance = useCallback((balance: string) => {
+    const num = Number.parseFloat(balance)
+    return num.toFixed(4)
   }, [])
 
-  // Connect to Ethereum wallets using Wagmi
-  const connectEthereumWallet = useCallback(
-    async (walletId: string) => {
-      try {
-        setWalletState((prev) => ({ ...prev, isConnecting: true, error: null }))
+  // Connect to Ethereum wallets
+  const connectEthereumWallet = useCallback(async (walletId: string) => {
+    try {
+      setWalletState((prev) => ({ ...prev, isConnecting: true, error: null }))
 
-        const detectedWallets = detectWallets()
+      const detectedWallets = detectWallets()
 
-        // Check if wallet is installed
-        switch (walletId) {
-          case "metamask":
-            if (!detectedWallets.metamask) {
-              throw new Error("MetaMask not installed. Please install MetaMask extension.")
-            }
-            break
-          case "coinbase":
-            if (!detectedWallets.coinbase) {
-              throw new Error("Coinbase Wallet not installed. Please install Coinbase Wallet extension.")
-            }
-            break
-          case "safe":
-            if (!detectedWallets.safe) {
-              throw new Error("Safe Wallet not available. Please use within Safe Apps or install Safe extension.")
-            }
-            break
-        }
-
-        // Find the appropriate connector
-        let connector
-        switch (walletId) {
-          case "metamask":
-            connector = connectors.find((c) => c.id === "metaMask")
-            break
-          case "coinbase":
-            connector = connectors.find((c) => c.id === "coinbaseWallet")
-            break
-          case "rainbow":
-            // Rainbow uses WalletConnect
-            connector = connectors.find((c) => c.id === "walletConnect")
-            break
-          case "safe":
-            connector = connectors.find((c) => c.id === "safe")
-            break
-        }
-
-        if (!connector) {
-          throw new Error(`${walletId} connector not found`)
-        }
-
-        await connect({ connector })
-
-        // Store connection info
-        localStorage.setItem(
-          "vmf_connected_wallet",
-          JSON.stringify({
-            walletType: walletId,
-            timestamp: Date.now(),
-          }),
-        )
-      } catch (error: any) {
-        console.error("Ethereum wallet connection error:", error)
-        setWalletState((prev) => ({
-          ...prev,
-          error: error.message || `Failed to connect ${walletId}`,
-          isConnecting: false,
-        }))
-
-        // Show user-friendly error
-        if (error.code === 4001) {
-          alert("Connection rejected by user")
-        } else if (error.code === -32002) {
-          alert("Connection request already pending. Please check your wallet.")
-        } else {
-          alert(error.message || `Failed to connect ${walletId}`)
-        }
+      // Check if wallet is installed
+      switch (walletId) {
+        case "metamask":
+          if (!detectedWallets.metamask) {
+            throw new Error("MetaMask not installed. Please install MetaMask extension.")
+          }
+          break
+        case "coinbase":
+          if (!detectedWallets.coinbase) {
+            throw new Error("Coinbase Wallet not installed. Please install Coinbase Wallet extension.")
+          }
+          break
       }
-    },
-    [connect, connectors],
-  )
 
-  // Connect to Phantom wallet (simplified)
+      const provider = getSpecificProvider(walletId)
+      if (!provider) {
+        throw new Error(`${walletId} provider not found`)
+      }
+
+      // Request account access
+      const accounts = await provider.request({ method: "eth_requestAccounts" })
+
+      if (accounts.length === 0) {
+        throw new Error("No accounts found")
+      }
+
+      const address = accounts[0]
+
+      // Get chain ID
+      const chainId = await provider.request({ method: "eth_chainId" })
+
+      // Get balance
+      let balance = "0.0000"
+      try {
+        const balanceWei = await provider.request({
+          method: "eth_getBalance",
+          params: [address, "latest"],
+        })
+        // Convert from wei to ETH (simplified)
+        const balanceEth = Number.parseInt(balanceWei, 16) / Math.pow(10, 18)
+        balance = balanceEth.toFixed(4)
+      } catch (balanceError) {
+        console.warn("Could not fetch balance:", balanceError)
+      }
+
+      setWalletState({
+        isConnected: true,
+        address,
+        walletType: walletId.charAt(0).toUpperCase() + walletId.slice(1),
+        balance,
+        chainId: Number.parseInt(chainId, 16),
+        isConnecting: false,
+        error: null,
+      })
+
+      // Store connection info
+      localStorage.setItem(
+        "vmf_connected_wallet",
+        JSON.stringify({
+          walletType: walletId,
+          address,
+          timestamp: Date.now(),
+        }),
+      )
+    } catch (error: any) {
+      console.error("Ethereum wallet connection error:", error)
+      setWalletState((prev) => ({
+        ...prev,
+        error: error.message || `Failed to connect ${walletId}`,
+        isConnecting: false,
+      }))
+
+      if (error.code === 4001) {
+        alert("Connection rejected by user")
+      } else if (error.code === -32002) {
+        alert("Connection request already pending. Please check your wallet.")
+      } else {
+        alert(error.message || `Failed to connect ${walletId}`)
+      }
+    }
+  }, [])
+
+  // Connect to Phantom wallet
   const connectPhantomWallet = useCallback(async () => {
     try {
       setWalletState((prev) => ({ ...prev, isConnecting: true, error: null }))
@@ -184,24 +151,16 @@ export function useWallet() {
       if (response.publicKey) {
         const address = response.publicKey.toString()
 
-        setSolanaWallet({
-          connected: true,
-          address,
-          balance: "0.0000", // Simplified - no balance fetching to avoid issues
-        })
-
-        setWalletState((prev) => ({
-          ...prev,
+        setWalletState({
           isConnected: true,
           address,
           walletType: "Phantom",
-          balance: null,
+          balance: "0.0000", // Simplified
           chainId: null,
           isConnecting: false,
           error: null,
-        }))
+        })
 
-        // Store connection info
         localStorage.setItem(
           "vmf_connected_wallet",
           JSON.stringify({
@@ -237,13 +196,8 @@ export function useWallet() {
   // Disconnect wallet
   const disconnectWallet = useCallback(async () => {
     try {
-      // Disconnect Ethereum wallets
-      if (isConnected) {
-        disconnect()
-      }
-
       // Disconnect Solana wallet
-      if (solanaWallet.connected && (window as any).solana?.isPhantom) {
+      if (walletState.walletType === "Phantom" && (window as any).solana?.isPhantom) {
         try {
           await (window as any).solana.disconnect()
         } catch (error) {
@@ -251,7 +205,7 @@ export function useWallet() {
         }
       }
 
-      // Reset states
+      // Reset state
       setWalletState({
         isConnected: false,
         address: null,
@@ -262,91 +216,70 @@ export function useWallet() {
         error: null,
       })
 
-      setSolanaWallet({
-        connected: false,
-        address: null,
-        balance: null,
-      })
-
       // Clear storage
       localStorage.removeItem("vmf_connected_wallet")
     } catch (error) {
       console.error("Error disconnecting wallet:", error)
     }
-  }, [isConnected, disconnect, solanaWallet.connected])
+  }, [walletState.walletType])
 
   // Switch network
   const switchNetwork = useCallback(
     async (networkKey: keyof typeof SUPPORTED_NETWORKS) => {
       try {
         const network = SUPPORTED_NETWORKS[networkKey]
-        await switchChain({ chainId: Number.parseInt(network.chainId, 16) })
+        const provider = getSpecificProvider(walletState.walletType?.toLowerCase() || "")
+
+        if (!provider) return false
+
+        await provider.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: network.chainId }],
+        })
+
+        // Update chain ID in state
+        setWalletState((prev) => ({
+          ...prev,
+          chainId: Number.parseInt(network.chainId, 16),
+        }))
+
         return true
-      } catch (error) {
+      } catch (error: any) {
         console.error("Failed to switch network:", error)
+
+        // If network doesn't exist, try to add it
+        if (error.code === 4902) {
+          return await addNetwork(networkKey)
+        }
+
         return false
       }
     },
-    [switchChain],
+    [walletState.walletType],
   )
 
   // Add network to wallet
-  const addNetwork = useCallback(async (networkKey: keyof typeof SUPPORTED_NETWORKS) => {
-    try {
-      const network = SUPPORTED_NETWORKS[networkKey]
+  const addNetwork = useCallback(
+    async (networkKey: keyof typeof SUPPORTED_NETWORKS) => {
+      try {
+        const network = SUPPORTED_NETWORKS[networkKey]
+        const provider = getSpecificProvider(walletState.walletType?.toLowerCase() || "")
 
-      if (typeof window !== "undefined" && (window as any).ethereum) {
-        await (window as any).ethereum.request({
+        if (!provider) return false
+
+        await provider.request({
           method: "wallet_addEthereumChain",
           params: [network],
         })
+
         return true
+      } catch (error) {
+        console.error("Failed to add network:", error)
+        return false
       }
-      return false
-    } catch (error) {
-      console.error("Failed to add network:", error)
-      return false
-    }
-  }, [])
-
-  // Update wallet state when Wagmi state changes
-  useEffect(() => {
-    if (isConnected && address) {
-      const storedWallet = localStorage.getItem("vmf_connected_wallet")
-      let walletType = "Unknown"
-
-      if (storedWallet) {
-        try {
-          const parsed = JSON.parse(storedWallet)
-          walletType = parsed.walletType || "Unknown"
-        } catch (error) {
-          console.warn("Error parsing stored wallet info:", error)
-        }
-      }
-
-      setWalletState((prev) => ({
-        ...prev,
-        isConnected: true,
-        address,
-        walletType: walletType.charAt(0).toUpperCase() + walletType.slice(1),
-        balance: balance ? formatBalance(balance.value, balance.decimals) : null,
-        chainId: chainId || null,
-        isConnecting: false,
-        error: null,
-      }))
-    } else if (!isConnected && !solanaWallet.connected) {
-      setWalletState((prev) => ({
-        ...prev,
-        isConnected: false,
-        address: null,
-        walletType: null,
-        balance: null,
-        chainId: null,
-        isConnecting: isPending,
-        error: null,
-      }))
-    }
-  }, [isConnected, address, balance, chainId, isPending, formatBalance, solanaWallet.connected])
+    },
+    [walletState.walletType],
+  )
 
   // Check for existing connections on mount
   useEffect(() => {
@@ -370,22 +303,44 @@ export function useWallet() {
             try {
               const publicKey = phantom.publicKey?.toString()
               if (publicKey) {
-                setSolanaWallet({
-                  connected: true,
-                  address: publicKey,
-                  balance: "0.0000",
-                })
-                setWalletState((prev) => ({
-                  ...prev,
+                setWalletState({
                   isConnected: true,
                   address: publicKey,
                   walletType: "Phantom",
-                  balance: null,
+                  balance: "0.0000",
                   chainId: null,
-                }))
+                  isConnecting: false,
+                  error: null,
+                })
               }
             } catch (error) {
               console.warn("Error checking Phantom connection:", error)
+            }
+          }
+        }
+
+        // Check Ethereum wallet connections
+        if (walletType !== "phantom") {
+          const provider = getSpecificProvider(walletType)
+          if (provider) {
+            try {
+              const accounts = await provider.request({ method: "eth_accounts" })
+              if (accounts.length > 0) {
+                const address = accounts[0]
+                const chainId = await provider.request({ method: "eth_chainId" })
+
+                setWalletState({
+                  isConnected: true,
+                  address,
+                  walletType: walletType.charAt(0).toUpperCase() + walletType.slice(1),
+                  balance: "0.0000",
+                  chainId: Number.parseInt(chainId, 16),
+                  isConnecting: false,
+                  error: null,
+                })
+              }
+            } catch (error) {
+              console.warn("Error checking Ethereum connection:", error)
             }
           }
         }
@@ -395,7 +350,6 @@ export function useWallet() {
       }
     }
 
-    // Add a small delay to ensure window objects are loaded
     const timer = setTimeout(checkExistingConnections, 500)
     return () => clearTimeout(timer)
   }, [])
@@ -407,12 +361,19 @@ export function useWallet() {
     const handleAccountsChanged = (accounts: string[]) => {
       if (accounts.length === 0) {
         disconnectWallet()
+      } else {
+        setWalletState((prev) => ({
+          ...prev,
+          address: accounts[0],
+        }))
       }
     }
 
-    const handleChainChanged = () => {
-      // Reload page on chain change to avoid issues
-      window.location.reload()
+    const handleChainChanged = (chainId: string) => {
+      setWalletState((prev) => ({
+        ...prev,
+        chainId: Number.parseInt(chainId, 16),
+      }))
     }
 
     // Ethereum events
@@ -426,6 +387,11 @@ export function useWallet() {
       ;(window as any).solana.on("accountChanged", (publicKey: any) => {
         if (!publicKey) {
           disconnectWallet()
+        } else {
+          setWalletState((prev) => ({
+            ...prev,
+            address: publicKey.toString(),
+          }))
         }
       })
     }
@@ -451,31 +417,20 @@ export function useWallet() {
             : wallet.id === "coinbase"
               ? detected.coinbase
               : wallet.id === "rainbow"
-                ? true // Rainbow uses WalletConnect, so always available
-                : wallet.id === "safe"
-                  ? detected.safe
-                  : false,
+                ? detected.rainbow || true // Rainbow might not be detectable
+                : false,
     }))
   }, [])
 
   return {
-    walletState: solanaWallet.connected
-      ? {
-          ...walletState,
-          isConnected: true,
-          address: solanaWallet.address,
-          walletType: "Phantom",
-          balance: solanaWallet.balance,
-        }
-      : walletState,
-    isConnecting: walletState.isConnecting || isPending,
+    walletState,
+    isConnecting: walletState.isConnecting,
     connectWallet,
     disconnectWallet,
     formatAddress,
     switchNetwork,
     addNetwork,
     getAvailableWallets,
-    // Expose additional utilities
     chainId: walletState.chainId,
     error: walletState.error,
   }
