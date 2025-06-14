@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -70,18 +72,6 @@ const charities: Charity[] = [
 ]
 
 const CONTRACT_ADDRESS = "0xB775a3116342d4258b1182B5adC8765d6B61F7e4"
-const CONTRACT_ABI = [
-  {
-    type: "function",
-    name: "handleUSDC",
-    inputs: [
-      { name: "amountUSDC", type: "uint256", internalType: "uint256" },
-      { name: "to", type: "address", internalType: "address" },
-    ],
-    outputs: [],
-    stateMutability: "nonpayable",
-  },
-]
 
 export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
   const [currentStep, setCurrentStep] = useState<"buy" | "verify" | "success">("buy")
@@ -99,24 +89,68 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
   const [isProcessing, setIsProcessing] = useState(false)
   const [needsNetworkSwitch, setNeedsNetworkSwitch] = useState(false)
 
+  // Focus management for accessibility
+  useEffect(() => {
+    if (isOpen) {
+      // Focus the modal when it opens
+      const modal = document.querySelector('[role="dialog"]') as HTMLElement
+      if (modal) {
+        modal.focus()
+      }
+    }
+  }, [isOpen])
+
+  // Trap focus within modal
+  useEffect(() => {
+    if (!isOpen) return
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose()
+      }
+
+      if (e.key === "Tab") {
+        const modal = document.querySelector('[role="dialog"]')
+        if (!modal) return
+
+        const focusableElements = modal.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        )
+        const firstElement = focusableElements[0] as HTMLElement
+        const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement) {
+            e.preventDefault()
+            lastElement.focus()
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            e.preventDefault()
+            firstElement.focus()
+          }
+        }
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown)
+    return () => document.removeEventListener("keydown", handleKeyDown)
+  }, [isOpen, onClose])
+
   useEffect(() => {
     if (amount) {
-      // Calculate VMF amount based on some conversion rate
       const vmf = (Number.parseFloat(amount) * 1000).toFixed(4)
       setVmfAmount(vmf)
       setCharityPool(amount)
     }
   }, [amount])
 
-  // Check if user needs to switch network
   useEffect(() => {
     if (walletState.isConnected && walletState.walletType !== "Phantom") {
-      // Check if on Sepolia testnet (chainId 11155111)
       setNeedsNetworkSwitch(walletState.chainId !== 11155111)
     }
   }, [walletState.chainId, walletState.isConnected, walletState.walletType])
 
-  // Auto-distribute equally when charities are selected
   useEffect(() => {
     if (selectedCharities.length > 0) {
       const equalPercentage = Math.floor(100 / selectedCharities.length)
@@ -146,7 +180,6 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
       dist.charityId === charityId ? { ...dist, percentage: newPercentage } : dist,
     )
 
-    // Ensure total doesn't exceed 100%
     const total = updatedDistributions.reduce((sum, dist) => sum + dist.percentage, 0)
     if (total <= 100) {
       setCharityDistributions(updatedDistributions)
@@ -187,17 +220,9 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
 
     try {
       setIsProcessing(true)
-
-      // Simplified contract execution - just simulate for now
-      // In a real implementation, you would use ethers.js or viem
-
-      // Simulate transaction hash
       const mockTxHash = "0x" + Math.random().toString(16).substr(2, 64)
       setTransactionHash(mockTxHash)
-
-      // Simulate processing time
       await new Promise((resolve) => setTimeout(resolve, 2000))
-
       return true
     } catch (error: any) {
       console.error("Smart contract execution failed:", error)
@@ -235,28 +260,56 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     onClose()
   }
 
+  const handleKeyDown = (event: React.KeyboardEvent, action: () => void) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault()
+      action()
+    }
+  }
+
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+    <div
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+      aria-describedby="modal-description"
+    >
+      <div
+        className="bg-white rounded-3xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto focus:outline-none"
+        tabIndex={-1}
+      >
         {/* Buy Step */}
         {currentStep === "buy" && (
           <Card className="border-0 shadow-none">
             <CardHeader className="relative pb-4">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-2xl font-bold text-center flex-1">BUY VMF</CardTitle>
+                <CardTitle id="modal-title" className="text-2xl font-bold text-center flex-1">
+                  BUY VMF
+                </CardTitle>
               </div>
-              <Button variant="ghost" size="icon" className="absolute top-4 right-4" onClick={handleClose}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute top-4 right-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                onClick={handleClose}
+                aria-label="Close modal"
+              >
                 <X className="h-4 w-4" />
               </Button>
             </CardHeader>
             <CardContent className="space-y-6">
+              <div id="modal-description" className="sr-only">
+                Purchase VMF tokens and select charities to support veterans and military families
+              </div>
+
               {/* Wallet Connection Status */}
               {!walletState.isConnected ? (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4" role="alert">
                   <div className="flex items-center space-x-2 mb-2">
-                    <AlertCircle className="h-4 w-4 text-blue-600" />
+                    <AlertCircle className="h-4 w-4 text-blue-600" aria-hidden="true" />
                     <span className="font-medium text-blue-800">Connect Your Wallet</span>
                   </div>
                   <p className="text-sm text-blue-700 mb-3">
@@ -264,7 +317,8 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                   </p>
                   <Button
                     onClick={() => connectWallet("metamask")}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    aria-label="Connect MetaMask wallet"
                   >
                     Connect Wallet
                   </Button>
@@ -272,9 +326,9 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
               ) : (
                 <>
                   {/* Connected Wallet Display */}
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4" role="status" aria-live="polite">
                     <div className="flex items-center space-x-2">
-                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      <CheckCircle className="h-4 w-4 text-green-600" aria-hidden="true" />
                       <span className="font-medium text-green-800">
                         {walletState.walletType}: {formatAddress(walletState.address!)}
                       </span>
@@ -288,15 +342,16 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
 
                   {/* Network Warning for Ethereum wallets */}
                   {walletState.walletType !== "Phantom" && needsNetworkSwitch && (
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4" role="alert">
                       <div className="flex items-center space-x-2 mb-2">
-                        <AlertCircle className="h-4 w-4 text-yellow-600" />
+                        <AlertCircle className="h-4 w-4 text-yellow-600" aria-hidden="true" />
                         <span className="font-medium text-yellow-800">Wrong Network</span>
                       </div>
                       <p className="text-sm text-yellow-700 mb-3">Please switch to Sepolia testnet to continue.</p>
                       <Button
                         onClick={handleNetworkSwitch}
-                        className="w-full bg-yellow-600 hover:bg-yellow-700 text-white"
+                        className="w-full bg-yellow-600 hover:bg-yellow-700 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
+                        aria-label="Switch to Sepolia testnet"
                       >
                         Switch to Sepolia
                       </Button>
@@ -305,9 +360,9 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
 
                   {/* Phantom Wallet Warning */}
                   {walletState.walletType === "Phantom" && (
-                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-4" role="alert">
                       <div className="flex items-center space-x-2 mb-2">
-                        <AlertCircle className="h-4 w-4 text-orange-600" />
+                        <AlertCircle className="h-4 w-4 text-orange-600" aria-hidden="true" />
                         <span className="font-medium text-orange-800">Solana Wallet Detected</span>
                       </div>
                       <p className="text-sm text-orange-700">
@@ -321,14 +376,21 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
 
               {/* Amount Input */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">AMOUNT $</label>
+                <label htmlFor="amount-input" className="block text-sm font-medium text-gray-700 mb-2">
+                  AMOUNT $
+                </label>
                 <input
+                  id="amount-input"
                   type="number"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder="Enter amount"
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none text-lg"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-lg"
+                  aria-describedby="amount-description"
                 />
+                <div id="amount-description" className="sr-only">
+                  Enter the dollar amount you want to spend on VMF tokens
+                </div>
               </div>
 
               {/* Description */}
@@ -340,48 +402,57 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
               </div>
 
               {/* Charity Selection */}
-              <div>
-                <h3 className="text-lg font-semibold mb-3">Pick Up To 3 Charities</h3>
-                <div className="grid grid-cols-2 gap-2">
+              <fieldset>
+                <legend className="text-lg font-semibold mb-3">Pick Up To 3 Charities</legend>
+                <div className="grid grid-cols-2 gap-2" role="group" aria-labelledby="charity-selection">
                   {charities.map((charity) => (
                     <Button
                       key={charity.id}
                       variant={selectedCharities.includes(charity.id) ? "default" : "outline"}
                       size="sm"
                       onClick={() => handleCharitySelect(charity.id)}
-                      className={`text-xs p-2 h-auto whitespace-normal ${
+                      onKeyDown={(e) => handleKeyDown(e, () => handleCharitySelect(charity.id))}
+                      className={`text-xs p-2 h-auto whitespace-normal focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
                         selectedCharities.includes(charity.id)
                           ? "bg-blue-600 text-white"
                           : "border-gray-300 text-gray-700 hover:bg-gray-50"
                       }`}
                       disabled={!selectedCharities.includes(charity.id) && selectedCharities.length >= 3}
+                      aria-pressed={selectedCharities.includes(charity.id)}
+                      aria-label={`${selectedCharities.includes(charity.id) ? "Deselect" : "Select"} ${charity.shortName}`}
                     >
                       {charity.shortName}
                     </Button>
                   ))}
                 </div>
-                <p className="text-xs text-gray-500 mt-2">Selected: {selectedCharities.length}/3</p>
-              </div>
+                <p className="text-xs text-gray-500 mt-2" aria-live="polite">
+                  Selected: {selectedCharities.length}/3
+                </p>
+              </fieldset>
 
               {/* Charity Distribution */}
               {selectedCharities.length > 0 && (
                 <div>
                   <h3 className="text-lg font-semibold mb-3">Distribute Your Donation</h3>
-                  <div className="space-y-3">
+                  <div className="space-y-3" role="list" aria-label="Charity distribution settings">
                     {charityDistributions.map((distribution) => {
                       const charity = charities.find((c) => c.id === distribution.charityId)
                       return (
-                        <div key={distribution.charityId} className="bg-gray-50 p-3 rounded-lg">
+                        <div key={distribution.charityId} className="bg-gray-50 p-3 rounded-lg" role="listitem">
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center space-x-2">
                               <img
                                 src={charity?.logo || "/placeholder.svg"}
-                                alt={charity?.name}
+                                alt=""
                                 className="w-6 h-6 rounded object-contain"
+                                aria-hidden="true"
                               />
                               <span className="text-sm font-medium">{charity?.shortName}</span>
                             </div>
-                            <span className="text-sm font-bold text-green-600">
+                            <span
+                              className="text-sm font-bold text-green-600"
+                              aria-label={`${charity?.shortName} will receive $${getCharityAmount(distribution.percentage)}`}
+                            >
                               ${getCharityAmount(distribution.percentage)}
                             </span>
                           </div>
@@ -389,29 +460,34 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                             <Button
                               variant="outline"
                               size="icon"
-                              className="h-6 w-6"
+                              className="h-6 w-6 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                               onClick={() =>
                                 updateCharityPercentage(
                                   distribution.charityId,
                                   Math.max(0, distribution.percentage - 5),
                                 )
                               }
+                              aria-label={`Decrease ${charity?.shortName} percentage by 5%`}
                             >
                               <Minus className="h-3 w-3" />
                             </Button>
-                            <div className="flex-1 bg-white rounded px-2 py-1 text-center text-sm font-medium">
+                            <div
+                              className="flex-1 bg-white rounded px-2 py-1 text-center text-sm font-medium"
+                              aria-label={`${charity?.shortName} receives ${distribution.percentage} percent`}
+                            >
                               {distribution.percentage}%
                             </div>
                             <Button
                               variant="outline"
                               size="icon"
-                              className="h-6 w-6"
+                              className="h-6 w-6 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                               onClick={() =>
                                 updateCharityPercentage(
                                   distribution.charityId,
                                   Math.min(100, distribution.percentage + 5),
                                 )
                               }
+                              aria-label={`Increase ${charity?.shortName} percentage by 5%`}
                             >
                               <Plus className="h-3 w-3" />
                             </Button>
@@ -420,7 +496,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                       )
                     })}
                   </div>
-                  <div className="mt-3 p-2 bg-blue-50 rounded-lg">
+                  <div className="mt-3 p-2 bg-blue-50 rounded-lg" role="status" aria-live="polite">
                     <div className="flex justify-between text-sm">
                       <span>Total Distribution:</span>
                       <span className={`font-bold ${getTotalPercentage() === 100 ? "text-green-600" : "text-red-600"}`}>
@@ -428,7 +504,9 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                       </span>
                     </div>
                     {getTotalPercentage() !== 100 && (
-                      <p className="text-xs text-red-600 mt-1">Distribution must equal 100% to continue</p>
+                      <p className="text-xs text-red-600 mt-1" role="alert">
+                        Distribution must equal 100% to continue
+                      </p>
                     )}
                   </div>
                 </div>
@@ -445,7 +523,8 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                   walletState.walletType === "Phantom" ||
                   needsNetworkSwitch
                 }
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg font-semibold disabled:opacity-50"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg font-semibold disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                aria-label="Continue to verification step"
               >
                 Continue
               </Button>
@@ -457,12 +536,18 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
         {currentStep === "verify" && (
           <Card className="border-0 shadow-none">
             <CardHeader className="relative pb-4">
-              <CardTitle className="text-2xl font-bold text-center">
+              <CardTitle id="modal-title" className="text-2xl font-bold text-center">
                 Verify
                 <br />
                 VMF Purchase
               </CardTitle>
-              <Button variant="ghost" size="icon" className="absolute top-4 right-4" onClick={handleClose}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute top-4 right-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                onClick={handleClose}
+                aria-label="Close modal"
+              >
                 <X className="h-4 w-4" />
               </Button>
             </CardHeader>
@@ -471,48 +556,52 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
               <div className="text-center">
                 <div className="bg-gray-100 rounded-lg p-4">
                   <label className="block text-sm font-medium text-gray-600 mb-1">VMF</label>
-                  <div className="text-2xl font-bold text-gray-900">{vmfAmount}</div>
-                </div>
-              </div>
-
-              {/* Amount */}
-              <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                <span className="font-medium text-gray-700">Amount:</span>
-                <span className="font-semibold">${amount}</span>
-              </div>
-
-              {/* Network */}
-              <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                <span className="font-medium text-gray-700">Network:</span>
-                <span className="font-semibold">Ethereum Sepolia</span>
-              </div>
-
-              {/* Contract Address */}
-              <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                <span className="font-medium text-gray-700">Contract:</span>
-                <div className="flex items-center space-x-2">
-                  <span className="font-mono text-xs">{formatAddress(CONTRACT_ADDRESS)}</span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => navigator.clipboard.writeText(CONTRACT_ADDRESS)}
-                    className="h-6 w-6"
+                  <div
+                    className="text-2xl font-bold text-gray-900"
+                    aria-label={`You will receive ${vmfAmount} VMF tokens`}
                   >
-                    <Copy className="h-3 w-3" />
-                  </Button>
+                    {vmfAmount}
+                  </div>
                 </div>
               </div>
 
-              {/* Fees */}
-              <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                <span className="font-medium text-gray-700">Gas Fees (Est.):</span>
-                <span className="font-semibold">${fees}</span>
-              </div>
+              {/* Transaction Details */}
+              <div role="list" aria-label="Transaction details">
+                <div className="flex justify-between items-center py-2 border-b border-gray-200" role="listitem">
+                  <span className="font-medium text-gray-700">Amount:</span>
+                  <span className="font-semibold">${amount}</span>
+                </div>
 
-              {/* Charity Pool */}
-              <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                <span className="font-medium text-gray-700">Charity Pool:</span>
-                <span className="font-semibold">${charityPool}</span>
+                <div className="flex justify-between items-center py-2 border-b border-gray-200" role="listitem">
+                  <span className="font-medium text-gray-700">Network:</span>
+                  <span className="font-semibold">Ethereum Sepolia</span>
+                </div>
+
+                <div className="flex justify-between items-center py-2 border-b border-gray-200" role="listitem">
+                  <span className="font-medium text-gray-700">Contract:</span>
+                  <div className="flex items-center space-x-2">
+                    <span className="font-mono text-xs">{formatAddress(CONTRACT_ADDRESS)}</span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => navigator.clipboard.writeText(CONTRACT_ADDRESS)}
+                      className="h-6 w-6 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                      aria-label="Copy contract address to clipboard"
+                    >
+                      <Copy className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center py-2 border-b border-gray-200" role="listitem">
+                  <span className="font-medium text-gray-700">Gas Fees (Est.):</span>
+                  <span className="font-semibold">${fees}</span>
+                </div>
+
+                <div className="flex justify-between items-center py-2 border-b border-gray-200" role="listitem">
+                  <span className="font-medium text-gray-700">Charity Pool:</span>
+                  <span className="font-semibold">${charityPool}</span>
+                </div>
               </div>
 
               {/* Charity Distribution Details */}
@@ -520,23 +609,31 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                 <Button
                   variant="ghost"
                   onClick={() => setIsCharityDropdownOpen(!isCharityDropdownOpen)}
-                  className="w-full justify-between p-3"
+                  className="w-full justify-between p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  aria-expanded={isCharityDropdownOpen}
+                  aria-controls="charity-distribution-details"
+                  aria-label="Toggle charity distribution details"
                 >
                   <span className="font-medium">Charity Distribution</span>
                   {isCharityDropdownOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                 </Button>
                 {isCharityDropdownOpen && (
-                  <div className="p-3 border-t border-gray-200 bg-gray-50">
-                    <div className="space-y-2">
+                  <div id="charity-distribution-details" className="p-3 border-t border-gray-200 bg-gray-50">
+                    <div className="space-y-2" role="list" aria-label="Charity distribution breakdown">
                       {charityDistributions.map((distribution) => {
                         const charity = charities.find((c) => c.id === distribution.charityId)
                         return (
-                          <div key={distribution.charityId} className="flex justify-between items-center">
+                          <div
+                            key={distribution.charityId}
+                            className="flex justify-between items-center"
+                            role="listitem"
+                          >
                             <div className="flex items-center space-x-2">
                               <img
                                 src={charity?.logo || "/placeholder.svg"}
-                                alt={charity?.name}
+                                alt=""
                                 className="w-4 h-4 rounded object-contain"
+                                aria-hidden="true"
                               />
                               <span className="text-sm">{charity?.name}</span>
                             </div>
@@ -557,27 +654,30 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                 <Button
                   variant="ghost"
                   onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
-                  className="w-full justify-between p-3"
+                  className="w-full justify-between p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  aria-expanded={isAdvancedOpen}
+                  aria-controls="advanced-details"
+                  aria-label="Toggle advanced transaction details"
                 >
                   <span className="font-medium">Advanced</span>
                   {isAdvancedOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                 </Button>
                 {isAdvancedOpen && (
-                  <div className="p-3 border-t border-gray-200 bg-gray-50">
-                    <div className="space-y-2 text-xs">
-                      <div className="flex justify-between">
+                  <div id="advanced-details" className="p-3 border-t border-gray-200 bg-gray-50">
+                    <div className="space-y-2 text-xs" role="list" aria-label="Advanced transaction details">
+                      <div className="flex justify-between" role="listitem">
                         <span>Contract Address:</span>
                         <span className="font-mono">{formatAddress(CONTRACT_ADDRESS)}</span>
                       </div>
-                      <div className="flex justify-between">
+                      <div className="flex justify-between" role="listitem">
                         <span>Function:</span>
                         <span className="font-mono">handleUSDC</span>
                       </div>
-                      <div className="flex justify-between">
+                      <div className="flex justify-between" role="listitem">
                         <span>Connected Wallet:</span>
                         <span className="font-mono">{formatAddress(walletState.address!)}</span>
                       </div>
-                      <div className="flex justify-between">
+                      <div className="flex justify-between" role="listitem">
                         <span>Chain ID:</span>
                         <span className="font-mono">{walletState.chainId}</span>
                       </div>
@@ -591,15 +691,17 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                 <Button
                   variant="outline"
                   onClick={() => setCurrentStep("buy")}
-                  className="flex-1 border-black text-black hover:bg-gray-50"
+                  className="flex-1 border-black text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
                   disabled={isProcessing}
+                  aria-label="Go back to purchase step"
                 >
                   Cancel
                 </Button>
                 <Button
                   onClick={handleVerifyConfirm}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   disabled={isProcessing || needsNetworkSwitch}
+                  aria-label={isProcessing ? "Processing transaction" : "Confirm and execute transaction"}
                 >
                   {isProcessing ? "Processing..." : "Confirm"}
                 </Button>
@@ -612,60 +714,82 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
         {currentStep === "success" && (
           <Card className="border-0 shadow-none">
             <CardHeader className="relative pb-4">
-              <CardTitle className="text-2xl font-bold text-center text-green-600">Success!</CardTitle>
-              <Button variant="ghost" size="icon" className="absolute top-4 right-4" onClick={handleClose}>
+              <CardTitle id="modal-title" className="text-2xl font-bold text-center text-green-600">
+                Success!
+              </CardTitle>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute top-4 right-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                onClick={handleClose}
+                aria-label="Close modal"
+              >
                 <X className="h-4 w-4" />
               </Button>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* VMF Total Amount */}
-              <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                <span className="font-medium text-gray-700">VMF Total Amount:</span>
-                <span className="font-semibold">{vmfAmount}</span>
-              </div>
-
-              {/* Amount */}
-              <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                <span className="font-medium text-gray-700">Amount:</span>
-                <span className="font-semibold">${amount}</span>
-              </div>
-
-              {/* Transaction Hash */}
-              {transactionHash && (
-                <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                  <span className="font-medium text-gray-700">Transaction:</span>
-                  <div className="flex items-center space-x-2">
-                    <span className="font-mono text-sm">{formatAddress(transactionHash)}</span>
-                    <Button variant="ghost" size="icon" onClick={handleCopyHash} className="h-6 w-6">
-                      {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
-                    </Button>
-                  </div>
+              {/* Success Details */}
+              <div role="list" aria-label="Transaction success details">
+                <div className="flex justify-between items-center py-2 border-b border-gray-200" role="listitem">
+                  <span className="font-medium text-gray-700">VMF Total Amount:</span>
+                  <span className="font-semibold">{vmfAmount}</span>
                 </div>
-              )}
+
+                <div className="flex justify-between items-center py-2 border-b border-gray-200" role="listitem">
+                  <span className="font-medium text-gray-700">Amount:</span>
+                  <span className="font-semibold">${amount}</span>
+                </div>
+
+                {transactionHash && (
+                  <div className="flex justify-between items-center py-2 border-b border-gray-200" role="listitem">
+                    <span className="font-medium text-gray-700">Transaction:</span>
+                    <div className="flex items-center space-x-2">
+                      <span className="font-mono text-sm">{formatAddress(transactionHash)}</span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={handleCopyHash}
+                        className="h-6 w-6 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        aria-label={copied ? "Transaction hash copied" : "Copy transaction hash"}
+                      >
+                        {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
 
               {/* Charity Distribution */}
               <div className="border border-gray-200 rounded-lg">
                 <Button
                   variant="ghost"
                   onClick={() => setIsCharityDropdownOpen(!isCharityDropdownOpen)}
-                  className="w-full justify-between p-3"
+                  className="w-full justify-between p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  aria-expanded={isCharityDropdownOpen}
+                  aria-controls="success-charity-distribution"
+                  aria-label="Toggle charity distribution details"
                 >
                   <span className="font-medium">Charity Distribution</span>
                   {isCharityDropdownOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                 </Button>
                 {isCharityDropdownOpen && (
-                  <div className="p-3 border-t border-gray-200 bg-gray-50">
-                    <div className="space-y-2">
+                  <div id="success-charity-distribution" className="p-3 border-t border-gray-200 bg-gray-50">
+                    <div className="space-y-2" role="list" aria-label="Successful charity distributions">
                       {charityDistributions.map((distribution) => {
                         const charity = charities.find((c) => c.id === distribution.charityId)
                         return (
-                          <div key={distribution.charityId} className="flex justify-between items-center">
+                          <div
+                            key={distribution.charityId}
+                            className="flex justify-between items-center"
+                            role="listitem"
+                          >
                             <div className="flex items-center space-x-2">
-                              <CheckCircle className="h-4 w-4 text-green-600" />
+                              <CheckCircle className="h-4 w-4 text-green-600" aria-label="Successfully donated" />
                               <img
                                 src={charity?.logo || "/placeholder.svg"}
-                                alt={charity?.name}
+                                alt=""
                                 className="w-4 h-4 rounded object-contain"
+                                aria-hidden="true"
                               />
                               <span className="text-sm">{charity?.name}</span>
                             </div>
@@ -688,24 +812,27 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                 <Button
                   variant="ghost"
                   onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
-                  className="w-full justify-between p-3"
+                  className="w-full justify-between p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  aria-expanded={isAdvancedOpen}
+                  aria-controls="success-advanced-details"
+                  aria-label="Toggle advanced transaction details"
                 >
                   <span className="font-medium">Advanced</span>
                   {isAdvancedOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                 </Button>
                 {isAdvancedOpen && (
-                  <div className="p-3 border-t border-gray-200 bg-gray-50">
-                    <div className="space-y-2 text-xs">
-                      <div className="flex justify-between">
+                  <div id="success-advanced-details" className="p-3 border-t border-gray-200 bg-gray-50">
+                    <div className="space-y-2 text-xs" role="list" aria-label="Advanced transaction details">
+                      <div className="flex justify-between" role="listitem">
                         <span>Network:</span>
                         <span>Ethereum Sepolia</span>
                       </div>
-                      <div className="flex justify-between">
+                      <div className="flex justify-between" role="listitem">
                         <span>Contract:</span>
                         <span className="font-mono">{formatAddress(CONTRACT_ADDRESS)}</span>
                       </div>
                       {transactionHash && (
-                        <div className="flex justify-between">
+                        <div className="flex justify-between" role="listitem">
                           <span>Tx Hash:</span>
                           <span className="font-mono">{formatAddress(transactionHash)}</span>
                         </div>
@@ -719,10 +846,14 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
               <div className="text-center">
                 <Button
                   variant="outline"
-                  className="bg-yellow-100 border-yellow-300 text-yellow-800 hover:bg-yellow-200"
+                  className="bg-yellow-100 border-yellow-300 text-yellow-800 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
                   onClick={() => window.open("#", "_blank")}
+                  aria-label="View Baldy NFT, opens in new tab"
                 >
-                  <div className="w-6 h-6 rounded-full bg-yellow-400 mr-2 flex items-center justify-center">
+                  <div
+                    className="w-6 h-6 rounded-full bg-yellow-400 mr-2 flex items-center justify-center"
+                    aria-hidden="true"
+                  >
                     <span className="text-xs font-bold">B</span>
                   </div>
                   Baldy NFT
@@ -730,7 +861,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
               </div>
 
               {/* Thank You Message */}
-              <div className="bg-green-50 p-4 rounded-lg text-center">
+              <div className="bg-green-50 p-4 rounded-lg text-center" role="status" aria-live="polite">
                 <p className="text-sm text-green-800 leading-relaxed">
                   <span className="font-bold">VMF</span> Thanks you for your support and donation to help our partnered
                   charities <span className="font-bold">HODL</span>
@@ -740,7 +871,8 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
               {/* Close Button */}
               <Button
                 onClick={handleClose}
-                className="w-full bg-green-600 hover:bg-green-700 text-white py-3 text-lg font-semibold"
+                className="w-full bg-green-600 hover:bg-green-700 text-white py-3 text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                aria-label="Complete transaction and close modal"
               >
                 Complete
               </Button>
