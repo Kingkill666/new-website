@@ -40,7 +40,7 @@ const StoryPage = () => {
       name: "Michael Gray",
       role: "Founder & CEO",
       bio: "A passionate advocate for veterans and military families, Michael founded VMF with the vision of revolutionizing charitable giving through blockchain technology. His commitment to transparency and efficiency drives VMF's mission to ensure every donation reaches those who served our country.",
-      image: "/new-website/images/michael-gray.png",
+      image: "/VMF-Start/images/michael-gray.png",
       linkedin: "https://x.com/VMFCoin",
     },
     // Add more team members as needed
@@ -199,7 +199,7 @@ const StoryPage = () => {
   const walletOptions = [
     {
       name: "Coinbase",
-      logo: "/new-website/images/coinbase-logo.png",
+      logo: "/VMF-Start/images/coinbase-logo.png",
       id: "coinbase",
     },
     {
@@ -264,7 +264,7 @@ const StoryPage = () => {
               aria-label="VMF Veterans and Military Families home page"
             >
               <div className="w-10 h-10 rounded-lg overflow-hidden">
-                <img src="/new-website/images/vmf-coin-logo.png" alt="VMF Coin Logo" className="w-full h-full object-cover" />
+                <img src="/VMF-Start/images/vmf-coin-logo.png" alt="VMF Coin Logo" className="w-full h-full object-cover" />
               </div>
               <div>
                 <span className="text-xl sm:text-2xl font-bold text-blue-900">VMF</span>
@@ -490,7 +490,7 @@ const StoryPage = () => {
           {/* American Flag Image Background */}
           <div className="absolute inset-0" aria-hidden="true">
             <img
-              src="/new-website/images/banner-vmf.jpg"
+              src="/VMF-Start/images/banner-vmf.jpg"
               alt=""
               className="w-full h-full object-cover"
               style={{ opacity: 0.42 }}
@@ -634,7 +634,7 @@ const StoryPage = () => {
                       <div className="text-center mb-8">
                         <div className="w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden bg-white shadow-lg">
                           <img
-                            src="/new-website/images/michael-gray.png"
+                            src="/VMF-Start/images/michael-gray.png"
                             alt="Michael Gray, Founder and CEO of VMF"
                             className="w-full h-full object-cover"
                           />
@@ -841,7 +841,7 @@ const StoryPage = () => {
             {/* American Flag Background with Gradient Overlay */}
             <div className="absolute inset-0" aria-hidden="true">
               <img
-                src="/new-website/images/banner-vmf.jpg"
+                src="/VMF-Start/images/banner-vmf.jpg"
                 alt=""
                 className="w-full h-full object-cover"
                 style={{ opacity: 0.42 }}
@@ -898,7 +898,7 @@ const StoryPage = () => {
                         <div className="relative mb-8">
                           <div className="w-64 h-80 mx-auto rounded-2xl overflow-hidden shadow-2xl border-4 border-white/30 group-hover:border-white/50 transition-all duration-500">
                             <img
-                              src="/new-website/images/memorial/donald-rose.jpeg"
+                              src="/VMF-Start/images/memorial/donald-rose.jpeg"
                               alt="Donald Rose with his mother upon return from being a prisoner of war in Japan, 1953"
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                             />
@@ -975,7 +975,7 @@ const StoryPage = () => {
                         <div className="relative mb-8">
                           <div className="w-64 h-80 mx-auto rounded-2xl overflow-hidden shadow-2xl border-4 border-white/30 group-hover:border-white/50 transition-all duration-500">
                             <img
-                              src="/new-website/images/memorial/donald-j-gray-navy.jpeg"
+                              src="/VMF-Start/images/memorial/donald-j-gray-navy.jpeg"
                               alt="Donald J. Gray in United States Navy uniform"
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                             />
@@ -1174,7 +1174,7 @@ const StoryPage = () => {
             <div className="flex flex-col items-center md:items-start">
               <div className="flex items-center space-x-3 mb-4">
                 <div className="w-12 h-12 rounded-xl overflow-hidden">
-                  <img src="/new-website/images/vmf-coin-logo.png" alt="VMF Coin Logo" className="w-full h-full object-cover" />
+                  <img src="/VMF-Start/images/vmf-coin-logo.png" alt="VMF Coin Logo" className="w-full h-full object-cover" />
                 </div>
                 <div>
                   <span className="text-xl font-bold">Veterans & Military Families</span>

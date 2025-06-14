@@ -34,7 +34,7 @@ const OfficersClubPage = () => {
   const router = useRouter()
 
   const walletOptions = [
-    { name: "Coinbase", logo: "/new-website/images/coinbase-logo.png", id: "coinbase" },
+    { name: "Coinbase", logo: "/VMF-Start/images/coinbase-logo.png", id: "coinbase" },
     { name: "MetaMask", logo: "🦊", id: "metamask" },
     { name: "Phantom", logo: "👻", id: "phantom" },
     { name: "Rainbow", logo: "🌈", id: "rainbow" },
@@ -169,7 +169,7 @@ const OfficersClubPage = () => {
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center space-x-3">
               <div className="w-10 h-10 rounded-lg overflow-hidden">
-                <img src="/new-website/images/vmf-coin-logo.png" alt="VMF Coin Logo" className="w-full h-full object-cover" />
+                <img src="/VMF-Start/images/vmf-coin-logo.png" alt="VMF Coin Logo" className="w-full h-full object-cover" />
               </div>
               <div>
                 <span className="text-xl sm:text-2xl font-bold text-white">VMF</span>
@@ -364,7 +364,7 @@ const OfficersClubPage = () => {
                 <div className="relative bg-slate-700/50 backdrop-blur-sm rounded-3xl p-4 border border-white/10 shadow-2xl">
                   <div className="overflow-hidden rounded-2xl shadow-lg" style={{ maxHeight: "500px" }}>
                     <img
-                      src="/new-website/images/secret-officers-club.jpeg"
+                      src="/VMF-Start/images/secret-officers-club.jpeg"
                       alt="Secret Officers Club interior"
                       className="w-full object-cover object-top"
                       style={{ marginTop: "-150px" }}
@@ -483,7 +483,7 @@ const OfficersClubPage = () => {
             <div className="flex flex-col items-center md:items-start">
               <div className="flex items-center space-x-3 mb-4">
                 <div className="w-12 h-12 rounded-xl overflow-hidden">
-                  <img src="/new-website/images/vmf-coin-logo.png" alt="VMF Coin Logo" className="w-full h-full object-cover" />
+                  <img src="/VMF-Start/images/vmf-coin-logo.png" alt="VMF Coin Logo" className="w-full h-full object-cover" />
                 </div>
                 <div>
                   <span className="text-xl font-bold">Officers Club</span>

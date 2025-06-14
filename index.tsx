@@ -39,7 +39,7 @@ const Index = () => {
   const walletOptions = [
     {
       name: "Coinbase",
-      logo: "/new-website/images/coinbase-logo.png",
+      logo: "/VMF-Start/images/coinbase-logo.png",
       id: "coinbase",
     },
     {
@@ -112,42 +112,42 @@ const Index = () => {
     {
       name: "Holy Family Village",
       description: "Housing and support for veterans, low-income families, and homeless individuals.",
-      logo: "/new-website/images/charity-logos/holy-family-village-logo.png",
+      logo: "/VMF-Start/images/charity-logos/holy-family-village-logo.png",
       website: "https://holyfamilyvillage.org",
       impact: "500+ Veterans Housed",
     },
     {
       name: "Camp Cowboy",
       description: "Equine therapy helping veterans overcome trauma and reconnect with life.",
-      logo: "/new-website/images/charity-logos/camp-cowboy-logo.png",
+      logo: "/VMF-Start/images/charity-logos/camp-cowboy-logo.png",
       website: "https://campcowboy.org",
       impact: "1,200+ Lives Changed",
     },
     {
       name: "Veterans In Need Project",
       description: "Emergency assistance for Arizona veterans facing immediate hardships.",
-      logo: "/new-website/images/charity-logos/veterans-in-need-logo.png",
+      logo: "/VMF-Start/images/charity-logos/veterans-in-need-logo.png",
       website: "https://veteransinneedproject.org",
       impact: "3,000+ Veterans Helped",
     },
     {
       name: "Honor HER Foundation",
       description: "Housing and services for homeless women veterans in Florida.",
-      logo: "/new-website/images/charity-logos/honor-her-logo.jpeg",
+      logo: "/VMF-Start/images/charity-logos/honor-her-logo.jpeg",
       website: "https://www.honorher.org/",
       impact: "200+ Women Housed",
     },
     {
       name: "Patriots Promise",
       description: "Permanent housing solutions and comprehensive veteran support services.",
-      logo: "/new-website/images/charity-logos/patriots-promise-logo.png",
+      logo: "/VMF-Start/images/charity-logos/patriots-promise-logo.png",
       website: "https://patriotspromise.org",
       impact: "800+ Veterans Served",
     },
     {
       name: "Victory For Veterans",
       description: "Suicide prevention and mental health support for veterans and first responders.",
-      logo: "/new-website/images/charity-logos/victory-for-veterans-logo.jpeg",
+      logo: "/VMF-Start/images/charity-logos/victory-for-veterans-logo.jpeg",
       website: "https://victoryforveterans.org",
       impact: "24/7 Crisis Support",
     },
@@ -309,7 +309,7 @@ const Index = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="w-12 h-12 rounded-xl overflow-hidden shadow-md">
-                <img src="/new-website/images/vmf-coin-logo.png" alt="VMF Coin Logo" className="w-full h-full object-cover" />
+                <img src="/VMF-Start/images/vmf-coin-logo.png" alt="VMF Coin Logo" className="w-full h-full object-cover" />
               </div>
               <div>
                 <span className="text-2xl font-bold text-blue-900">VMF</span>
@@ -576,7 +576,7 @@ const Index = () => {
         <section className="relative py-16 sm:py-24 overflow-hidden bg-gradient-to-br from-blue-50 via-white to-red-50">
           <div className="absolute inset-0" aria-hidden="true">
             <img
-              src="/new-website/images/banner-vmf.jpg"
+              src="/VMF-Start/images/banner-vmf.jpg"
               alt=""
               className="w-full h-full object-cover"
               style={{ opacity: 0.42 }}
@@ -636,7 +636,7 @@ const Index = () => {
                     <div className="text-center mb-6">
                       <div className="w-24 h-24 mx-auto mb-4 rounded-2xl overflow-hidden shadow-lg">
                         <img
-                          src="/new-website/images/baldy-og.png"
+                          src="/VMF-Start/images/baldy-og.png"
                           alt="Baldy OG - VMF Mascot"
                           className="w-full h-full object-cover"
                         />
@@ -906,7 +906,7 @@ const Index = () => {
             <div className="flex flex-col items-center md:items-start">
               <div className="flex items-center space-x-3 mb-4">
                 <div className="w-12 h-12 rounded-xl overflow-hidden">
-                  <img src="/new-website/images/vmf-coin-logo.png" alt="VMF Coin Logo" className="w-full h-full object-cover" />
+                  <img src="/VMF-Start/images/vmf-coin-logo.png" alt="VMF Coin Logo" className="w-full h-full object-cover" />
                 </div>
                 <div>
                   <span className="text-xl font-bold">Veterans & Military Families</span>
