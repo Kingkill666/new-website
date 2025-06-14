@@ -931,7 +931,7 @@ const Index = () => {
                   <span className="text-xl font-bold">Veterans & Military Families</span>
                 </div>
               </div>
-              <p className="text-gray-400 text-center md:text-left">Serving Those Who Served</p>
+              <p className="text-gray-400 text-center md:text-left">Supporting Those Who Served</p>
             </div>
 
             <div className="flex flex-col items-center">
