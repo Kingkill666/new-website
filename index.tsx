@@ -223,7 +223,7 @@ const Index = () => {
         Skip to main content
       </a>
 
-      {/* Enhanced Navigation with Dynamic Colors */}
+      {/* Enhanced Navigation with Improved Layout and New Logo */}
       <nav
         className={`border-b backdrop-blur-md sticky top-0 z-50 shadow-sm transition-all duration-300 ${
           scrolled ? "bg-white/95 border-gray-200" : "bg-white/98 border-border/10"
@@ -233,57 +233,70 @@ const Index = () => {
       >
         <div className="container mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
+            {/* Enhanced Logo Section with New Logo */}
             <Link
               href="/"
-              className="flex items-center space-x-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg p-1"
+              className="flex items-center space-x-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg p-2"
               aria-label="VMF Veterans and Military Families home page"
             >
-              <div className="w-12 h-12 rounded-xl overflow-hidden shadow-md">
-                <img src="/images/vmf-coin-logo.png" alt="VMF Coin Logo" className="w-full h-full object-cover" />
+              <div className="w-14 h-14 rounded-xl overflow-hidden shadow-lg bg-white p-1">
+                <img
+                  src="/images/vmf-logo-new.png"
+                  alt="VMF Logo - Patriotic star with red and white stripes"
+                  className="w-full h-full object-contain"
+                />
               </div>
-              <div>
-                <span className="text-2xl font-bold text-blue-900">VMF</span>
-                <p className="text-xs text-red-600 font-medium">Veterans & Military Families</p>
+              <div className="flex flex-col">
+                <span className={`text-3xl font-bold transition-colors ${scrolled ? "text-blue-900" : "text-white"}`}>
+                  VMF
+                </span>
+                <p className={`text-sm font-medium transition-colors ${scrolled ? "text-red-600" : "text-red-300"}`}>
+                  Veterans & Military Families
+                </p>
               </div>
             </Link>
 
-            {/* Enhanced Desktop Navigation with Dynamic Colors */}
-            <div className="hidden lg:flex items-center space-x-6">
-              <button
-                onClick={() => scrollToSection("how-it-works")}
-                onKeyDown={(e) => handleKeyDown(e, () => scrollToSection("how-it-works"))}
-                className={`transition-colors font-medium text-sm whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1 ${
-                  scrolled ? "text-slate-800 hover:text-blue-600" : "text-white hover:text-blue-200"
-                }`}
-                aria-label="Navigate to How It Works section"
-              >
-                How It Works
-              </button>
-              <button
-                onClick={() => scrollToSection("charities")}
-                onKeyDown={(e) => handleKeyDown(e, () => scrollToSection("charities"))}
-                className={`transition-colors font-medium text-sm whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1 ${
-                  scrolled ? "text-slate-800 hover:text-blue-600" : "text-white hover:text-blue-200"
-                }`}
-                aria-label="Navigate to Our Partners section"
-              >
-                Our Partners
-              </button>
-              <button
-                onClick={() => scrollToSection("governance")}
-                onKeyDown={(e) => handleKeyDown(e, () => scrollToSection("governance"))}
-                className={`transition-colors font-medium text-sm whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1 ${
-                  scrolled ? "text-slate-800 hover:text-blue-600" : "text-white hover:text-blue-200"
-                }`}
-                aria-label="Navigate to Community section"
-              >
-                Community
-              </button>
-              <div className="flex items-center space-x-2">
+            {/* Enhanced Desktop Navigation with Better Spacing */}
+            <div className="hidden lg:flex items-center space-x-8">
+              <div className="flex items-center space-x-8">
+                <button
+                  onClick={() => scrollToSection("how-it-works")}
+                  onKeyDown={(e) => handleKeyDown(e, () => scrollToSection("how-it-works"))}
+                  className={`transition-colors font-medium text-base whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3 py-2 ${
+                    scrolled ? "text-slate-800 hover:text-blue-600" : "text-white hover:text-blue-200"
+                  }`}
+                  aria-label="Navigate to How It Works section"
+                >
+                  How It Works
+                </button>
+                <button
+                  onClick={() => scrollToSection("charities")}
+                  onKeyDown={(e) => handleKeyDown(e, () => scrollToSection("charities"))}
+                  className={`transition-colors font-medium text-base whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3 py-2 ${
+                    scrolled ? "text-slate-800 hover:text-blue-600" : "text-white hover:text-blue-200"
+                  }`}
+                  aria-label="Navigate to Our Partners section"
+                >
+                  Our Partners
+                </button>
+                <button
+                  onClick={() => scrollToSection("governance")}
+                  onKeyDown={(e) => handleKeyDown(e, () => scrollToSection("governance"))}
+                  className={`transition-colors font-medium text-base whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3 py-2 ${
+                    scrolled ? "text-slate-800 hover:text-blue-600" : "text-white hover:text-blue-200"
+                  }`}
+                  aria-label="Navigate to Community section"
+                >
+                  Community
+                </button>
+              </div>
+
+              {/* Action Buttons with Better Spacing */}
+              <div className="flex items-center space-x-3">
                 <Link href="/story">
                   <Button
                     size="sm"
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                     aria-label="Read our story"
                   >
                     Our Story
@@ -291,7 +304,7 @@ const Index = () => {
                 </Link>
                 <Button
                   size="sm"
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   onClick={() => setIsBuyModalOpen(true)}
                   aria-label="Buy VMF tokens"
                 >
@@ -339,15 +352,15 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Enhanced Mobile Menu */}
+          {/* Enhanced Mobile Menu with Better Spacing */}
           {isMenuOpen && (
             <div
               id="mobile-menu"
-              className="lg:hidden mt-4 pb-4 border-t border-gray-100"
+              className="lg:hidden mt-6 pb-6 border-t border-gray-100"
               role="menu"
               aria-label="Mobile navigation menu"
             >
-              <div className="flex flex-col space-y-3 pt-4">
+              <div className="flex flex-col space-y-4 pt-6">
                 <button
                   onClick={() => {
                     scrollToSection("how-it-works")
@@ -359,7 +372,7 @@ const Index = () => {
                       setIsMenuOpen(false)
                     })
                   }
-                  className="text-slate-700 hover:text-blue-600 font-medium py-2 text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2"
+                  className="text-slate-700 hover:text-blue-600 font-medium py-3 text-left text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3"
                   role="menuitem"
                   aria-label="Navigate to How It Works section"
                 >
@@ -376,7 +389,7 @@ const Index = () => {
                       setIsMenuOpen(false)
                     })
                   }
-                  className="text-slate-700 hover:text-blue-600 font-medium py-2 text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2"
+                  className="text-slate-700 hover:text-blue-600 font-medium py-3 text-left text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3"
                   role="menuitem"
                   aria-label="Navigate to Our Partners section"
                 >
@@ -393,16 +406,18 @@ const Index = () => {
                       setIsMenuOpen(false)
                     })
                   }
-                  className="text-slate-700 hover:text-blue-600 font-medium py-2 text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2"
+                  className="text-slate-700 hover:text-blue-600 font-medium py-3 text-left text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3"
                   role="menuitem"
                   aria-label="Navigate to Community section"
                 >
                   Community
                 </button>
-                <div className="flex flex-col space-y-2 pt-2">
+
+                {/* Mobile Action Buttons */}
+                <div className="flex flex-col space-y-3 pt-4 border-t border-gray-200">
                   <Link href="/story">
                     <Button
-                      className="bg-blue-600 hover:bg-blue-700 text-white w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                      className="bg-blue-600 hover:bg-blue-700 text-white w-full py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                       onClick={() => setIsMenuOpen(false)}
                       aria-label="Read our story"
                     >
@@ -410,7 +425,7 @@ const Index = () => {
                     </Button>
                   </Link>
                   <Button
-                    className="bg-blue-600 hover:bg-blue-700 text-white w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    className="bg-blue-600 hover:bg-blue-700 text-white w-full py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                     onClick={() => {
                       setIsBuyModalOpen(true)
                       setIsMenuOpen(false)
@@ -423,7 +438,7 @@ const Index = () => {
                   {/* Mobile Officers Club Button */}
                   <Link href="/officers-club">
                     <Button
-                      className="w-full relative overflow-hidden text-white font-bold px-6 py-3 shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
+                      className="w-full relative overflow-hidden text-white font-bold px-6 py-4 shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
                       style={{
                         background:
                           "linear-gradient(45deg, #3B82F6 0%, #EF4444 25%, #3B82F6 50%, #EF4444 75%, #3B82F6 100%)",
@@ -439,7 +454,7 @@ const Index = () => {
                   </Link>
 
                   {/* Mobile Wallet Connection */}
-                  <WalletConnector size="default" className="w-full" />
+                  <WalletConnector size="default" className="w-full py-3" />
                 </div>
               </div>
             </div>
@@ -855,8 +870,8 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             <div className="flex flex-col items-center md:items-start">
               <div className="flex items-center space-x-3 mb-4">
-                <div className="w-12 h-12 rounded-xl overflow-hidden">
-                  <img src="/images/vmf-coin-logo.png" alt="VMF Coin Logo" className="w-full h-full object-cover" />
+                <div className="w-12 h-12 rounded-xl overflow-hidden bg-white p-1">
+                  <img src="/images/vmf-logo-new.png" alt="VMF Logo" className="w-full h-full object-contain" />
                 </div>
                 <div>
                   <span className="text-xl font-bold">Veterans & Military Families</span>
