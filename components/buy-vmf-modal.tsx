@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { X, Wallet, ChevronDown, ChevronUp, CheckCircle, Copy, Check, Minus, Plus } from "lucide-react"
+import { X, ChevronDown, ChevronUp, CheckCircle, Copy, Check, Minus, Plus, AlertCircle } from "lucide-react"
 import { useWallet } from "@/hooks/useWallet"
 
 interface BuyVMFModalProps {
@@ -90,13 +90,14 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
   const [charityDistributions, setCharityDistributions] = useState<CharityDistribution[]>([])
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false)
   const [isCharityDropdownOpen, setIsCharityDropdownOpen] = useState(false)
-  const { walletState, isConnecting, connectWallet, formatAddress } = useWallet()
+  const { walletState, connectWallet, formatAddress, switchNetwork } = useWallet()
   const [transactionHash, setTransactionHash] = useState("")
   const [vmfAmount, setVmfAmount] = useState("")
   const [fees] = useState("20.0")
   const [charityPool, setCharityPool] = useState("0.00")
   const [copied, setCopied] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
+  const [needsNetworkSwitch, setNeedsNetworkSwitch] = useState(false)
 
   useEffect(() => {
     if (amount) {
@@ -106,6 +107,14 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
       setCharityPool(amount)
     }
   }, [amount])
+
+  // Check if user needs to switch network
+  useEffect(() => {
+    if (walletState.isConnected && walletState.walletType !== "Phantom") {
+      // Check if on Sepolia testnet (chainId 11155111)
+      setNeedsNetworkSwitch(walletState.chainId !== 11155111)
+    }
+  }, [walletState.chainId, walletState.isConnected, walletState.walletType])
 
   // Auto-distribute equally when charities are selected
   useEffect(() => {
@@ -153,17 +162,38 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     return ((Number.parseFloat(amount) * percentage) / 100).toFixed(2)
   }
 
+  const handleNetworkSwitch = async () => {
+    const success = await switchNetwork("sepolia")
+    if (success) {
+      setNeedsNetworkSwitch(false)
+    }
+  }
+
   const handleBuyNext = () => {
     if (amount && selectedCharities.length > 0 && walletState.isConnected && getTotalPercentage() === 100) {
+      if (needsNetworkSwitch) {
+        alert("Please switch to Sepolia testnet to continue")
+        return
+      }
       setCurrentStep("verify")
     }
   }
 
   const executeSmartContract = async () => {
-    if (!walletState.isConnected || !amount) return false
+    if (!walletState.isConnected || !amount || walletState.walletType === "Phantom") {
+      alert("Smart contract execution requires an Ethereum wallet")
+      return false
+    }
 
     try {
       setIsProcessing(true)
+
+      // Check if ethers is available
+      if (typeof window === "undefined" || !(window as any).ethers) {
+        // Dynamically import ethers
+        const ethers = await import("ethers")
+        ;(window as any).ethers = ethers
+      }
 
       // Get the Web3 provider
       const provider = new (window as any).ethers.providers.Web3Provider((window as any).ethereum)
@@ -171,9 +201,6 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
 
       // Create contract instance
       const contract = new (window as any).ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer)
-
-      // Convert amount to Wei (assuming USDC has 6 decimals)
-      const amountInWei = (window as any).ethers.utils.parseUnits(amount, 6)
 
       // Execute transactions for each charity
       const transactions = []
@@ -196,9 +223,16 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
       }
 
       return true
-    } catch (error) {
+    } catch (error: any) {
       console.error("Smart contract execution failed:", error)
-      alert("Transaction failed. Please try again.")
+
+      if (error.code === 4001) {
+        alert("Transaction rejected by user")
+      } else if (error.code === -32603) {
+        alert("Transaction failed. Please check your balance and try again.")
+      } else {
+        alert(`Transaction failed: ${error.message || "Unknown error"}`)
+      }
       return false
     } finally {
       setIsProcessing(false)
@@ -206,6 +240,11 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
   }
 
   const handleVerifyConfirm = async () => {
+    if (needsNetworkSwitch) {
+      alert("Please switch to Sepolia testnet first")
+      return
+    }
+
     const success = await executeSmartContract()
     if (success) {
       setCurrentStep("success")
@@ -223,6 +262,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     setAmount("")
     setSelectedCharities([])
     setCharityDistributions([])
+    setTransactionHash("")
     onClose()
   }
 
@@ -243,18 +283,72 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
               </Button>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Connect Wallet */}
-              <Button
-                onClick={() => connectWallet("metamask")} // Default to MetaMask, or add wallet selection
-                className={`w-full py-3 text-lg font-semibold ${
-                  walletState.isConnected
-                    ? "bg-green-600 hover:bg-green-700 text-white"
-                    : "bg-blue-600 hover:bg-blue-700 text-white"
-                }`}
-              >
-                <Wallet className="h-5 w-5 mr-2" />
-                {walletState.isConnected ? `Connected: ${formatAddress(walletState.address!)}` : "Connect Wallet"}
-              </Button>
+              {/* Wallet Connection Status */}
+              {!walletState.isConnected ? (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <AlertCircle className="h-4 w-4 text-blue-600" />
+                    <span className="font-medium text-blue-800">Connect Your Wallet</span>
+                  </div>
+                  <p className="text-sm text-blue-700 mb-3">
+                    Please connect your wallet to continue with the purchase.
+                  </p>
+                  <Button
+                    onClick={() => connectWallet("metamask")}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    Connect Wallet
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  {/* Connected Wallet Display */}
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <div className="flex items-center space-x-2">
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      <span className="font-medium text-green-800">
+                        {walletState.walletType}: {formatAddress(walletState.address!)}
+                      </span>
+                    </div>
+                    {walletState.balance && (
+                      <p className="text-sm text-green-700 mt-1">
+                        Balance: {walletState.balance} {walletState.walletType === "Phantom" ? "SOL" : "ETH"}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Network Warning for Ethereum wallets */}
+                  {walletState.walletType !== "Phantom" && needsNetworkSwitch && (
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <AlertCircle className="h-4 w-4 text-yellow-600" />
+                        <span className="font-medium text-yellow-800">Wrong Network</span>
+                      </div>
+                      <p className="text-sm text-yellow-700 mb-3">Please switch to Sepolia testnet to continue.</p>
+                      <Button
+                        onClick={handleNetworkSwitch}
+                        className="w-full bg-yellow-600 hover:bg-yellow-700 text-white"
+                      >
+                        Switch to Sepolia
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* Phantom Wallet Warning */}
+                  {walletState.walletType === "Phantom" && (
+                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <AlertCircle className="h-4 w-4 text-orange-600" />
+                        <span className="font-medium text-orange-800">Solana Wallet Detected</span>
+                      </div>
+                      <p className="text-sm text-orange-700">
+                        Smart contract execution requires an Ethereum wallet. Please connect MetaMask, Coinbase, or
+                        Rainbow wallet.
+                      </p>
+                    </div>
+                  )}
+                </>
+              )}
 
               {/* Amount Input */}
               <div>
@@ -375,7 +469,12 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
               <Button
                 onClick={handleBuyNext}
                 disabled={
-                  !amount || selectedCharities.length === 0 || !walletState.isConnected || getTotalPercentage() !== 100
+                  !amount ||
+                  selectedCharities.length === 0 ||
+                  !walletState.isConnected ||
+                  getTotalPercentage() !== 100 ||
+                  walletState.walletType === "Phantom" ||
+                  needsNetworkSwitch
                 }
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg font-semibold disabled:opacity-50"
               >
@@ -509,6 +608,10 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                         <span>Connected Wallet:</span>
                         <span className="font-mono">{formatAddress(walletState.address!)}</span>
                       </div>
+                      <div className="flex justify-between">
+                        <span>Chain ID:</span>
+                        <span className="font-mono">{walletState.chainId}</span>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -527,7 +630,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                 <Button
                   onClick={handleVerifyConfirm}
                   className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
-                  disabled={isProcessing}
+                  disabled={isProcessing || needsNetworkSwitch}
                 >
                   {isProcessing ? "Processing..." : "Confirm"}
                 </Button>
