@@ -176,63 +176,79 @@ export function WalletConnector({
         </div>
       )}
 
-      {/* Wallet Options Dropdown */}
+      {/* Wallet Options Dropdown - ENHANCED VISIBILITY */}
       {showWalletOptions && (
-        <div className="absolute right-0 top-full mt-2 w-72 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-          <div className="px-4 py-2 border-b border-gray-100">
-            <h3 className="font-semibold text-gray-900">Connect Wallet</h3>
-            <p className="text-sm text-gray-600">Choose your preferred wallet</p>
+        <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-lg shadow-2xl border border-gray-200 py-3 z-[60] max-h-96 overflow-y-auto">
+          <div className="px-4 py-3 border-b border-gray-100">
+            <h3 className="font-bold text-gray-900 text-lg">Connect Wallet</h3>
+            <p className="text-sm text-gray-600 mt-1">Choose your preferred wallet to connect</p>
           </div>
 
-          {availableWallets.map((wallet) => (
-            <div key={wallet.id} className="relative">
-              <button
-                onClick={() =>
-                  wallet.installed ? handleWalletConnect(wallet.id) : window.open(getInstallUrl(wallet.id), "_blank")
-                }
-                disabled={isConnecting}
-                className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors disabled:opacity-50"
-              >
-                <div className="flex items-center space-x-3">
-                  {wallet.logo.startsWith("/") ? (
-                    <img
-                      src={wallet.logo || "/placeholder.svg"}
-                      alt={`${wallet.name} logo`}
-                      className="w-6 h-6 rounded"
-                    />
-                  ) : (
-                    <span className="text-2xl">{wallet.logo}</span>
-                  )}
-                  <div className="text-left">
-                    <div className="font-medium text-gray-900">{wallet.name}</div>
-                    {!wallet.installed && <div className="text-xs text-gray-500">Not installed</div>}
+          <div className="py-2">
+            {availableWallets.map((wallet) => (
+              <div key={wallet.id} className="relative">
+                <button
+                  onClick={() =>
+                    wallet.installed ? handleWalletConnect(wallet.id) : window.open(getInstallUrl(wallet.id), "_blank")
+                  }
+                  disabled={isConnecting}
+                  className="w-full flex items-center justify-between px-4 py-4 hover:bg-gray-50 transition-colors disabled:opacity-50 border-b border-gray-50 last:border-b-0"
+                >
+                  <div className="flex items-center space-x-4">
+                    {/* Wallet Icon */}
+                    <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center flex-shrink-0">
+                      {wallet.logo.startsWith("/") ? (
+                        <img
+                          src={wallet.logo || "/placeholder.svg"}
+                          alt={`${wallet.name} logo`}
+                          className="w-8 h-8 rounded object-contain"
+                        />
+                      ) : (
+                        <span className="text-2xl">{wallet.logo}</span>
+                      )}
+                    </div>
+
+                    {/* Wallet Info */}
+                    <div className="text-left">
+                      <div className="font-semibold text-gray-900 text-base">{wallet.name}</div>
+                      <div className="text-sm text-gray-500">
+                        {wallet.installed ? "Ready to connect" : "Not installed - Click to install"}
+                      </div>
+                    </div>
                   </div>
-                </div>
 
-                <div className="flex items-center space-x-2">
-                  {wallet.installed ? (
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                  ) : (
-                    <ExternalLink className="h-4 w-4 text-gray-400" />
-                  )}
-                  {isConnecting && (
-                    <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                  )}
-                </div>
-              </button>
-            </div>
-          ))}
+                  {/* Status Icons */}
+                  <div className="flex items-center space-x-2">
+                    {wallet.installed ? (
+                      <div className="flex items-center space-x-1">
+                        <CheckCircle className="h-5 w-5 text-green-500" />
+                        <span className="text-xs text-green-600 font-medium">Installed</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center space-x-1">
+                        <ExternalLink className="h-4 w-4 text-gray-400" />
+                        <span className="text-xs text-gray-500">Install</span>
+                      </div>
+                    )}
+                    {isConnecting && (
+                      <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                    )}
+                  </div>
+                </button>
+              </div>
+            ))}
+          </div>
 
-          <div className="px-4 py-2 border-t border-gray-100 mt-2">
-            <p className="text-xs text-gray-500">
-              New to crypto wallets?
+          <div className="px-4 py-3 border-t border-gray-100 bg-gray-50">
+            <p className="text-xs text-gray-500 leading-relaxed">
+              New to crypto wallets?{" "}
               <a
                 href="https://ethereum.org/en/wallets/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:underline ml-1"
+                className="text-blue-600 hover:underline font-medium"
               >
-                Learn more
+                Learn more about wallets
               </a>
             </p>
           </div>

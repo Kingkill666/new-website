@@ -322,7 +322,9 @@ const Index = () => {
                 </Link>
 
                 {/* Compact Wallet Connection */}
-                <WalletConnector size="sm" className="px-2 py-1.5 text-xs" />
+                <div className="relative">
+                  <WalletConnector size="sm" className="px-2 py-1.5 text-xs" />
+                </div>
               </div>
             </div>
 
@@ -444,7 +446,9 @@ const Index = () => {
                   </Link>
 
                   {/* Mobile Wallet Connection */}
-                  <WalletConnector size="default" className="w-full py-2" />
+                  <div className="relative">
+                    <WalletConnector size="default" className="w-full py-2" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -453,7 +457,7 @@ const Index = () => {
       </nav>
 
       <main id="main-content">
-        {/* Enhanced Hero Section */}
+        {/* Enhanced Hero Section - REVERTED TO ORIGINAL SIZES */}
         <section
           className="relative py-16 sm:py-24 overflow-hidden bg-gradient-to-br from-blue-50 via-white to-red-50"
           aria-labelledby="hero-heading"
@@ -472,7 +476,7 @@ const Index = () => {
           <div className="container mx-auto px-2 sm:px-4 lg:px-6">
             <div className="max-w-6xl mx-auto">
               <div className="grid lg:grid-cols-2 gap-6 lg:gap-12 items-center overflow-x-hidden">
-                {/* Left Column - Content */}
+                {/* Left Column - Content - REVERTED TO ORIGINAL SIZES */}
                 <div className="text-center lg:text-left">
                   <h1 id="hero-heading" className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
                     <span className="text-blue-900">Honor.</span>
