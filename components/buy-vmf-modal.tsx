@@ -2,6 +2,7 @@
 
 import type React from "react"
 
+import { ethers } from "ethers"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -31,42 +32,42 @@ const charities: Charity[] = [
     id: "holy-family",
     name: "Holy Family Village",
     shortName: "Holy Family Village",
-    address: "0x1234567890123456789012345678901234567890",
+    address: "0xB697C8b4bCaE454d9dee1E83f73327D7a63600a1",
     logo: "/images/charity-logos/holy-family-village-logo.png",
   },
   {
     id: "patriots-promise",
     name: "Patriots Promise",
     shortName: "Patriots Promise",
-    address: "0x2345678901234567890123456789012345678901",
+    address: "0x6456879a5073038b0E57ea8E498Cb0240e949fC3",
     logo: "/images/charity-logos/patriots-promise-logo.png",
   },
   {
     id: "victory-veterans",
     name: "Victory For Veterans",
     shortName: "Victory for Veterans",
-    address: "0x3456789012345678901234567890123456789012",
+    address: "0x700B53ff9a58Ee257F9A2EFda3a373D391028007",
     logo: "/images/charity-logos/victory-for-veterans-logo.jpeg",
   },
   {
     id: "veterans-need",
     name: "Veterans In Need Project",
     shortName: "Veterans In Need Project",
-    address: "0x4567890123456789012345678901234567890123",
+    address: "0xfB0EF51792c36Ae1fE6636603be199788819b67D",
     logo: "/images/charity-logos/veterans-in-need-logo.png",
   },
   {
     id: "honor-her",
     name: "Honor HER Foundation",
     shortName: "Honor HER Foundation",
-    address: "0x5678901234567890123456789012345678901234",
+    address: "0x10F01632DC709F7fA413A140739D8843b06235A1",
     logo: "/images/charity-logos/honor-her-logo.jpeg",
   },
   {
     id: "camp-cowboy",
     name: "Camp Cowboy",
     shortName: "Camp Cowboy",
-    address: "0x6789012345678901234567890123456789012345",
+    address: "0x5951A4160F73b8798D68e7177dF8af6a7902e725",
     logo: "/images/charity-logos/camp-cowboy-logo.png",
   },
 ]
@@ -80,14 +81,14 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
   const [charityDistributions, setCharityDistributions] = useState<CharityDistribution[]>([])
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false)
   const [isCharityDropdownOpen, setIsCharityDropdownOpen] = useState(false)
-  const { walletState, connectWallet, formatAddress, switchNetwork } = useWallet()
+  const { walletState, connectWallet, formatAddress, switchNetwork} = useWallet()
   const [transactionHash, setTransactionHash] = useState("")
   const [vmfAmount, setVmfAmount] = useState("")
   const [fees] = useState("20.0")
   const [charityPool, setCharityPool] = useState("0.00")
   const [copied, setCopied] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
-  const [needsNetworkSwitch, setNeedsNetworkSwitch] = useState(false)
+  const [needsNetworkSwitch, setNeedsNetworkSwitch] = [false, (value: boolean) => {}] as const
 
   // Focus management for accessibility
   useEffect(() => {
@@ -166,7 +167,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
       setCharityDistributions([])
     }
   }, [selectedCharities])
-
+  
   const handleCharitySelect = (charityId: string) => {
     if (selectedCharities.includes(charityId)) {
       setSelectedCharities(selectedCharities.filter((id) => id !== charityId))
@@ -208,20 +209,76 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
         alert("Please switch to Sepolia testnet to continue")
         return
       }
+      if(!walletState.usdcBalance) {
+        alert("No USDC")
+        return
+      }
+      if(walletState.usdcBalance && Number(amount) > Number(walletState.usdcBalance)) {
+        alert(`cannot buy more than your USDC balance ${walletState.usdcBalance}, ${amount}`)
+        return
+      }
       setCurrentStep("verify")
     }
   }
 
   const executeSmartContract = async () => {
-    if (!walletState.isConnected || !amount || walletState.walletType === "Phantom") {
+    if (!walletState.isConnected || !amount) {
       alert("Smart contract execution requires an Ethereum wallet")
       return false
     }
 
     try {
       setIsProcessing(true)
-      const mockTxHash = "0x" + Math.random().toString(16).substr(2, 64)
-      setTransactionHash(mockTxHash)
+      // Import ethers only when needed (client-side)
+      // Prompt user for Ethereum provider (MetaMask)
+      if (!window.ethereum) {
+        console.log("no eth")
+        return
+      }
+      const provider = new ethers.BrowserProvider(window.ethereum)
+      const signer = await provider.getSigner()
+      console.log("signer", signer)
+      const contract = new ethers.Contract(
+        CONTRACT_ADDRESS,
+        [
+          {
+        type: "function",
+        name: "handleUSDC",
+        inputs: [
+          { name: "amountUSDC", type: "uint256", internalType: "uint256" },
+          { name: "to", type: "address", internalType: "address" },
+        ],
+        outputs: [],
+        stateMutability: "nonpayable",
+          },
+        ],
+        signer
+      )
+
+      // For each charity, send their share
+      let lastTxHash = ""
+      for (const dist of charityDistributions) {
+        const charity = charities.find((c) => c.id === dist.charityId)
+        if (!charity) continue
+        // Calculate USDC amount (assuming 6 decimals for USDC)
+        const usdcAmount = ethers.parseUnits(
+          ((Number(amount) * dist.percentage) / 100).toFixed(2),
+          6
+        )
+        const usdcContractAddress = "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238";
+        const erc20Abi = [
+          "function balanceOf(address owner) view returns (uint256)",
+          "function approve(address spender, uint256 amount) external returns (bool)"
+        ];
+        const usdcContract = new ethers.Contract(usdcContractAddress, erc20Abi, signer);
+        const approveTx = await usdcContract.approve(CONTRACT_ADDRESS, usdcAmount);
+        await approveTx.wait();
+
+        const tx = await contract.handleUSDC(usdcAmount, charity.address)
+        lastTxHash = tx.hash
+        await tx.wait()
+      }
+      setTransactionHash(lastTxHash)
       await new Promise((resolve) => setTimeout(resolve, 2000))
       return true
     } catch (error: any) {
@@ -334,10 +391,15 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                       </span>
                     </div>
                     {walletState.balance && (
+                      
                       <p className="text-sm text-green-700 mt-1">
-                        Balance: {walletState.balance} {walletState.walletType === "Phantom" ? "SOL" : "ETH"}
+                        Balance: {walletState.balance} ETH
                       </p>
                     )}
+                    {walletState.usdcBalance && (
+                      <p className="text-sm text-green-700 mt-1">
+                        ${walletState.usdcBalance}
+                      </p>)}
                   </div>
 
                   {/* Network Warning for Ethereum wallets */}
@@ -383,6 +445,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                   id="amount-input"
                   type="number"
                   value={amount}
+                  max={walletState.usdcBalance || ""}
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder="Enter amount"
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-lg"
