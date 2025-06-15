@@ -172,6 +172,8 @@ export function WalletConnector({
         return "https://metamask.io/download/"
       case "coinbase":
         return "https://www.coinbase.com/wallet"
+      case "coinbaseSmart":
+        return "https://www.coinbase.com/wallet" // Same as regular Coinbase wallet
       case "rainbow":
         return "https://rainbow.me/"
       case "phantom":

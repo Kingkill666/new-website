@@ -402,6 +402,36 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                       </p>)}
                   </div>
 
+                  {/* USDC Balance Warning */}
+                  {(!walletState.usdcBalance || Number(walletState.usdcBalance) === 0) && (
+                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-4" role="alert">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <AlertCircle className="h-4 w-4 text-orange-600" aria-hidden="true" />
+                        <span className="font-medium text-orange-800">No USDC Balance</span>
+                      </div>
+                      <p className="text-sm text-orange-700 mb-3">
+                        You need USDC to purchase VMF tokens. Get USDC directly on Base network.
+                      </p>
+                      <div className="flex flex-col gap-2">
+                        <Button
+                          onClick={() => connectWallet("coinbaseSmart")}
+                          className="w-full bg-blue-600 hover:bg-blue-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                          aria-label="Connect Coinbase Smart Wallet"
+                        >
+                          Connect Coinbase Smart Wallet
+                        </Button>
+                        <Button
+                          variant="outline"
+                          onClick={() => window.open("https://coinbase.com/buy/usdc", "_blank")}
+                          className="w-full text-orange-700 border-orange-300 hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                          aria-label="Buy USDC on Coinbase, opens in new tab"
+                        >
+                          Buy USDC on Coinbase
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Network Warning for Ethereum wallets */}
                   {walletState.walletType !== "Phantom" && needsNetworkSwitch && (
                     <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4" role="alert">
@@ -446,6 +476,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                   type="number"
                   value={amount}
                   max={walletState.usdcBalance || ""}
+                  min="0"
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder="Enter amount"
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-lg"
