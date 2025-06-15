@@ -487,9 +487,9 @@ const Index = () => {
                       <span className="text-blue-900">For Real Veterans.</span>
                     </h1>
 
-                    <p className="text-xl text-slate-600 mb-8 leading-relaxed max-w-2xl mx-auto lg:mx-0">
-                      You buy. We match. You choose.
-                      <br />A new way to donate.
+                    <p className="text-xl text-black font-bold mb-8 leading-tight max-w-2xl mx-auto lg:mx-0">
+                      <span className="block">You buy. We match. You choose.</span>
+                      <span className="block">With VMF, your purchase supports Veterans.</span>
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8">
