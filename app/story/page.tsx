@@ -705,13 +705,6 @@ const StoryPage = () => {
                               className="h-px bg-gradient-to-r from-transparent via-blue-300 to-transparent w-16"
                               aria-hidden="true"
                             ></div>
-                            <p className="text-blue-200 font-semibold text-lg px-4 py-1 bg-blue-500/20 rounded-full border border-blue-300/30">
-                              Beloved Family Member & Veteran
-                            </p>
-                            <div
-                              className="h-px bg-gradient-to-r from-transparent via-blue-300 to-transparent w-16"
-                              aria-hidden="true"
-                            ></div>
                           </div>
                         </div>
 
