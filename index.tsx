@@ -239,7 +239,7 @@ const Index = () => {
               className="flex items-center space-x-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg p-1.5"
               aria-label="VMF Veterans and Military Families home page"
             >
-              <div className="h-10 w-10">
+              <div className="h-12 w-12">
                 <img
                   src="/images/vmf-logo-patriotic.png"
                   alt="VMF Logo - Patriotic star with red and white stripes"
