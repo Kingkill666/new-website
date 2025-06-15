@@ -109,6 +109,39 @@ export function useWallet() {
       "function balanceOf(address owner) view returns (uint256)",
     ];
     const ethProvider = new ethers.BrowserProvider(window.ethereum);
+    const network = await ethProvider.getNetwork();
+
+    // Base Mainnet chainId is 8453 (decimal) or 0x2105 (hex)
+    const BASE_MAINNET_CHAIN_ID = 8453;
+    if (network.chainId !== BASE_MAINNET_CHAIN_ID) {
+      try {
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: "0x2105" }],
+      });
+      // Refresh provider/network after switching
+      const updatedNetwork = await ethProvider.getNetwork();
+      if (Number(updatedNetwork.chainId) !== Number(BASE_MAINNET_CHAIN_ID)) {
+        throw new Error(`Failed to switch to Base Mainnet. ${updatedNetwork.chainId} ${BASE_MAINNET_CHAIN_ID}`);
+      }
+      } catch (switchError: any) {
+      if (switchError.code === 4902) {
+        // Chain not added, try to add Base Mainnet
+        await window.ethereum.request({
+        method: "wallet_addEthereumChain",
+        params: [{
+          chainId: "0x2105",
+          chainName: "Base Mainnet",
+          nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+          rpcUrls: ["https://mainnet.base.org"],
+          blockExplorerUrls: ["https://basescan.org"],
+        }],
+        });
+      } else {
+        throw switchError;
+      }
+      }
+    }
   
     const usdcContract = new ethers.Contract(usdcContractAddress, erc20Abi, ethProvider);
 

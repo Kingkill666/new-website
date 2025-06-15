@@ -147,8 +147,8 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
   }, [amount])
 
   useEffect(() => {
-    if (walletState.isConnected && walletState.walletType !== "Phantom") {
-      setNeedsNetworkSwitch(walletState.chainId !== 11155111)
+    if (walletState.isConnected) {
+      setNeedsNetworkSwitch(walletState.chainId !== 8453)
     }
   }, [walletState.chainId, walletState.isConnected, walletState.walletType])
 
