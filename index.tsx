@@ -231,36 +231,36 @@ const Index = () => {
         role="navigation"
         aria-label="Main navigation"
       >
-        <div className="container mx-auto px-2 sm:px-4 py-2.5 overflow-x-hidden">
+        <div className="container mx-auto px-2 sm:px-4 py-2 overflow-x-hidden">
           <div className="flex items-center justify-between min-w-0">
-            {/* Professional Logo Section - More Prominent */}
+            {/* Compact Logo Section */}
             <Link
               href="/"
-              className="flex items-center space-x-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg p-1.5"
+              className="flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg p-1 flex-shrink-0"
               aria-label="VMF Veterans and Military Families home page"
             >
-              <div className="h-28 w-28">
+              <div className="h-16 w-16">
                 <img
                   src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/New%20VMF%20Logo-HJjs5zLNzX1i3UA7BdYWX0EPUg7eWR.png"
                   alt="VMF Logo - Patriotic star with red and white stripes"
                   className="w-full h-full object-contain"
                 />
               </div>
-              <div className="flex items-center space-x-2">
-                <span className="text-6xl font-black text-black tracking-tight">VMF</span>
-                <span className="text-xs font-bold text-red-600 tracking-wide uppercase">
+              <div className="flex flex-col">
+                <span className="text-3xl font-black text-black tracking-tight leading-none">VMF</span>
+                <span className="text-xs font-bold text-red-600 tracking-wide uppercase leading-none">
                   Veterans & Military Families
                 </span>
               </div>
             </Link>
 
-            {/* High Contrast Desktop Navigation */}
-            <div className="hidden lg:flex items-center space-x-2 xl:space-x-4 min-w-0">
-              <div className="flex items-center space-x-2 xl:space-x-4 min-w-0">
+            {/* Compact Desktop Navigation */}
+            <div className="hidden lg:flex items-center space-x-1 min-w-0">
+              <div className="flex items-center space-x-1 min-w-0">
                 <button
                   onClick={() => scrollToSection("how-it-works")}
                   onKeyDown={(e) => handleKeyDown(e, () => scrollToSection("how-it-works"))}
-                  className="font-semibold text-sm whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3 py-2 transition-all duration-200 text-slate-800 hover:text-blue-600 hover:bg-blue-50"
+                  className="font-semibold text-xs whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1.5 transition-all duration-200 text-slate-800 hover:text-blue-600 hover:bg-blue-50"
                   aria-label="Navigate to How It Works section"
                 >
                   How It Works
@@ -268,7 +268,7 @@ const Index = () => {
                 <button
                   onClick={() => scrollToSection("charities")}
                   onKeyDown={(e) => handleKeyDown(e, () => scrollToSection("charities"))}
-                  className="font-semibold text-sm whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3 py-2 transition-all duration-200 text-slate-800 hover:text-blue-600 hover:bg-blue-50"
+                  className="font-semibold text-xs whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1.5 transition-all duration-200 text-slate-800 hover:text-blue-600 hover:bg-blue-50"
                   aria-label="Navigate to Our Partners section"
                 >
                   Our Partners
@@ -276,7 +276,7 @@ const Index = () => {
                 <button
                   onClick={() => scrollToSection("governance")}
                   onKeyDown={(e) => handleKeyDown(e, () => scrollToSection("governance"))}
-                  className="font-semibold text-sm whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3 py-2 transition-all duration-200 text-slate-800 hover:text-blue-600 hover:bg-blue-50"
+                  className="font-semibold text-xs whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1.5 transition-all duration-200 text-slate-800 hover:text-blue-600 hover:bg-blue-50"
                   aria-label="Navigate to Community section"
                 >
                   Community
@@ -284,11 +284,11 @@ const Index = () => {
               </div>
 
               {/* Compact Action Buttons */}
-              <div className="flex items-center space-x-1 xl:space-x-2 min-w-0">
+              <div className="flex items-center space-x-1 min-w-0">
                 <Link href="/story">
                   <Button
                     size="sm"
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                     aria-label="Read our story"
                   >
                     Our Story
@@ -296,7 +296,7 @@ const Index = () => {
                 </Link>
                 <Button
                   size="sm"
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   onClick={() => setIsBuyModalOpen(true)}
                   aria-label="Buy VMF tokens"
                 >
@@ -306,7 +306,7 @@ const Index = () => {
                 {/* Compact Officers Club Button */}
                 <Link href="/officers-club">
                   <Button
-                    className="relative overflow-hidden text-white font-bold px-3 py-1.5 text-xs shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
+                    className="relative overflow-hidden text-white font-bold px-2 py-1.5 text-xs shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
                     style={{
                       background:
                         "linear-gradient(45deg, #3B82F6 0%, #EF4444 25%, #3B82F6 50%, #EF4444 75%, #3B82F6 100%)",
@@ -322,7 +322,7 @@ const Index = () => {
                 </Link>
 
                 {/* Compact Wallet Connection */}
-                <WalletConnector size="sm" className="px-3 py-1.5 text-xs" />
+                <WalletConnector size="sm" className="px-2 py-1.5 text-xs" />
               </div>
             </div>
 
