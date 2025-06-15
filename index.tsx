@@ -235,10 +235,11 @@ const Index = () => {
         <div className="container mx-auto px-2 sm:px-4 py-2 overflow-x-hidden">
           <div className="flex items-center justify-between min-w-0">
             {/* Compact Logo Section */}
-            <Link
-              href="/"
+            <button
+              type="button"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               className="flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg p-1 flex-shrink-0"
-              aria-label="VMF Veterans and Military Families home page"
+              aria-label="Scroll to top of page"
             >
               <div className="h-16 w-16">
                 <img
@@ -253,7 +254,7 @@ const Index = () => {
                   Veterans & Military Families
                 </span>
               </div>
-            </Link>
+            </button>
 
             {/* Compact Desktop Navigation */}
             <div className="hidden lg:flex items-center space-x-1 min-w-0">

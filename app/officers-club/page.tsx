@@ -73,7 +73,7 @@ const OfficersClubPage = () => {
       <nav className="border-b border-border/20 bg-slate-800/95 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4 sm:px-6 py-3">
           <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center space-x-3">
+            <button type="button" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center space-x-3" aria-label="Scroll to top of page">
               <div className="w-10 h-10 rounded-lg overflow-hidden">
                 <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/New%20VMF%20Logo-HJjs5zLNzX1i3UA7BdYWX0EPUg7eWR.png" alt="VMF Logo - Patriotic star with red and white stripes" className="w-full h-full object-contain" />
               </div>
@@ -81,7 +81,7 @@ const OfficersClubPage = () => {
                 <span className="text-xl sm:text-2xl font-bold text-white">VMF</span>
                 <p className="text-xs text-red-400 hidden sm:block">Veterans & Military Families</p>
               </div>
-            </Link>
+            </button>
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-4">

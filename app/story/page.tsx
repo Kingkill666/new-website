@@ -147,10 +147,11 @@ const StoryPage = () => {
       >
         <div className="container mx-auto px-4 sm:px-6 py-3">
           <div className="flex items-center justify-between">
-            <Link
-              href="/"
+            <button
+              type="button"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               className="flex items-center space-x-3"
-              aria-label="VMF Veterans and Military Families home page"
+              aria-label="Scroll to top of page"
             >
               <div className="h-16 w-16">
                 <img
@@ -165,7 +166,7 @@ const StoryPage = () => {
                   VETERANS & MILITARY FAMILIES
                 </span>
               </div>
-            </Link>
+            </button>
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-4">
