@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect, useCallback } from "react"
+import { createPortal } from "react-dom"
 import { Button } from "@/components/ui/button"
 import { Wallet, ExternalLink, AlertCircle, CheckCircle } from "lucide-react"
 import { useWallet } from "@/hooks/useWallet"
@@ -35,39 +36,55 @@ export function WalletConnector({
   const [showWalletOptions, setShowWalletOptions] = useState(false)
   const [showNetworkOptions, setShowNetworkOptions] = useState(false)
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 })
+  const [mounted, setMounted] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
 
   const availableWallets = getAvailableWallets()
 
-  // Calculate dropdown position
+  // Ensure component is mounted (for SSR compatibility)
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Calculate dropdown position with better viewport handling
   const calculatePosition = useCallback(() => {
-    if (buttonRef.current) {
+    if (buttonRef.current && typeof window !== "undefined") {
       const rect = buttonRef.current.getBoundingClientRect()
-      const scrollY = window.scrollY || window.pageYOffset
-      const scrollX = window.scrollX || window.pageXOffset
+      const viewportWidth = window.innerWidth
+      const viewportHeight = window.innerHeight
+      const dropdownWidth = 320
+      const dropdownHeight = 400 // Approximate height
 
-      // Calculate position
-      const top = rect.bottom + scrollY + 8 // 8px gap below button
-      let left = rect.right + scrollX - 320 // 320px is dropdown width, align to right edge
+      let top = rect.bottom + 8 // 8px gap below button
+      let left = rect.right - dropdownWidth // Align to right edge of button
 
-      // Ensure dropdown doesn't go off-screen on the left
-      if (left < 10) {
-        left = rect.left + scrollX
+      // Adjust if dropdown would go off the right edge
+      if (left + dropdownWidth > viewportWidth - 10) {
+        left = viewportWidth - dropdownWidth - 10
       }
 
-      // Ensure dropdown doesn't go off-screen on the right
-      const viewportWidth = window.innerWidth
-      if (left + 320 > viewportWidth - 10) {
-        left = viewportWidth - 330 // 320px width + 10px margin
+      // Adjust if dropdown would go off the left edge
+      if (left < 10) {
+        left = 10
+      }
+
+      // Adjust if dropdown would go off the bottom edge
+      if (top + dropdownHeight > viewportHeight - 10) {
+        top = rect.top - dropdownHeight - 8 // Show above button instead
+      }
+
+      // Ensure it doesn't go off the top
+      if (top < 10) {
+        top = 10
       }
 
       setDropdownPosition({ top, left })
     }
   }, [])
 
-  // Update position when dropdown opens or window resizes/scrolls
+  // Update position when dropdown opens or window changes
   useEffect(() => {
-    if (showWalletOptions) {
+    if (showWalletOptions && mounted) {
       calculatePosition()
 
       const handleScroll = () => calculatePosition()
@@ -81,17 +98,27 @@ export function WalletConnector({
         window.removeEventListener("resize", handleResize)
       }
     }
-  }, [showWalletOptions, calculatePosition])
+  }, [showWalletOptions, mounted, calculatePosition])
 
-  // Close dropdown when clicking outside or pressing escape
+  // Handle clicks outside dropdown
   useEffect(() => {
+    if (!showWalletOptions || !mounted) return
+
     const handleClickOutside = (event: MouseEvent) => {
-      if (showWalletOptions && buttonRef.current && !buttonRef.current.contains(event.target as Node)) {
-        const dropdown = document.getElementById("wallet-dropdown")
-        if (dropdown && !dropdown.contains(event.target as Node)) {
-          setShowWalletOptions(false)
-        }
+      const target = event.target as Element
+
+      // Don't close if clicking on the button
+      if (buttonRef.current?.contains(target)) {
+        return
       }
+
+      // Don't close if clicking inside the dropdown
+      const dropdown = document.getElementById("wallet-dropdown-portal")
+      if (dropdown?.contains(target)) {
+        return
+      }
+
+      setShowWalletOptions(false)
     }
 
     const handleEscape = (event: KeyboardEvent) => {
@@ -101,16 +128,15 @@ export function WalletConnector({
       }
     }
 
-    if (showWalletOptions) {
-      document.addEventListener("mousedown", handleClickOutside)
-      document.addEventListener("keydown", handleEscape)
+    // Use capture phase to ensure we catch the event before other handlers
+    document.addEventListener("mousedown", handleClickOutside, true)
+    document.addEventListener("keydown", handleEscape)
 
-      return () => {
-        document.removeEventListener("mousedown", handleClickOutside)
-        document.removeEventListener("keydown", handleEscape)
-      }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside, true)
+      document.removeEventListener("keydown", handleEscape)
     }
-  }, [showWalletOptions])
+  }, [showWalletOptions, mounted])
 
   const handleWalletConnect = async (walletId: string) => {
     await connectWallet(walletId)
@@ -120,7 +146,6 @@ export function WalletConnector({
   const handleNetworkSwitch = async (network: string) => {
     const success = await switchNetwork(network as any)
     if (!success) {
-      // Try to add the network if switching failed
       await addNetwork(network as any)
     }
     setShowNetworkOptions(false)
@@ -156,6 +181,103 @@ export function WalletConnector({
       default:
         return "#"
     }
+  }
+
+  // Render dropdown portal
+  const renderDropdown = () => {
+    if (!mounted || !showWalletOptions || typeof window === "undefined") {
+      return null
+    }
+
+    const dropdown = (
+      <div
+        id="wallet-dropdown-portal"
+        className="fixed bg-white rounded-lg shadow-2xl border border-gray-200 py-3 max-h-96 overflow-y-auto"
+        style={{
+          top: `${dropdownPosition.top}px`,
+          left: `${dropdownPosition.left}px`,
+          width: "320px",
+          zIndex: 999999, // Very high z-index
+          maxWidth: "90vw",
+        }}
+      >
+        <div className="px-4 py-3 border-b border-gray-100">
+          <h3 className="font-bold text-gray-900 text-lg">Connect Wallet</h3>
+          <p className="text-sm text-gray-600 mt-1">Choose your preferred wallet to connect</p>
+        </div>
+
+        <div className="py-2">
+          {availableWallets.map((wallet) => (
+            <div key={wallet.id} className="relative">
+              <button
+                onClick={() =>
+                  wallet.installed ? handleWalletConnect(wallet.id) : window.open(getInstallUrl(wallet.id), "_blank")
+                }
+                disabled={isConnecting}
+                className="w-full flex items-center justify-between px-4 py-4 hover:bg-gray-50 transition-colors disabled:opacity-50 border-b border-gray-50 last:border-b-0"
+              >
+                <div className="flex items-center space-x-4">
+                  {/* Wallet Icon */}
+                  <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center flex-shrink-0">
+                    {wallet.logo.startsWith("/") ? (
+                      <img
+                        src={wallet.logo || "/placeholder.svg"}
+                        alt={`${wallet.name} logo`}
+                        className="w-8 h-8 rounded object-contain"
+                      />
+                    ) : (
+                      <span className="text-2xl">{wallet.logo}</span>
+                    )}
+                  </div>
+
+                  {/* Wallet Info */}
+                  <div className="text-left">
+                    <div className="font-semibold text-gray-900 text-base">{wallet.name}</div>
+                    <div className="text-sm text-gray-500">
+                      {wallet.installed ? "Ready to connect" : "Not installed - Click to install"}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Status Icons */}
+                <div className="flex items-center space-x-2">
+                  {wallet.installed ? (
+                    <div className="flex items-center space-x-1">
+                      <CheckCircle className="h-5 w-5 text-green-500" />
+                      <span className="text-xs text-green-600 font-medium">Installed</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center space-x-1">
+                      <ExternalLink className="h-4 w-4 text-gray-400" />
+                      <span className="text-xs text-gray-500">Install</span>
+                    </div>
+                  )}
+                  {isConnecting && (
+                    <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                  )}
+                </div>
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <div className="px-4 py-3 border-t border-gray-100 bg-gray-50">
+          <p className="text-xs text-gray-500 leading-relaxed">
+            New to crypto wallets?{" "}
+            <a
+              href="https://ethereum.org/en/wallets/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline font-medium"
+            >
+              Learn more about wallets
+            </a>
+          </p>
+        </div>
+      </div>
+    )
+
+    return createPortal(dropdown, document.body)
   }
 
   if (walletState.isConnected) {
@@ -194,8 +316,8 @@ export function WalletConnector({
 
             {showNetworkOptions && (
               <>
-                <div className="fixed inset-0 z-[9998]" onClick={() => setShowNetworkOptions(false)} />
-                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-[9999]">
+                <div className="fixed inset-0 z-[999998]" onClick={() => setShowNetworkOptions(false)} />
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-[999999]">
                   <div className="px-4 py-2 border-b border-gray-100">
                     <h3 className="font-semibold text-gray-900">Switch Network</h3>
                   </div>
@@ -248,7 +370,7 @@ export function WalletConnector({
 
         {/* Error Display */}
         {error && (
-          <div className="absolute top-full mt-2 right-0 w-64 bg-red-50 border border-red-200 rounded-lg p-3 z-[9999]">
+          <div className="absolute top-full mt-2 right-0 w-64 bg-red-50 border border-red-200 rounded-lg p-3 z-[999999]">
             <div className="flex items-start space-x-2">
               <AlertCircle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
               <div className="text-sm text-red-700">{error}</div>
@@ -257,99 +379,20 @@ export function WalletConnector({
         )}
       </div>
 
-      {/* Wallet Options Dropdown - IMPROVED POSITIONING */}
-      {showWalletOptions && (
+      {/* Render dropdown using portal */}
+      {renderDropdown()}
+
+      {/* Background overlay when dropdown is open */}
+      {showWalletOptions && mounted && (
         <>
-          {/* Click outside to close overlay */}
-          <div className="fixed inset-0 z-[9998]" onClick={() => setShowWalletOptions(false)} />
-
-          {/* Dropdown */}
-          <div
-            id="wallet-dropdown"
-            className="fixed w-80 bg-white rounded-lg shadow-2xl border border-gray-200 py-3 z-[9999] max-h-96 overflow-y-auto"
-            style={{
-              top: `${dropdownPosition.top}px`,
-              left: `${dropdownPosition.left}px`,
-              minWidth: "320px",
-              maxWidth: "90vw", // Ensure it doesn't exceed viewport width
-            }}
-          >
-            <div className="px-4 py-3 border-b border-gray-100">
-              <h3 className="font-bold text-gray-900 text-lg">Connect Wallet</h3>
-              <p className="text-sm text-gray-600 mt-1">Choose your preferred wallet to connect</p>
-            </div>
-
-            <div className="py-2">
-              {availableWallets.map((wallet) => (
-                <div key={wallet.id} className="relative">
-                  <button
-                    onClick={() =>
-                      wallet.installed
-                        ? handleWalletConnect(wallet.id)
-                        : window.open(getInstallUrl(wallet.id), "_blank")
-                    }
-                    disabled={isConnecting}
-                    className="w-full flex items-center justify-between px-4 py-4 hover:bg-gray-50 transition-colors disabled:opacity-50 border-b border-gray-50 last:border-b-0"
-                  >
-                    <div className="flex items-center space-x-4">
-                      {/* Wallet Icon */}
-                      <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center flex-shrink-0">
-                        {wallet.logo.startsWith("/") ? (
-                          <img
-                            src={wallet.logo || "/placeholder.svg"}
-                            alt={`${wallet.name} logo`}
-                            className="w-8 h-8 rounded object-contain"
-                          />
-                        ) : (
-                          <span className="text-2xl">{wallet.logo}</span>
-                        )}
-                      </div>
-
-                      {/* Wallet Info */}
-                      <div className="text-left">
-                        <div className="font-semibold text-gray-900 text-base">{wallet.name}</div>
-                        <div className="text-sm text-gray-500">
-                          {wallet.installed ? "Ready to connect" : "Not installed - Click to install"}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Status Icons */}
-                    <div className="flex items-center space-x-2">
-                      {wallet.installed ? (
-                        <div className="flex items-center space-x-1">
-                          <CheckCircle className="h-5 w-5 text-green-500" />
-                          <span className="text-xs text-green-600 font-medium">Installed</span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center space-x-1">
-                          <ExternalLink className="h-4 w-4 text-gray-400" />
-                          <span className="text-xs text-gray-500">Install</span>
-                        </div>
-                      )}
-                      {isConnecting && (
-                        <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                      )}
-                    </div>
-                  </button>
-                </div>
-              ))}
-            </div>
-
-            <div className="px-4 py-3 border-t border-gray-100 bg-gray-50">
-              <p className="text-xs text-gray-500 leading-relaxed">
-                New to crypto wallets?{" "}
-                <a
-                  href="https://ethereum.org/en/wallets/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline font-medium"
-                >
-                  Learn more about wallets
-                </a>
-              </p>
-            </div>
-          </div>
+          {createPortal(
+            <div
+              className="fixed inset-0 bg-black/10 backdrop-blur-[1px]"
+              style={{ zIndex: 999998 }}
+              onClick={() => setShowWalletOptions(false)}
+            />,
+            document.body,
+          )}
         </>
       )}
     </>
