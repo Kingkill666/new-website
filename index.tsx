@@ -196,7 +196,7 @@ const Index = () => {
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId)
     if (element) {
-      const navHeight = 70 // Reduced nav height
+      const navHeight = 80 // Increased for fixed header
       const elementPosition = element.getBoundingClientRect().top + window.pageYOffset - navHeight
       window.scrollTo({
         top: elementPosition,
@@ -223,13 +223,14 @@ const Index = () => {
         Skip to main content
       </a>
 
-      {/* Compact Professional Navigation with High Contrast */}
+      {/* Compact Professional Navigation with High Contrast - FIXED FLOATING HEADER */}
       <nav
-        className={`border-b backdrop-blur-md sticky top-0 z-50 shadow-lg transition-all duration-300 ${
+        className={`border-b backdrop-blur-md fixed top-0 left-0 right-0 z-50 shadow-lg transition-all duration-300 ${
           scrolled ? "bg-white/98 border-gray-200 shadow-md" : "bg-white/95 border-border/20"
         }`}
         role="navigation"
         aria-label="Main navigation"
+        style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50 }}
       >
         <div className="container mx-auto px-2 sm:px-4 py-2 overflow-x-hidden">
           <div className="flex items-center justify-between min-w-0">
@@ -456,7 +457,7 @@ const Index = () => {
         </div>
       </nav>
 
-      <main id="main-content">
+      <main id="main-content" className="pt-20">
         {/* Enhanced Hero Section - REVERTED TO ORIGINAL SIZES */}
         <section
           className="relative py-16 sm:py-24 overflow-hidden bg-gradient-to-br from-blue-50 via-white to-red-50"
