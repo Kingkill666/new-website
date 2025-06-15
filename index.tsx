@@ -261,7 +261,7 @@ const Index = () => {
                 <button
                   onClick={() => scrollToSection("how-it-works")}
                   onKeyDown={(e) => handleKeyDown(e, () => scrollToSection("how-it-works"))}
-                  className="font-semibold text-xs whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1.5 transition-all duration-200 text-slate-800 hover:text-blue-600 hover:bg-blue-50"
+                  className="font-extrabold text-xl whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3 py-2 transition-all duration-200 text-slate-900 hover:text-blue-600 hover:bg-blue-50"
                   aria-label="Navigate to How It Works section"
                 >
                   How It Works
@@ -269,7 +269,7 @@ const Index = () => {
                 <button
                   onClick={() => scrollToSection("charities")}
                   onKeyDown={(e) => handleKeyDown(e, () => scrollToSection("charities"))}
-                  className="font-semibold text-xs whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1.5 transition-all duration-200 text-slate-800 hover:text-blue-600 hover:bg-blue-50"
+                  className="font-extrabold text-xl whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3 py-2 transition-all duration-200 text-slate-900 hover:text-blue-600 hover:bg-blue-50"
                   aria-label="Navigate to Our Partners section"
                 >
                   Our Partners
@@ -277,7 +277,7 @@ const Index = () => {
                 <button
                   onClick={() => scrollToSection("governance")}
                   onKeyDown={(e) => handleKeyDown(e, () => scrollToSection("governance"))}
-                  className="font-semibold text-xs whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1.5 transition-all duration-200 text-slate-800 hover:text-blue-600 hover:bg-blue-50"
+                  className="font-extrabold text-xl whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3 py-2 transition-all duration-200 text-slate-900 hover:text-blue-600 hover:bg-blue-50"
                   aria-label="Navigate to Community section"
                 >
                   Community
