@@ -468,7 +468,7 @@ const Index = () => {
               src="/images/banner-vmf.jpg"
               alt=""
               className="w-full h-full object-cover"
-              style={{ opacity: 0.42 }}
+              style={{ opacity: 0.5 }}
               role="presentation"
             />
             <div className="absolute inset-0 bg-gradient-to-br from-blue-50/95 via-white/98 to-red-50/95"></div>
