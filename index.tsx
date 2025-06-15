@@ -241,7 +241,7 @@ const Index = () => {
             >
               <div className="h-20 w-20">
                 <img
-                  src="/images/vmf-logo-new-patriotic.png"
+                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/New%20VMF%20Logo-HJjs5zLNzX1i3UA7BdYWX0EPUg7eWR.png"
                   alt="VMF Logo - Patriotic star with red and white stripes"
                   className="w-full h-full object-contain"
                 />
