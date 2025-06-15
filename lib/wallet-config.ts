@@ -10,6 +10,7 @@ export const detectWallets = () => {
   return {
     metamask: ethereum?.isMetaMask,
     coinbase: ethereum?.isCoinbaseWallet || ethereum?.selectedProvider?.isCoinbaseWallet,
+    coinbaseSmart: true, // Coinbase Smart Web Wallet is always available
     rainbow: ethereum?.isRainbow,
     phantom: solana?.isPhantom,
     // Check for multiple providers
@@ -42,6 +43,40 @@ export const getSpecificProvider = (walletType: string) => {
 
   // Single provider case
   return ethereum
+}
+
+// Coinbase Smart Web Wallet connection
+export const connectCoinbaseSmartWallet = async () => {
+  if (typeof window === "undefined") return null
+
+  try {
+    // Load Coinbase Smart Wallet SDK
+    const { CoinbaseWalletSDK } = await import('@coinbase/wallet-sdk')
+    
+    const coinbaseWallet = new CoinbaseWalletSDK({
+      appName: "VMF Token",
+      appLogoUrl: "https://your-app-logo-url.com/logo.png", // Replace with your app logo
+    })
+
+    // Get the provider
+    const provider = coinbaseWallet.makeWeb3Provider()
+    
+    // Connect to the wallet
+    const accounts = await provider.request({ method: 'eth_requestAccounts' }) as string[]
+    
+    if (accounts.length === 0) {
+      throw new Error("No accounts found")
+    }
+
+    return {
+      provider,
+      address: accounts[0],
+      wallet: coinbaseWallet
+    }
+  } catch (error) {
+    console.error("Coinbase Smart Wallet connection error:", error)
+    throw error
+  }
 }
 
 // Network configurations

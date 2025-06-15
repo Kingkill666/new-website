@@ -2,7 +2,7 @@
 
 import { ethers } from "ethers"
 import { useState, useEffect, useCallback } from "react"
-import { detectWallets, getSpecificProvider, SUPPORTED_NETWORKS } from "@/lib/wallet-config"
+import { detectWallets, getSpecificProvider, SUPPORTED_NETWORKS, connectCoinbaseSmartWallet } from "@/lib/wallet-config"
 
 export interface WalletInfo {
   name: string
@@ -24,7 +24,8 @@ export interface WalletState {
 
 export const WALLET_OPTIONS: WalletInfo[] = [
   { name: "MetaMask", logo: "🦊", id: "metamask" },
-  { name: "Coinbase", logo: "/images/coinbase-logo.png", id: "coinbase" },
+  { name: "Coinbase Extension", logo: "/images/coinbase-logo.png", id: "coinbase" },
+  { name: "Coinbase Smart Wallet", logo: "/images/coinbase-logo.png", id: "coinbaseSmart" },
   { name: "Rainbow", logo: "🌈", id: "rainbow" },
 ]
 
@@ -68,28 +69,44 @@ export function useWallet() {
             throw new Error("Coinbase Wallet not installed. Please install Coinbase Wallet extension.")
           }
           break
+        case "coinbaseSmart":
+          // Coinbase Smart Wallet is always available, no installation check needed
+          break
       }
 
-      const provider = getSpecificProvider(walletId)
-      if (!provider) {
-        throw new Error(`${walletId} provider not found`)
+      let provider: any
+      let address: string
+
+      // Handle Coinbase Smart Wallet separately
+      if (walletId === "coinbaseSmart") {
+        const smartWalletResult = await connectCoinbaseSmartWallet()
+        if (!smartWalletResult) {
+          throw new Error("Failed to connect to Coinbase Smart Wallet")
+        }
+        provider = smartWalletResult.provider
+        address = smartWalletResult.address
+      } else {
+        provider = getSpecificProvider(walletId)
+        if (!provider) {
+          throw new Error(`${walletId} provider not found`)
+        }
+
+        // Request account access
+        const accounts = await provider.request({ method: "eth_requestAccounts" })
+
+        if (accounts.length === 0) {
+          throw new Error("No accounts found")
+        }
+
+        address = accounts[0]
       }
-
-      // Request account access
-      const accounts = await provider.request({ method: "eth_requestAccounts" })
-
-      if (accounts.length === 0) {
-        throw new Error("No accounts found")
-      }
-
-      const address = accounts[0];
 
       // Get chain ID
       const chainId = await provider.request({ method: "eth_chainId" })
 
       // Get balances
       let balance = "0.0000"
-      console.log("Fetching balance for address:", address, accounts[0])
+      console.log("Fetching balance for address:", address)
       try {
         const balanceWei = await provider.request({
           method: "eth_getBalance",
@@ -108,26 +125,26 @@ export function useWallet() {
     const erc20Abi = [
       "function balanceOf(address owner) view returns (uint256)",
     ];
-    const ethProvider = new ethers.BrowserProvider(window.ethereum);
+    const ethProvider = new ethers.BrowserProvider(provider);
     const network = await ethProvider.getNetwork();
 
     // Base Mainnet chainId is 8453 (decimal) or 0x2105 (hex)
     const BASE_MAINNET_CHAIN_ID = 8453;
-    if (network.chainId !== BASE_MAINNET_CHAIN_ID) {
+    if (network.chainId !== BigInt(BASE_MAINNET_CHAIN_ID)) {
       try {
-      await window.ethereum.request({
+      await provider.request({
         method: "wallet_switchEthereumChain",
         params: [{ chainId: "0x2105" }],
       });
       // Refresh provider/network after switching
       const updatedNetwork = await ethProvider.getNetwork();
-      if (Number(updatedNetwork.chainId) !== Number(BASE_MAINNET_CHAIN_ID)) {
+      if (updatedNetwork.chainId !== BigInt(BASE_MAINNET_CHAIN_ID)) {
         throw new Error(`Failed to switch to Base Mainnet. ${updatedNetwork.chainId} ${BASE_MAINNET_CHAIN_ID}`);
       }
       } catch (switchError: any) {
       if (switchError.code === 4902) {
         // Chain not added, try to add Base Mainnet
-        await window.ethereum.request({
+        await provider.request({
         method: "wallet_addEthereumChain",
         params: [{
           chainId: "0x2105",
@@ -157,7 +174,7 @@ export function useWallet() {
       setWalletState({
         isConnected: true,
         address,
-        walletType: walletId.charAt(0).toUpperCase() + walletId.slice(1),
+        walletType: walletId === "coinbaseSmart" ? "Coinbase Smart Wallet" : walletId.charAt(0).toUpperCase() + walletId.slice(1),
         balance,
         usdcBalance: usdcFormattedBalance,
         chainId: Number.parseInt(chainId, 16),
@@ -353,9 +370,11 @@ export function useWallet() {
             ? detected.metamask
             : wallet.id === "coinbase"
               ? detected.coinbase
-              : wallet.id === "rainbow"
-                ? detected.rainbow || true // Rainbow might not be detectable
-                : false,
+              : wallet.id === "coinbaseSmart"
+                ? detected.coinbaseSmart || true // Coinbase Smart Wallet might not be detectable
+                : wallet.id === "rainbow"
+                  ? detected.rainbow || true // Rainbow might not be detectable
+                  : false,
     }))
   }, [])
 
