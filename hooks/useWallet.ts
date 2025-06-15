@@ -103,7 +103,7 @@ export function useWallet() {
       }
       
     // Get USDC Balance
-    const usdcContractAddress = "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238";
+    const usdcContractAddress = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
     console.log("(wallet) Fetching USDC balance for address:", address, usdcContractAddress)
     const erc20Abi = [
       "function balanceOf(address owner) view returns (uint256)",
