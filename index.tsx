@@ -241,13 +241,13 @@ const Index = () => {
             >
               <div className="h-20 w-20">
                 <img
-                  src="/images/vmf-logo-patriotic.png"
+                  src="/images/vmf-logo-new-patriotic.png"
                   alt="VMF Logo - Patriotic star with red and white stripes"
                   className="w-full h-full object-contain"
                 />
               </div>
               <div className="flex items-center space-x-2">
-                <span className="text-5xl font-black text-slate-900 tracking-tight">VMF</span>
+                <span className="text-5xl font-black text-black tracking-tight">VMF</span>
                 <span className="text-xs font-bold text-red-600 tracking-wide uppercase">
                   Veterans & Military Families
                 </span>
