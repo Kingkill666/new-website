@@ -152,12 +152,18 @@ const StoryPage = () => {
               className="flex items-center space-x-3"
               aria-label="VMF Veterans and Military Families home page"
             >
-              <div className="w-10 h-10 rounded-lg overflow-hidden">
-                <img src="/images/vmf-coin-logo.png" alt="VMF Coin Logo" className="w-full h-full object-cover" />
+              <div className="h-16 w-16">
+                <img
+                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/New%20VMF%20Logo-HJjs5zLNzX1i3UA7BdYWX0EPUg7eWR.png"
+                  alt="VMF Logo - Patriotic star with red and white stripes"
+                  className="w-full h-full object-contain"
+                />
               </div>
-              <div>
-                <span className="text-xl sm:text-2xl font-bold text-blue-900">VMF</span>
-                <p className="text-xs text-red-600 hidden sm:block">Veterans & Military Families</p>
+              <div className="flex flex-col">
+                <span className="text-3xl font-black text-black tracking-tight leading-none">VMF</span>
+                <span className="text-xl font-bold text-red-600 tracking-wide uppercase leading-none">
+                  VETERANS & MILITARY FAMILIES
+                </span>
               </div>
             </Link>
 
@@ -955,7 +961,7 @@ const StoryPage = () => {
             <div className="flex flex-col items-center md:items-start">
               <div className="flex items-center space-x-3 mb-4">
                 <div className="w-12 h-12 rounded-xl overflow-hidden">
-                  <img src="/images/vmf-coin-logo.png" alt="VMF Coin Logo" className="w-full h-full object-cover" />
+                  <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/New%20VMF%20Logo-HJjs5zLNzX1i3UA7BdYWX0EPUg7eWR.png" alt="VMF Logo - Patriotic star with red and white stripes" className="w-full h-full object-contain" />
                 </div>
                 <div>
                   <span className="text-xl font-bold">Veterans & Military Families</span>

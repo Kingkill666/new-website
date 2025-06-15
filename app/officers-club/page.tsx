@@ -75,7 +75,7 @@ const OfficersClubPage = () => {
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center space-x-3">
               <div className="w-10 h-10 rounded-lg overflow-hidden">
-                <img src="/images/vmf-coin-logo.png" alt="VMF Coin Logo" className="w-full h-full object-cover" />
+                <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/New%20VMF%20Logo-HJjs5zLNzX1i3UA7BdYWX0EPUg7eWR.png" alt="VMF Logo - Patriotic star with red and white stripes" className="w-full h-full object-contain" />
               </div>
               <div>
                 <span className="text-xl sm:text-2xl font-bold text-white">VMF</span>
@@ -339,7 +339,7 @@ const OfficersClubPage = () => {
             <div className="flex flex-col items-center md:items-start">
               <div className="flex items-center space-x-3 mb-4">
                 <div className="w-12 h-12 rounded-xl overflow-hidden">
-                  <img src="/images/vmf-coin-logo.png" alt="VMF Coin Logo" className="w-full h-full object-cover" />
+                  <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/New%20VMF%20Logo-HJjs5zLNzX1i3UA7BdYWX0EPUg7eWR.png" alt="VMF Logo - Patriotic star with red and white stripes" className="w-full h-full object-contain" />
                 </div>
                 <div>
                   <span className="text-xl font-bold">Officers Club</span>

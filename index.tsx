@@ -870,7 +870,7 @@ const Index = () => {
             <div className="flex flex-col items-center md:items-start">
               <div className="flex items-center space-x-3 mb-4">
                 <div className="w-12 h-12 rounded-xl overflow-hidden bg-white p-1">
-                  <img src="/images/vmf-logo-new.png" alt="VMF Logo" className="w-full h-full object-contain" />
+                  <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/New%20VMF%20Logo-HJjs5zLNzX1i3UA7BdYWX0EPUg7eWR.png" alt="VMF Logo - Patriotic star with red and white stripes" className="w-full h-full object-contain" />
                 </div>
                 <div>
                   <span className="text-xl font-bold">Veterans & Military Families</span>
