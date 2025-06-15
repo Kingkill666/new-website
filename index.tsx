@@ -752,15 +752,21 @@ const Index = () => {
                   Every VMF token holder has a voice in how we support veterans. Vote on funding, partnerships, and
                   platform improvements.
                 </p>
-                <Button
-                  size="lg"
-                  className="bg-yellow-500 hover:bg-yellow-600 text-black px-8 py-4 text-lg font-bold shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
-                  onClick={() => window.open("https://vmf-governance.vercel.app/", "_blank")}
-                  aria-label="Join the DAO governance platform, opens in new tab"
+                <a
+                  href="https://vmf-governance.vercel.app/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block"
                 >
-                  Join the DAO
-                  <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />
-                </Button>
+                  <Button
+                    size="lg"
+                    className="bg-yellow-500 hover:bg-yellow-600 text-black px-8 py-4 text-lg font-bold shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
+                    aria-label="Join the DAO governance platform, opens in new tab"
+                  >
+                    Join the DAO
+                    <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />
+                  </Button>
+                </a>
               </div>
 
               <div
