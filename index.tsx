@@ -533,7 +533,9 @@ const Index = () => {
                         />
                       </div>
                       <h2 className="text-2xl font-bold text-slate-800 mb-2">Token-Based Crowdfunding</h2>
-                      <p className="text-slate-600">Every VMF purchase = Direct veteran support</p>
+                      <span className="block text-blue-800 bg-blue-100 rounded px-2 py-1 text-base font-medium w-fit mx-auto mb-4">
+                        Real donations. Direct impact.
+                      </span>
                     </div>
 
                     <div className="space-y-4" role="list" aria-label="Platform statistics">
