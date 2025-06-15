@@ -118,7 +118,7 @@ export function WalletConnector({
             </Button>
 
             {showNetworkOptions && (
-              <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+              <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-[9999]">
                 <div className="px-4 py-2 border-b border-gray-100">
                   <h3 className="font-semibold text-gray-900">Switch Network</h3>
                 </div>
@@ -178,7 +178,7 @@ export function WalletConnector({
 
       {/* Wallet Options Dropdown - ENHANCED VISIBILITY */}
       {showWalletOptions && (
-        <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-lg shadow-2xl border border-gray-200 py-3 z-[60] max-h-96 overflow-y-auto">
+        <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-lg shadow-2xl border border-gray-200 py-3 z-[9999] max-h-96 overflow-y-auto">
           <div className="px-4 py-3 border-b border-gray-100">
             <h3 className="font-bold text-gray-900 text-lg">Connect Wallet</h3>
             <p className="text-sm text-gray-600 mt-1">Choose your preferred wallet to connect</p>
@@ -258,7 +258,7 @@ export function WalletConnector({
       {/* Click outside to close */}
       {(showWalletOptions || showNetworkOptions) && (
         <div
-          className="fixed inset-0 z-40"
+          className="fixed inset-0 z-[9998]"
           onClick={() => {
             setShowWalletOptions(false)
             setShowNetworkOptions(false)
