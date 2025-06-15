@@ -296,7 +296,7 @@ export function WalletConnector({
             </div>
             {showBalance && walletState.balance && (
               <div className="text-xs text-green-600">
-                {walletState.balance} {walletState.walletType === "Phantom" ? "SOL" : "ETH"}
+                {walletState.balance} ETH
               </div>
             )}
           </div>

@@ -1,5 +1,6 @@
 "use client"
 
+import { ethers } from "ethers"
 import { useState, useEffect, useCallback } from "react"
 import { detectWallets, getSpecificProvider, SUPPORTED_NETWORKS } from "@/lib/wallet-config"
 
@@ -15,6 +16,7 @@ export interface WalletState {
   address: string | null
   walletType: string | null
   balance: string | null
+  usdcBalance: string | null
   chainId: number | null
   isConnecting: boolean
   error: string | null
@@ -24,7 +26,6 @@ export const WALLET_OPTIONS: WalletInfo[] = [
   { name: "MetaMask", logo: "🦊", id: "metamask" },
   { name: "Coinbase", logo: "/images/coinbase-logo.png", id: "coinbase" },
   { name: "Rainbow", logo: "🌈", id: "rainbow" },
-  { name: "Phantom", logo: "👻", id: "phantom" },
 ]
 
 export function useWallet() {
@@ -33,6 +34,7 @@ export function useWallet() {
     address: null,
     walletType: null,
     balance: null,
+    usdcBalance: null,
     chainId: null,
     isConnecting: false,
     error: null,
@@ -80,13 +82,14 @@ export function useWallet() {
         throw new Error("No accounts found")
       }
 
-      const address = accounts[0]
+      const address = accounts[0];
 
       // Get chain ID
       const chainId = await provider.request({ method: "eth_chainId" })
 
-      // Get balance
+      // Get balances
       let balance = "0.0000"
+      console.log("Fetching balance for address:", address, accounts[0])
       try {
         const balanceWei = await provider.request({
           method: "eth_getBalance",
@@ -98,12 +101,32 @@ export function useWallet() {
       } catch (balanceError) {
         console.warn("Could not fetch balance:", balanceError)
       }
+      
+    // Get USDC Balance
+    const usdcContractAddress = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
+    console.log("(wallet) Fetching USDC balance for address:", address, usdcContractAddress)
+    const erc20Abi = [
+      "function balanceOf(address owner) view returns (uint256)",
+    ];
+    const ethProvider = new ethers.BrowserProvider(window.ethereum);
+  
+    const usdcContract = new ethers.Contract(usdcContractAddress, erc20Abi, ethProvider);
+
+    const rawUsdcBalance = await usdcContract.balanceOf(address);
+    console.log(`The (raw) USDC balance is: ${rawUsdcBalance}`);
+
+    // Format the balance using the 6 decimals for USDC
+    const usdcFormattedBalance = ethers.formatUnits(rawUsdcBalance, 6);
+
+    console.log(`The USDC balance is: ${usdcFormattedBalance}`);
+    console.log("ADDRSS", address)
 
       setWalletState({
         isConnected: true,
         address,
         walletType: walletId.charAt(0).toUpperCase() + walletId.slice(1),
         balance,
+        usdcBalance: usdcFormattedBalance,
         chainId: Number.parseInt(chainId, 16),
         isConnecting: false,
         error: null,
@@ -136,81 +159,24 @@ export function useWallet() {
     }
   }, [])
 
-  // Connect to Phantom wallet
-  const connectPhantomWallet = useCallback(async () => {
-    try {
-      setWalletState((prev) => ({ ...prev, isConnecting: true, error: null }))
-
-      if (typeof window === "undefined" || !(window as any).solana?.isPhantom) {
-        throw new Error("Phantom Wallet not installed. Please install Phantom extension.")
-      }
-
-      const phantom = (window as any).solana
-      const response = await phantom.connect()
-
-      if (response.publicKey) {
-        const address = response.publicKey.toString()
-
-        setWalletState({
-          isConnected: true,
-          address,
-          walletType: "Phantom",
-          balance: "0.0000", // Simplified
-          chainId: null,
-          isConnecting: false,
-          error: null,
-        })
-
-        localStorage.setItem(
-          "vmf_connected_wallet",
-          JSON.stringify({
-            walletType: "phantom",
-            address,
-            timestamp: Date.now(),
-          }),
-        )
-      }
-    } catch (error: any) {
-      console.error("Phantom wallet connection error:", error)
-      setWalletState((prev) => ({
-        ...prev,
-        error: error.message || "Failed to connect Phantom",
-        isConnecting: false,
-      }))
-      alert(error.message || "Failed to connect Phantom")
-    }
-  }, [])
-
   // Main connect function
   const connectWallet = useCallback(
     async (walletId: string) => {
-      if (walletId === "phantom") {
-        await connectPhantomWallet()
-      } else {
-        await connectEthereumWallet(walletId)
-      }
+      await connectEthereumWallet(walletId)
     },
-    [connectEthereumWallet, connectPhantomWallet],
+    [connectEthereumWallet],
   )
 
   // Disconnect wallet
   const disconnectWallet = useCallback(async () => {
     try {
-      // Disconnect Solana wallet
-      if (walletState.walletType === "Phantom" && (window as any).solana?.isPhantom) {
-        try {
-          await (window as any).solana.disconnect()
-        } catch (error) {
-          console.warn("Error disconnecting Phantom:", error)
-        }
-      }
-
       // Reset state
       setWalletState({
         isConnected: false,
         address: null,
         walletType: null,
         balance: null,
+        usdcBalance: null,
         chainId: null,
         isConnecting: false,
         error: null,
@@ -228,6 +194,7 @@ export function useWallet() {
     async (networkKey: keyof typeof SUPPORTED_NETWORKS) => {
       try {
         const network = SUPPORTED_NETWORKS[networkKey]
+        console.log("Switching network to:", networkKey, network.chainId)
         const provider = getSpecificProvider(walletState.walletType?.toLowerCase() || "")
 
         if (!provider) return false
@@ -248,7 +215,7 @@ export function useWallet() {
         console.error("Failed to switch network:", error)
 
         // If network doesn't exist, try to add it
-        if (error.code === 4902) {
+        if (error.code === 4902 || error.code === -32603) {
           return await addNetwork(networkKey)
         }
 
@@ -296,54 +263,6 @@ export function useWallet() {
           return
         }
 
-        // Check Phantom connection
-        if (walletType === "phantom" && (window as any).solana?.isPhantom) {
-          const phantom = (window as any).solana
-          if (phantom.isConnected) {
-            try {
-              const publicKey = phantom.publicKey?.toString()
-              if (publicKey) {
-                setWalletState({
-                  isConnected: true,
-                  address: publicKey,
-                  walletType: "Phantom",
-                  balance: "0.0000",
-                  chainId: null,
-                  isConnecting: false,
-                  error: null,
-                })
-              }
-            } catch (error) {
-              console.warn("Error checking Phantom connection:", error)
-            }
-          }
-        }
-
-        // Check Ethereum wallet connections
-        if (walletType !== "phantom") {
-          const provider = getSpecificProvider(walletType)
-          if (provider) {
-            try {
-              const accounts = await provider.request({ method: "eth_accounts" })
-              if (accounts.length > 0) {
-                const address = accounts[0]
-                const chainId = await provider.request({ method: "eth_chainId" })
-
-                setWalletState({
-                  isConnected: true,
-                  address,
-                  walletType: walletType.charAt(0).toUpperCase() + walletType.slice(1),
-                  balance: "0.0000",
-                  chainId: Number.parseInt(chainId, 16),
-                  isConnecting: false,
-                  error: null,
-                })
-              }
-            } catch (error) {
-              console.warn("Error checking Ethereum connection:", error)
-            }
-          }
-        }
       } catch (error) {
         console.error("Error checking existing connections:", error)
         localStorage.removeItem("vmf_connected_wallet")
@@ -364,7 +283,6 @@ export function useWallet() {
       } else {
         setWalletState((prev) => ({
           ...prev,
-          address: accounts[0],
         }))
       }
     }
@@ -380,20 +298,6 @@ export function useWallet() {
     if ((window as any).ethereum) {
       ;(window as any).ethereum.on("accountsChanged", handleAccountsChanged)
       ;(window as any).ethereum.on("chainChanged", handleChainChanged)
-    }
-
-    // Phantom events
-    if ((window as any).solana?.isPhantom) {
-      ;(window as any).solana.on("accountChanged", (publicKey: any) => {
-        if (!publicKey) {
-          disconnectWallet()
-        } else {
-          setWalletState((prev) => ({
-            ...prev,
-            address: publicKey.toString(),
-          }))
-        }
-      })
     }
 
     return () => {
