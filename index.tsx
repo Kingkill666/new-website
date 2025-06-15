@@ -239,18 +239,18 @@ const Index = () => {
               className="flex items-center space-x-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg p-1.5"
               aria-label="VMF Veterans and Military Families home page"
             >
-              <div className="w-12 h-12 rounded-lg overflow-hidden shadow-lg bg-white p-0.5 border border-gray-200">
+              <div className="h-8 w-8">
                 <img
-                  src="/images/vmf-logo-new.png"
+                  src="/images/vmf-logo-patriotic.png"
                   alt="VMF Logo - Patriotic star with red and white stripes"
                   className="w-full h-full object-contain"
                 />
               </div>
-              <div className="flex flex-col">
+              <div className="flex items-center space-x-2">
                 <span className="text-2xl font-black text-slate-900 tracking-tight">VMF</span>
-                <p className="text-xs font-bold text-red-600 tracking-wide uppercase leading-none">
+                <span className="text-xs font-bold text-red-600 tracking-wide uppercase">
                   Veterans & Military Families
-                </p>
+                </span>
               </div>
             </Link>
 
