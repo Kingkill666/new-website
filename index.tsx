@@ -679,11 +679,11 @@ const Index = () => {
                 {charities.map((charity, index) => (
                   <Card
                     key={index}
-                    className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 group overflow-hidden focus-within:ring-2 focus-within:ring-blue-500"
+                    className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 group overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 flex flex-col h-full"
                     role="listitem"
                   >
-                    <CardContent className="p-0">
-                      <div className="p-6 pb-4">
+                    <CardContent className="p-0 flex flex-col h-full">
+                      <div className="p-6 pb-4 flex-grow">
                         <div className="flex items-center space-x-4 mb-4">
                           <div className="w-16 h-16 rounded-xl overflow-hidden bg-white shadow-md flex-shrink-0">
                             <img
@@ -702,9 +702,9 @@ const Index = () => {
                             </div>
                           </div>
                         </div>
-                        <p className="text-slate-600 text-sm leading-relaxed mb-4">{charity.description}</p>
+                        <p className="text-slate-600 text-sm leading-relaxed">{charity.description}</p>
                       </div>
-                      <div className="px-6 pb-6">
+                      <div className="px-6 pb-6 mt-auto">
                         <Button
                           size="sm"
                           variant="outline"
