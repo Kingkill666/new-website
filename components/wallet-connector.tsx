@@ -367,16 +367,6 @@ export function WalletConnector({
           <Wallet className="h-4 w-4 mr-2" />
           {isConnecting ? "Connecting..." : "Connect"}
         </Button>
-
-        {/* Error Display */}
-        {error && (
-          <div className="absolute top-full mt-2 right-0 w-64 bg-red-50 border border-red-200 rounded-lg p-3 z-[999999]">
-            <div className="flex items-start space-x-2">
-              <AlertCircle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
-              <div className="text-sm text-red-700">{error}</div>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Render dropdown using portal */}
