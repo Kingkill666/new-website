@@ -470,7 +470,7 @@ const Index = () => {
               style={{ opacity: 0.42 }}
               role="presentation"
             />
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-50/90 via-white/95 to-red-50/90"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-50/95 via-white/98 to-red-50/95"></div>
           </div>
 
           <div className="container mx-auto px-2 sm:px-4 lg:px-6">
@@ -478,43 +478,45 @@ const Index = () => {
               <div className="grid lg:grid-cols-2 gap-6 lg:gap-12 items-center overflow-x-hidden">
                 {/* Left Column - Content - REVERTED TO ORIGINAL SIZES */}
                 <div className="text-center lg:text-left">
-                  <h1 id="hero-heading" className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-                    <span className="text-blue-900">Honor.</span>
-                    <br />
-                    <span className="text-red-600">Support.</span>
-                    <br />
-                    <span className="text-slate-800">Empower.</span>
-                  </h1>
+                  <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-8 shadow-lg">
+                    <h1 id="hero-heading" className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+                      <span className="text-blue-900">Honor.</span>
+                      <br />
+                      <span className="text-red-600">Support.</span>
+                      <br />
+                      <span className="text-slate-800">Empower.</span>
+                    </h1>
 
-                  <p className="text-xl text-slate-600 mb-8 leading-relaxed max-w-2xl mx-auto lg:mx-0">
-                    You buy, We match, You choose.
-                    <br />A new way to donate.
-                  </p>
+                    <p className="text-xl text-slate-600 mb-8 leading-relaxed max-w-2xl mx-auto lg:mx-0">
+                      You buy, We match, You choose.
+                      <br />A new way to donate.
+                    </p>
 
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8">
-                    <Button
-                      size="lg"
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-semibold shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                      onClick={() => setIsBuyModalOpen(true)}
-                      aria-label="Buy VMF tokens to support veterans"
-                    >
-                      Buy VMF
-                    </Button>
-                  </div>
-
-                  {/* Trust Indicators */}
-                  <div className="flex flex-wrap justify-center lg:justify-start gap-6 text-sm text-slate-600">
-                    <div className="flex items-center space-x-2">
-                      <CheckCircle className="h-5 w-5 text-green-600" aria-hidden="true" />
-                      <span>100% Transparent</span>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8">
+                      <Button
+                        size="lg"
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-semibold shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        onClick={() => setIsBuyModalOpen(true)}
+                        aria-label="Buy VMF tokens to support veterans"
+                      >
+                        Buy VMF
+                      </Button>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Shield className="h-5 w-5 text-blue-600" aria-hidden="true" />
-                      <span>Veteran Verified</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Heart className="h-5 w-5 text-red-600" aria-hidden="true" />
-                      <span>Zero Fees</span>
+
+                    {/* Trust Indicators */}
+                    <div className="flex flex-wrap justify-center lg:justify-start gap-6 text-sm text-slate-600">
+                      <div className="flex items-center space-x-2">
+                        <CheckCircle className="h-5 w-5 text-green-600" aria-hidden="true" />
+                        <span>100% Transparent</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Shield className="h-5 w-5 text-blue-600" aria-hidden="true" />
+                        <span>Veteran Verified</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Heart className="h-5 w-5 text-red-600" aria-hidden="true" />
+                        <span>Zero Fees</span>
+                      </div>
                     </div>
                   </div>
                 </div>
