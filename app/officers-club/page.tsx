@@ -24,10 +24,12 @@ import Link from "next/link"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { WalletConnector } from "@/components/wallet-connector"
+import { BuyVMFModal } from "@/components/buy-vmf-modal"
 
 const OfficersClubPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const router = useRouter()
+  const [isBuyModalOpen, setIsBuyModalOpen] = useState(false)
 
   const handleBackToHome = () => {
     router.push("/")
@@ -83,7 +85,12 @@ const OfficersClubPage = () => {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-4">
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6">Buy VMF</Button>
+              <Button
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6"
+                onClick={() => setIsBuyModalOpen(true)}
+              >
+                Buy VMF
+              </Button>
 
               {/* Wallet Connection */}
               <div className="relative">
@@ -117,7 +124,12 @@ const OfficersClubPage = () => {
           {isMenuOpen && (
             <div className="md:hidden mt-4 pb-4 border-t border-gray-700">
               <div className="flex flex-col space-y-3 pt-4">
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white w-full">Buy VMF</Button>
+                <Button
+                  className="bg-blue-600 hover:bg-blue-700 text-white w-full"
+                  onClick={() => setIsBuyModalOpen(true)}
+                >
+                  Buy VMF
+                </Button>
                 <WalletConnector size="default" className="w-full" showBalance={true} />
                 <Button
                   variant="outline"
@@ -428,6 +440,8 @@ const OfficersClubPage = () => {
       `}</style>
 
       {/* Click outside to close wallet options */}
+      {/* Buy VMF Modal */}
+      <BuyVMFModal isOpen={isBuyModalOpen} onClose={() => setIsBuyModalOpen(false)} />
     </div>
   )
 }

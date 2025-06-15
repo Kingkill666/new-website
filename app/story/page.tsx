@@ -24,10 +24,12 @@ import Link from "next/link"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { WalletConnector } from "@/components/wallet-connector"
+import { BuyVMFModal } from "@/components/buy-vmf-modal"
 
 const StoryPage = () => {
   const [activeTab, setActiveTab] = useState("vision")
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isBuyModalOpen, setIsBuyModalOpen] = useState(false)
 
   const router = useRouter()
 
@@ -161,7 +163,12 @@ const StoryPage = () => {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-4">
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6">Buy VMF</Button>
+              <Button
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6"
+                onClick={() => setIsBuyModalOpen(true)}
+              >
+                Buy VMF
+              </Button>
 
               {/* Officers Club Button */}
               <Link href="/officers-club">
@@ -212,7 +219,12 @@ const StoryPage = () => {
             <div className="md:hidden mt-4 pb-4 border-t border-gray-100">
               <div className="flex flex-col space-y-3 pt-4">
                 <div className="flex flex-col space-y-2">
-                  <Button className="bg-blue-600 hover:bg-blue-700 text-white w-full">Buy VMF</Button>
+                  <Button
+                    className="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    onClick={() => setIsBuyModalOpen(true)}
+                  >
+                    Buy VMF
+                  </Button>
 
                   {/* Mobile Officers Club Button */}
                   <Link href="/officers-club">
@@ -915,6 +927,7 @@ const StoryPage = () => {
                 <Button
                   size="lg"
                   className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 text-lg font-semibold"
+                  onClick={() => setIsBuyModalOpen(true)}
                   aria-label="Purchase VMF tokens"
                 >
                   Buy VMF Tokens
@@ -1056,6 +1069,8 @@ const StoryPage = () => {
         }
       `}</style>
       {/* Click outside to close wallet options */}
+      {/* Buy VMF Modal */}
+      <BuyVMFModal isOpen={isBuyModalOpen} onClose={() => setIsBuyModalOpen(false)} />
     </div>
   )
 }
