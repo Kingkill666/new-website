@@ -468,10 +468,10 @@ const Index = () => {
               src="/images/banner-vmf.jpg"
               alt=""
               className="w-full h-full object-cover"
-              style={{ opacity: 0.7 }}
+              style={{ opacity: 0.6 }}
               role="presentation"
             />
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-50/95 via-white/98 to-red-50/95"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-50/80 via-white/90 to-red-50/80"></div>
           </div>
 
           <div className="container mx-auto px-2 sm:px-4 lg:px-6">
@@ -481,15 +481,13 @@ const Index = () => {
                 <div className="text-center lg:text-left">
                   <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-8 shadow-lg">
                     <h1 id="hero-heading" className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-                      <span className="text-blue-900">Honor.</span>
+                      <span className="text-red-600">Real Help.</span>
                       <br />
-                      <span className="text-red-600">Support.</span>
-                      <br />
-                      <span className="text-slate-800">Empower.</span>
+                      <span className="text-blue-900">For Real Veterans.</span>
                     </h1>
 
                     <p className="text-xl text-slate-600 mb-8 leading-relaxed max-w-2xl mx-auto lg:mx-0">
-                      You buy, We match, You choose.
+                      You buy. We match. You choose.
                       <br />A new way to donate.
                     </p>
 
@@ -524,7 +522,7 @@ const Index = () => {
 
                 {/* Right Column - Visual */}
                 <div className="relative">
-                  <div className="bg-white rounded-3xl p-8 shadow-2xl border border-gray-100">
+                  <div className="bg-white rounded-3xl p-8 shadow-2xl !border-0">
                     <div className="text-center mb-6">
                       <div className="w-24 h-24 mx-auto mb-4 rounded-2xl overflow-hidden shadow-lg">
                         <img

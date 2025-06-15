@@ -279,7 +279,7 @@ const StoryPage = () => {
               src="/images/banner-vmf.jpg"
               alt=""
               className="w-full h-full object-cover"
-              style={{ opacity: 0.42 }}
+              style={{ opacity: 0.6 }}
               role="presentation"
             />
             <div className="absolute inset-0 bg-gradient-to-b from-white/80 via-white/50 to-white/80"></div>
@@ -630,7 +630,7 @@ const StoryPage = () => {
                 src="/images/banner-vmf.jpg"
                 alt=""
                 className="w-full h-full object-cover"
-                style={{ opacity: 0.42 }}
+                style={{ opacity: 0.6 }}
                 role="presentation"
               />
               <div className="absolute inset-0 bg-gradient-to-b from-slate-900/80 via-blue-900/70 to-slate-900/80"></div>
