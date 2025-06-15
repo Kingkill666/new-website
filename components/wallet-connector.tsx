@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Wallet, ExternalLink, AlertCircle, CheckCircle } from "lucide-react"
 import { useWallet } from "@/hooks/useWallet"
@@ -34,8 +34,25 @@ export function WalletConnector({
 
   const [showWalletOptions, setShowWalletOptions] = useState(false)
   const [showNetworkOptions, setShowNetworkOptions] = useState(false)
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, right: 0 })
+  const buttonRef = useRef<HTMLButtonElement>(null)
 
   const availableWallets = getAvailableWallets()
+
+  // Calculate dropdown position when it opens
+  useEffect(() => {
+    if (showWalletOptions && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect()
+      const scrollY = window.scrollY
+      const scrollX = window.scrollX
+
+      setDropdownPosition({
+        top: rect.bottom + scrollY + 8, // 8px gap below button
+        left: rect.right + scrollX - 320, // 320px is dropdown width, align to right edge
+        right: rect.right + scrollX,
+      })
+    }
+  }, [showWalletOptions])
 
   const handleWalletConnect = async (walletId: string) => {
     await connectWallet(walletId)
@@ -154,117 +171,150 @@ export function WalletConnector({
   }
 
   return (
-    <div className="relative">
-      <Button
-        variant={variant}
-        size={size}
-        className={`border-red-600 text-red-600 hover:bg-red-50 font-semibold ${className}`}
-        onClick={() => setShowWalletOptions(!showWalletOptions)}
-        disabled={isConnecting}
-      >
-        <Wallet className="h-4 w-4 mr-2" />
-        {isConnecting ? "Connecting..." : "Connect"}
-      </Button>
+    <>
+      <div className="relative">
+        <Button
+          ref={buttonRef}
+          variant={variant}
+          size={size}
+          className={`border-red-600 text-red-600 hover:bg-red-50 font-semibold ${className}`}
+          onClick={() => setShowWalletOptions(!showWalletOptions)}
+          disabled={isConnecting}
+        >
+          <Wallet className="h-4 w-4 mr-2" />
+          {isConnecting ? "Connecting..." : "Connect"}
+        </Button>
 
-      {/* Error Display */}
-      {error && (
-        <div className="absolute top-full mt-2 right-0 w-64 bg-red-50 border border-red-200 rounded-lg p-3 z-50">
-          <div className="flex items-start space-x-2">
-            <AlertCircle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
-            <div className="text-sm text-red-700">{error}</div>
+        {/* Error Display */}
+        {error && (
+          <div className="absolute top-full mt-2 right-0 w-64 bg-red-50 border border-red-200 rounded-lg p-3 z-[9999]">
+            <div className="flex items-start space-x-2">
+              <AlertCircle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
+              <div className="text-sm text-red-700">{error}</div>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
-      {/* Wallet Options Dropdown - ENHANCED VISIBILITY */}
+      {/* Wallet Options Dropdown - FIXED POSITIONING */}
       {showWalletOptions && (
-        <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-lg shadow-2xl border border-gray-200 py-3 z-[9999] max-h-96 overflow-y-auto">
-          <div className="px-4 py-3 border-b border-gray-100">
-            <h3 className="font-bold text-gray-900 text-lg">Connect Wallet</h3>
-            <p className="text-sm text-gray-600 mt-1">Choose your preferred wallet to connect</p>
-          </div>
+        <>
+          {/* Click outside to close overlay */}
+          <div className="fixed inset-0 z-[9998]" onClick={() => setShowWalletOptions(false)} />
 
-          <div className="py-2">
-            {availableWallets.map((wallet) => (
-              <div key={wallet.id} className="relative">
-                <button
-                  onClick={() =>
-                    wallet.installed ? handleWalletConnect(wallet.id) : window.open(getInstallUrl(wallet.id), "_blank")
-                  }
-                  disabled={isConnecting}
-                  className="w-full flex items-center justify-between px-4 py-4 hover:bg-gray-50 transition-colors disabled:opacity-50 border-b border-gray-50 last:border-b-0"
-                >
-                  <div className="flex items-center space-x-4">
-                    {/* Wallet Icon */}
-                    <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center flex-shrink-0">
-                      {wallet.logo.startsWith("/") ? (
-                        <img
-                          src={wallet.logo || "/placeholder.svg"}
-                          alt={`${wallet.name} logo`}
-                          className="w-8 h-8 rounded object-contain"
-                        />
+          {/* Dropdown */}
+          <div
+            className="fixed w-80 bg-white rounded-lg shadow-2xl border border-gray-200 py-3 z-[9999] max-h-96 overflow-y-auto"
+            style={{
+              top: `${dropdownPosition.top}px`,
+              left: `${dropdownPosition.left}px`,
+              minWidth: "320px",
+            }}
+          >
+            <div className="px-4 py-3 border-b border-gray-100">
+              <h3 className="font-bold text-gray-900 text-lg">Connect Wallet</h3>
+              <p className="text-sm text-gray-600 mt-1">Choose your preferred wallet to connect</p>
+            </div>
+
+            <div className="py-2">
+              {availableWallets.map((wallet) => (
+                <div key={wallet.id} className="relative">
+                  <button
+                    onClick={() =>
+                      wallet.installed
+                        ? handleWalletConnect(wallet.id)
+                        : window.open(getInstallUrl(wallet.id), "_blank")
+                    }
+                    disabled={isConnecting}
+                    className="w-full flex items-center justify-between px-4 py-4 hover:bg-gray-50 transition-colors disabled:opacity-50 border-b border-gray-50 last:border-b-0"
+                  >
+                    <div className="flex items-center space-x-4">
+                      {/* Wallet Icon */}
+                      <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center flex-shrink-0">
+                        {wallet.logo.startsWith("/") ? (
+                          <img
+                            src={wallet.logo || "/placeholder.svg"}
+                            alt={`${wallet.name} logo`}
+                            className="w-8 h-8 rounded object-contain"
+                          />
+                        ) : (
+                          <span className="text-2xl">{wallet.logo}</span>
+                        )}
+                      </div>
+
+                      {/* Wallet Info */}
+                      <div className="text-left">
+                        <div className="font-semibold text-gray-900 text-base">{wallet.name}</div>
+                        <div className="text-sm text-gray-500">
+                          {wallet.installed ? "Ready to connect" : "Not installed - Click to install"}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Status Icons */}
+                    <div className="flex items-center space-x-2">
+                      {wallet.installed ? (
+                        <div className="flex items-center space-x-1">
+                          <CheckCircle className="h-5 w-5 text-green-500" />
+                          <span className="text-xs text-green-600 font-medium">Installed</span>
+                        </div>
                       ) : (
-                        <span className="text-2xl">{wallet.logo}</span>
+                        <div className="flex items-center space-x-1">
+                          <ExternalLink className="h-4 w-4 text-gray-400" />
+                          <span className="text-xs text-gray-500">Install</span>
+                        </div>
+                      )}
+                      {isConnecting && (
+                        <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
                       )}
                     </div>
+                  </button>
+                </div>
+              ))}
+            </div>
 
-                    {/* Wallet Info */}
-                    <div className="text-left">
-                      <div className="font-semibold text-gray-900 text-base">{wallet.name}</div>
-                      <div className="text-sm text-gray-500">
-                        {wallet.installed ? "Ready to connect" : "Not installed - Click to install"}
-                      </div>
-                    </div>
-                  </div>
+            <div className="px-4 py-3 border-t border-gray-100 bg-gray-50">
+              <p className="text-xs text-gray-500 leading-relaxed">
+                New to crypto wallets?{" "}
+                <a
+                  href="https://ethereum.org/en/wallets/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline font-medium"
+                >
+                  Learn more about wallets
+                </a>
+              </p>
+            </div>
+          </div>
+        </>
+      )}
 
-                  {/* Status Icons */}
-                  <div className="flex items-center space-x-2">
-                    {wallet.installed ? (
-                      <div className="flex items-center space-x-1">
-                        <CheckCircle className="h-5 w-5 text-green-500" />
-                        <span className="text-xs text-green-600 font-medium">Installed</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center space-x-1">
-                        <ExternalLink className="h-4 w-4 text-gray-400" />
-                        <span className="text-xs text-gray-500">Install</span>
-                      </div>
-                    )}
-                    {isConnecting && (
-                      <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                    )}
-                  </div>
-                </button>
-              </div>
+      {/* Network Options Dropdown */}
+      {showNetworkOptions && (
+        <>
+          <div className="fixed inset-0 z-[9998]" onClick={() => setShowNetworkOptions(false)} />
+          <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-[9999]">
+            <div className="px-4 py-2 border-b border-gray-100">
+              <h3 className="font-semibold text-gray-900">Switch Network</h3>
+            </div>
+            {[
+              { key: "ethereum", name: "Ethereum Mainnet" },
+              { key: "sepolia", name: "Sepolia Testnet" },
+              { key: "base", name: "Base" },
+              { key: "baseSepolia", name: "Base Sepolia" },
+            ].map((network) => (
+              <button
+                key={network.key}
+                onClick={() => handleNetworkSwitch(network.key)}
+                className="w-full text-left px-4 py-2 hover:bg-gray-50 transition-colors"
+              >
+                {network.name}
+              </button>
             ))}
           </div>
-
-          <div className="px-4 py-3 border-t border-gray-100 bg-gray-50">
-            <p className="text-xs text-gray-500 leading-relaxed">
-              New to crypto wallets?{" "}
-              <a
-                href="https://ethereum.org/en/wallets/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:underline font-medium"
-              >
-                Learn more about wallets
-              </a>
-            </p>
-          </div>
-        </div>
+        </>
       )}
-
-      {/* Click outside to close */}
-      {(showWalletOptions || showNetworkOptions) && (
-        <div
-          className="fixed inset-0 z-[9998]"
-          onClick={() => {
-            setShowWalletOptions(false)
-            setShowNetworkOptions(false)
-          }}
-        />
-      )}
-    </div>
+    </>
   )
 }
