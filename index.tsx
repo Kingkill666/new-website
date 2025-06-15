@@ -522,7 +522,7 @@ const Index = () => {
 
                 {/* Right Column - Visual */}
                 <div className="relative">
-                  <div className="bg-white rounded-3xl p-8 shadow-2xl !border-0">
+                  <div className="!border-0 bg-white rounded-3xl p-8">
                     <div className="text-center mb-6">
                       <div className="w-24 h-24 mx-auto mb-4 rounded-2xl overflow-hidden shadow-lg">
                         <img
