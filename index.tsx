@@ -487,7 +487,7 @@ const Index = () => {
                     </h1>
 
                     <p className="text-xl text-slate-600 mb-8 leading-relaxed max-w-2xl mx-auto lg:mx-0">
-                      You buy, We match, You choose.
+                      You buy. We match. You choose.
                       <br />A new way to donate.
                     </p>
 
