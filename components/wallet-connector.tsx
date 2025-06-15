@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Wallet, ExternalLink, AlertCircle, CheckCircle } from "lucide-react"
 import { useWallet } from "@/hooks/useWallet"
@@ -34,23 +34,81 @@ export function WalletConnector({
 
   const [showWalletOptions, setShowWalletOptions] = useState(false)
   const [showNetworkOptions, setShowNetworkOptions] = useState(false)
-  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, right: 0 })
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 })
   const buttonRef = useRef<HTMLButtonElement>(null)
 
   const availableWallets = getAvailableWallets()
 
-  // Calculate dropdown position when it opens
-  useEffect(() => {
-    if (showWalletOptions && buttonRef.current) {
+  // Calculate dropdown position
+  const calculatePosition = useCallback(() => {
+    if (buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect()
-      const scrollY = window.scrollY
-      const scrollX = window.scrollX
+      const scrollY = window.scrollY || window.pageYOffset
+      const scrollX = window.scrollX || window.pageXOffset
 
-      setDropdownPosition({
-        top: rect.bottom + scrollY + 8, // 8px gap below button
-        left: rect.right + scrollX - 320, // 320px is dropdown width, align to right edge
-        right: rect.right + scrollX,
-      })
+      // Calculate position
+      const top = rect.bottom + scrollY + 8 // 8px gap below button
+      let left = rect.right + scrollX - 320 // 320px is dropdown width, align to right edge
+
+      // Ensure dropdown doesn't go off-screen on the left
+      if (left < 10) {
+        left = rect.left + scrollX
+      }
+
+      // Ensure dropdown doesn't go off-screen on the right
+      const viewportWidth = window.innerWidth
+      if (left + 320 > viewportWidth - 10) {
+        left = viewportWidth - 330 // 320px width + 10px margin
+      }
+
+      setDropdownPosition({ top, left })
+    }
+  }, [])
+
+  // Update position when dropdown opens or window resizes/scrolls
+  useEffect(() => {
+    if (showWalletOptions) {
+      calculatePosition()
+
+      const handleScroll = () => calculatePosition()
+      const handleResize = () => calculatePosition()
+
+      window.addEventListener("scroll", handleScroll, { passive: true })
+      window.addEventListener("resize", handleResize, { passive: true })
+
+      return () => {
+        window.removeEventListener("scroll", handleScroll)
+        window.removeEventListener("resize", handleResize)
+      }
+    }
+  }, [showWalletOptions, calculatePosition])
+
+  // Close dropdown when clicking outside or pressing escape
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showWalletOptions && buttonRef.current && !buttonRef.current.contains(event.target as Node)) {
+        const dropdown = document.getElementById("wallet-dropdown")
+        if (dropdown && !dropdown.contains(event.target as Node)) {
+          setShowWalletOptions(false)
+        }
+      }
+    }
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setShowWalletOptions(false)
+        setShowNetworkOptions(false)
+      }
+    }
+
+    if (showWalletOptions) {
+      document.addEventListener("mousedown", handleClickOutside)
+      document.addEventListener("keydown", handleEscape)
+
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside)
+        document.removeEventListener("keydown", handleEscape)
+      }
     }
   }, [showWalletOptions])
 
@@ -135,25 +193,28 @@ export function WalletConnector({
             </Button>
 
             {showNetworkOptions && (
-              <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-[9999]">
-                <div className="px-4 py-2 border-b border-gray-100">
-                  <h3 className="font-semibold text-gray-900">Switch Network</h3>
+              <>
+                <div className="fixed inset-0 z-[9998]" onClick={() => setShowNetworkOptions(false)} />
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-[9999]">
+                  <div className="px-4 py-2 border-b border-gray-100">
+                    <h3 className="font-semibold text-gray-900">Switch Network</h3>
+                  </div>
+                  {[
+                    { key: "ethereum", name: "Ethereum Mainnet" },
+                    { key: "sepolia", name: "Sepolia Testnet" },
+                    { key: "base", name: "Base" },
+                    { key: "baseSepolia", name: "Base Sepolia" },
+                  ].map((network) => (
+                    <button
+                      key={network.key}
+                      onClick={() => handleNetworkSwitch(network.key)}
+                      className="w-full text-left px-4 py-2 hover:bg-gray-50 transition-colors"
+                    >
+                      {network.name}
+                    </button>
+                  ))}
                 </div>
-                {[
-                  { key: "ethereum", name: "Ethereum Mainnet" },
-                  { key: "sepolia", name: "Sepolia Testnet" },
-                  { key: "base", name: "Base" },
-                  { key: "baseSepolia", name: "Base Sepolia" },
-                ].map((network) => (
-                  <button
-                    key={network.key}
-                    onClick={() => handleNetworkSwitch(network.key)}
-                    className="w-full text-left px-4 py-2 hover:bg-gray-50 transition-colors"
-                  >
-                    {network.name}
-                  </button>
-                ))}
-              </div>
+              </>
             )}
           </div>
         )}
@@ -196,7 +257,7 @@ export function WalletConnector({
         )}
       </div>
 
-      {/* Wallet Options Dropdown - FIXED POSITIONING */}
+      {/* Wallet Options Dropdown - IMPROVED POSITIONING */}
       {showWalletOptions && (
         <>
           {/* Click outside to close overlay */}
@@ -204,11 +265,13 @@ export function WalletConnector({
 
           {/* Dropdown */}
           <div
+            id="wallet-dropdown"
             className="fixed w-80 bg-white rounded-lg shadow-2xl border border-gray-200 py-3 z-[9999] max-h-96 overflow-y-auto"
             style={{
               top: `${dropdownPosition.top}px`,
               left: `${dropdownPosition.left}px`,
               minWidth: "320px",
+              maxWidth: "90vw", // Ensure it doesn't exceed viewport width
             }}
           >
             <div className="px-4 py-3 border-b border-gray-100">
@@ -286,32 +349,6 @@ export function WalletConnector({
                 </a>
               </p>
             </div>
-          </div>
-        </>
-      )}
-
-      {/* Network Options Dropdown */}
-      {showNetworkOptions && (
-        <>
-          <div className="fixed inset-0 z-[9998]" onClick={() => setShowNetworkOptions(false)} />
-          <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-[9999]">
-            <div className="px-4 py-2 border-b border-gray-100">
-              <h3 className="font-semibold text-gray-900">Switch Network</h3>
-            </div>
-            {[
-              { key: "ethereum", name: "Ethereum Mainnet" },
-              { key: "sepolia", name: "Sepolia Testnet" },
-              { key: "base", name: "Base" },
-              { key: "baseSepolia", name: "Base Sepolia" },
-            ].map((network) => (
-              <button
-                key={network.key}
-                onClick={() => handleNetworkSwitch(network.key)}
-                className="w-full text-left px-4 py-2 hover:bg-gray-50 transition-colors"
-              >
-                {network.name}
-              </button>
-            ))}
           </div>
         </>
       )}
