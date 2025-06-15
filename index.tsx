@@ -481,11 +481,9 @@ const Index = () => {
                 <div className="text-center lg:text-left">
                   <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-8 shadow-lg">
                     <h1 id="hero-heading" className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-                      <span className="text-blue-900">Honor.</span>
+                      <span className="text-red-600">Real Help.</span>
                       <br />
-                      <span className="text-red-600">Support.</span>
-                      <br />
-                      <span className="text-slate-800">Empower.</span>
+                      <span className="text-blue-900">For Real Veterans</span>
                     </h1>
 
                     <p className="text-xl text-slate-600 mb-8 leading-relaxed max-w-2xl mx-auto lg:mx-0">
