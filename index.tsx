@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -23,46 +25,53 @@ import {
   Zap,
   DollarSign,
   Eye,
-  Wallet,
   Crown,
 } from "lucide-react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import { BuyVMFModal } from "@/components/buy-vmf-modal"
+import { WalletConnector } from "@/components/wallet-connector"
 
 const Index = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [showWalletOptions, setShowWalletOptions] = useState(false)
-  const [connectedWallet, setConnectedWallet] = useState<string | null>(null)
-  const [walletAddress, setWalletAddress] = useState<string | null>(null)
-  const [isConnecting, setIsConnecting] = useState(false)
+  const [isBuyModalOpen, setIsBuyModalOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
 
-  const walletOptions = [
-    {
-      name: "Coinbase",
-      logo: "/images/coinbase-logo.png",
-      id: "coinbase",
-    },
-    {
-      name: "MetaMask",
-      logo: "🦊",
-      id: "metamask",
-    },
-    {
-      name: "Phantom",
-      logo: "👻",
-      id: "phantom",
-    },
-    {
-      name: "Rainbow",
-      logo: "🌈",
-      id: "rainbow",
-    },
-    {
-      name: "Safe",
-      logo: "🔒",
-      id: "safe",
-    },
-  ]
+  // Handle scroll for navigation styling
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY
+      setScrolled(scrollPosition > 50) // Reduced threshold for earlier transition
+    }
+
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isMenuOpen && !(event.target as Element).closest("nav")) {
+        setIsMenuOpen(false)
+      }
+    }
+
+    document.addEventListener("click", handleClickOutside)
+    return () => document.removeEventListener("click", handleClickOutside)
+  }, [isMenuOpen])
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isBuyModalOpen) {
+      document.body.style.overflow = "hidden"
+    } else {
+      document.body.style.overflow = "unset"
+    }
+
+    return () => {
+      document.body.style.overflow = "unset"
+    }
+  }, [isBuyModalOpen])
 
   const socialLinks = [
     {
@@ -71,9 +80,9 @@ const Index = () => {
       url: "https://www.facebook.com/profile.php?id=61574041978891&mibextid=wwXIfr&mibextid=wwXIfr",
     },
     {
-      name: "X",
+      name: "X (formerly Twitter)",
       icon: (
-        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
           <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
         </svg>
       ),
@@ -84,11 +93,15 @@ const Index = () => {
       icon: <Instagram className="h-5 w-5" />,
       url: "https://www.instagram.com/vmfcoin?igsh=MTJtcjl3Ym1jbm9qMA%3D%3D&utm_source=qr",
     },
-    { name: "LinkedIn", icon: <Linkedin className="h-5 w-5" />, url: "https://www.linkedin.com/company/vmfcoin/" },
+    {
+      name: "LinkedIn",
+      icon: <Linkedin className="h-5 w-5" />,
+      url: "https://www.linkedin.com/company/vmfcoin/",
+    },
     {
       name: "Farcaster",
       icon: (
-        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
           <path d="M4 4h16v2H4V4zm2 4h12v2H6V8zm1 4h10v2H7v-2zm2 4h6v2H9v-2zm3 4h2v2h-2v-2z" />
           <path d="M5 6v12h2V8h10v10h2V6H5z" />
           <rect x="7" y="10" width="10" height="6" fill="none" stroke="currentColor" strokeWidth="1" />
@@ -100,7 +113,7 @@ const Index = () => {
     {
       name: "BlueSky",
       icon: (
-        <svg className="h-5 w-5" viewBox="0 0 600 530" fill="currentColor">
+        <svg className="h-5 w-5" viewBox="0 0 600 530" fill="currentColor" aria-hidden="true">
           <path d="m135.72 44.03c66.496 49.921 138.02 151.14 164.28 205.46 26.262-54.316 97.782-155.54 164.28-205.46 47.98-36.021 125.72-63.892 125.72 24.795 0 17.712-10.155 148.79-16.111 170.07-20.703 73.984-96.144 92.854-163.25 81.433 117.3 19.964 147.14 86.092 82.697 152.22-122.39 125.59-175.91-31.511-189.63-71.766-2.514-7.3797-3.6904-10.832-3.7077-7.8964-0.0174-2.9357-1.1937 0.51669-3.7077 7.8964-13.714 40.255-67.233 197.36-189.63 71.766-64.444-66.128-34.605-132.26 82.697-152.22-67.108 11.421-142.55-7.4491-163.25-81.433-5.9562-21.282-16.111-152.36-16.111-170.07 0-88.687 77.742-60.816 125.72-24.795z" />
         </svg>
       ),
@@ -174,8 +187,8 @@ const Index = () => {
     },
     {
       icon: <Scale className="h-8 w-8 text-white" />,
-      title: "Fair Gas Costs",
-      description: "VMF reimburses voting gas fees while proposers cover submission costs",
+      title: "Gas Free Voting",
+      description: "VMF pays all gas fees to vote. Your voice matters.",
       color: "bg-purple-600",
     },
   ]
@@ -183,7 +196,7 @@ const Index = () => {
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId)
     if (element) {
-      const navHeight = 80
+      const navHeight = 80 // Increased for fixed header
       const elementPosition = element.getBoundingClientRect().top + window.pageYOffset - navHeight
       window.scrollTo({
         top: elementPosition,
@@ -192,258 +205,126 @@ const Index = () => {
     }
   }
 
-  const connectWallet = async (walletId: string) => {
-    setIsConnecting(true)
-    try {
-      let provider: any = null
-      let accounts: string[] = []
-
-      switch (walletId) {
-        case "metamask":
-          if (typeof window !== "undefined" && (window as any).ethereum) {
-            provider = (window as any).ethereum
-            accounts = await provider.request({ method: "eth_requestAccounts" })
-            setConnectedWallet("MetaMask")
-            setWalletAddress(accounts[0])
-          } else {
-            throw new Error("MetaMask not installed")
-          }
-          break
-
-        case "coinbase":
-          if (typeof window !== "undefined" && (window as any).ethereum?.isCoinbaseWallet) {
-            provider = (window as any).ethereum
-            accounts = await provider.request({ method: "eth_requestAccounts" })
-            setConnectedWallet("Coinbase")
-            setWalletAddress(accounts[0])
-          } else {
-            // Fallback to WalletLink/Coinbase Wallet SDK
-            throw new Error("Coinbase Wallet not installed")
-          }
-          break
-
-        case "phantom":
-          if (typeof window !== "undefined" && (window as any).solana?.isPhantom) {
-            const resp = await (window as any).solana.connect()
-            setConnectedWallet("Phantom")
-            setWalletAddress(resp.publicKey.toString())
-          } else {
-            throw new Error("Phantom Wallet not installed")
-          }
-          break
-
-        case "rainbow":
-          if (typeof window !== "undefined" && (window as any).ethereum?.isRainbow) {
-            provider = (window as any).ethereum
-            accounts = await provider.request({ method: "eth_requestAccounts" })
-            setConnectedWallet("Rainbow")
-            setWalletAddress(accounts[0])
-          } else {
-            throw new Error("Rainbow Wallet not installed")
-          }
-          break
-
-        case "safe":
-          // Safe wallet connection would typically require Safe Apps SDK
-          throw new Error("Safe Wallet connection requires Safe Apps environment")
-
-        default:
-          throw new Error("Unsupported wallet")
-      }
-
-      setShowWalletOptions(false)
-    } catch (error: any) {
-      console.error("Wallet connection error:", error)
-      alert(`Failed to connect ${walletId}: ${error.message}`)
-    } finally {
-      setIsConnecting(false)
+  // Handle keyboard navigation
+  const handleKeyDown = (event: React.KeyboardEvent, action: () => void) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault()
+      action()
     }
   }
-
-  const disconnectWallet = () => {
-    setConnectedWallet(null)
-    setWalletAddress(null)
-  }
-
-  const formatAddress = (address: string) => {
-    return `${address.slice(0, 6)}...${address.slice(-4)}`
-  }
-
-  // Check for existing wallet connections on page load
-  useEffect(() => {
-    const checkWalletConnection = async () => {
-      if (typeof window !== "undefined") {
-        // Check MetaMask
-        if ((window as any).ethereum && (window as any).ethereum.selectedAddress) {
-          setConnectedWallet("MetaMask")
-          setWalletAddress((window as any).ethereum.selectedAddress)
-        }
-        // Check Phantom
-        else if ((window as any).solana?.isConnected) {
-          setConnectedWallet("Phantom")
-          setWalletAddress((window as any).solana.publicKey?.toString())
-        }
-      }
-    }
-
-    checkWalletConnection()
-  }, [])
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Skip to main content link for screen readers */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-md z-50"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-md z-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
       >
         Skip to main content
       </a>
 
-      {/* Simplified Navigation */}
+      {/* Compact Professional Navigation with High Contrast - FIXED FLOATING HEADER */}
       <nav
-        className="border-b border-border/10 bg-white/98 backdrop-blur-md sticky top-0 z-50 shadow-sm"
+        className={`border-b backdrop-blur-md fixed top-0 left-0 right-0 z-50 shadow-lg transition-all duration-300 ${
+          scrolled ? "bg-white/98 border-gray-200 shadow-md" : "bg-white/95 border-border/20"
+        }`}
         role="navigation"
         aria-label="Main navigation"
+        style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50 }}
       >
-        <div className="container mx-auto px-4 sm:px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 rounded-xl overflow-hidden shadow-md">
-                <img src="/images/vmf-coin-logo.png" alt="VMF Coin Logo" className="w-full h-full object-cover" />
+        <div className="container mx-auto px-2 sm:px-4 py-2 overflow-x-hidden">
+          <div className="flex items-center justify-between min-w-0">
+            {/* Compact Logo Section */}
+            <Link
+              href="/"
+              className="flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg p-1 flex-shrink-0"
+              aria-label="VMF Veterans and Military Families home page"
+            >
+              <div className="h-16 w-16">
+                <img
+                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/New%20VMF%20Logo-HJjs5zLNzX1i3UA7BdYWX0EPUg7eWR.png"
+                  alt="VMF Logo - Patriotic star with red and white stripes"
+                  className="w-full h-full object-contain"
+                />
               </div>
-              <div>
-                <span className="text-2xl font-bold text-blue-900">VMF</span>
-                <p className="text-xs text-red-600 font-medium">Veterans & Military Families</p>
+              <div className="flex flex-col">
+                <span className="text-3xl font-black text-black tracking-tight leading-none">VMF</span>
+                <span className="text-xs font-bold text-red-600 tracking-wide uppercase leading-none">
+                  Veterans & Military Families
+                </span>
               </div>
-            </div>
+            </Link>
 
-            {/* Simplified Desktop Navigation */}
-            <div className="hidden lg:flex items-center space-x-6">
-              <a
-                href="#how-it-works"
-                className="text-slate-700 hover:text-blue-600 transition-colors font-medium text-sm whitespace-nowrap"
-                onClick={(e) => {
-                  e.preventDefault()
-                  scrollToSection("how-it-works")
-                }}
-              >
-                How It Works
-              </a>
-              <a
-                href="#charities"
-                className="text-slate-700 hover:text-blue-600 transition-colors font-medium text-sm whitespace-nowrap"
-                onClick={(e) => {
-                  e.preventDefault()
-                  scrollToSection("charities")
-                }}
-              >
-                Our Partners
-              </a>
-              <a
-                href="#governance"
-                className="text-slate-700 hover:text-blue-600 transition-colors font-medium text-sm whitespace-nowrap"
-                onClick={(e) => {
-                  e.preventDefault()
-                  scrollToSection("governance")
-                }}
-              >
-                Community
-              </a>
-              <div className="flex items-center space-x-2">
+            {/* Compact Desktop Navigation */}
+            <div className="hidden lg:flex items-center space-x-1 min-w-0">
+              <div className="flex items-center space-x-1 min-w-0">
+                <button
+                  onClick={() => scrollToSection("how-it-works")}
+                  onKeyDown={(e) => handleKeyDown(e, () => scrollToSection("how-it-works"))}
+                  className="font-semibold text-xs whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1.5 transition-all duration-200 text-slate-800 hover:text-blue-600 hover:bg-blue-50"
+                  aria-label="Navigate to How It Works section"
+                >
+                  How It Works
+                </button>
+                <button
+                  onClick={() => scrollToSection("charities")}
+                  onKeyDown={(e) => handleKeyDown(e, () => scrollToSection("charities"))}
+                  className="font-semibold text-xs whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1.5 transition-all duration-200 text-slate-800 hover:text-blue-600 hover:bg-blue-50"
+                  aria-label="Navigate to Our Partners section"
+                >
+                  Our Partners
+                </button>
+                <button
+                  onClick={() => scrollToSection("governance")}
+                  onKeyDown={(e) => handleKeyDown(e, () => scrollToSection("governance"))}
+                  className="font-semibold text-xs whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1.5 transition-all duration-200 text-slate-800 hover:text-blue-600 hover:bg-blue-50"
+                  aria-label="Navigate to Community section"
+                >
+                  Community
+                </button>
+              </div>
+
+              {/* Compact Action Buttons */}
+              <div className="flex items-center space-x-1 min-w-0">
                 <Link href="/story">
                   <Button
                     size="sm"
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 text-sm"
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    aria-label="Read our story"
                   >
                     Our Story
                   </Button>
                 </Link>
-                <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 text-sm">
+                <Button
+                  size="sm"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  onClick={() => setIsBuyModalOpen(true)}
+                  aria-label="Buy VMF tokens"
+                >
                   Buy VMF
                 </Button>
 
-                {/* Officers Club Button */}
+                {/* Compact Officers Club Button */}
                 <Link href="/officers-club">
                   <Button
-                    size="sm"
-                    className="relative overflow-hidden text-white font-bold px-4 py-2 text-sm shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                    className="relative overflow-hidden text-white font-bold px-2 py-1.5 text-xs shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
                     style={{
                       background:
                         "linear-gradient(45deg, #3B82F6 0%, #EF4444 25%, #3B82F6 50%, #EF4444 75%, #3B82F6 100%)",
                       backgroundSize: "200% 200%",
                       animation: "gradient-shift 3s ease infinite",
                     }}
+                    size="sm"
+                    aria-label="Access Officers Club"
                   >
-                    <Crown className="h-3 w-3 mr-1" />
-                    <span className="relative z-10 font-extrabold tracking-wide text-xs">OFFICERS CLUB</span>
+                    <Crown className="h-3 w-3 mr-1" aria-hidden="true" />
+                    <span className="relative z-10 font-extrabold tracking-wide">OFFICERS CLUB</span>
                   </Button>
                 </Link>
 
-                {/* Wallet Connection */}
+                {/* Compact Wallet Connection */}
                 <div className="relative">
-                  {connectedWallet ? (
-                    <div className="flex items-center space-x-2">
-                      <div className="flex items-center space-x-2 bg-green-50 border border-green-200 rounded-lg px-2 py-1">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="text-xs font-medium text-green-700">
-                          {connectedWallet}: {walletAddress && formatAddress(walletAddress)}
-                        </span>
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={disconnectWallet}
-                        className="text-red-600 border-red-200 hover:bg-red-50 px-3 py-1 text-xs"
-                      >
-                        Disconnect
-                      </Button>
-                    </div>
-                  ) : (
-                    <>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="border-red-600 text-red-600 hover:bg-red-50 font-semibold px-4 py-2 text-sm"
-                        onClick={() => setShowWalletOptions(!showWalletOptions)}
-                        disabled={isConnecting}
-                      >
-                        <Wallet className="h-3 w-3 mr-1" />
-                        {isConnecting ? "Connecting..." : "Connect"}
-                      </Button>
-
-                      {/* Wallet Options Dropdown */}
-                      {showWalletOptions && (
-                        <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-                          <div className="px-4 py-2 border-b border-gray-100">
-                            <h3 className="font-semibold text-gray-900">Connect Wallet</h3>
-                            <p className="text-sm text-gray-600">Choose your preferred wallet</p>
-                          </div>
-                          {walletOptions.map((wallet) => (
-                            <button
-                              key={wallet.id}
-                              onClick={() => connectWallet(wallet.id)}
-                              disabled={isConnecting}
-                              className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors disabled:opacity-50"
-                            >
-                              {wallet.logo.startsWith("/") ? (
-                                <img
-                                  src={wallet.logo || "/placeholder.svg"}
-                                  alt={`${wallet.name} logo`}
-                                  className="w-6 h-6 rounded"
-                                />
-                              ) : (
-                                <span className="text-2xl">{wallet.logo}</span>
-                              )}
-                              <span className="font-medium text-gray-900">{wallet.name}</span>
-                              {isConnecting && (
-                                <div className="ml-auto w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                              )}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </>
-                  )}
+                  <WalletConnector size="sm" className="px-2 py-1.5 text-xs" />
                 </div>
               </div>
             </div>
@@ -455,135 +336,120 @@ const Index = () => {
                 size="icon"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 aria-expanded={isMenuOpen}
-                aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+                aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+                aria-controls="mobile-menu"
+                className="focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-slate-800 hover:bg-gray-100"
               >
-                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </Button>
             </div>
           </div>
 
-          {/* Mobile Menu */}
+          {/* Compact Mobile Menu */}
           {isMenuOpen && (
-            <div className="lg:hidden mt-4 pb-4 border-t border-gray-100">
-              <div className="flex flex-col space-y-3 pt-4">
-                <a
-                  href="#how-it-works"
-                  className="text-slate-700 hover:text-blue-600 font-medium py-2"
-                  onClick={(e) => {
-                    e.preventDefault()
+            <div
+              id="mobile-menu"
+              className="lg:hidden mt-4 pb-4 border-t border-gray-200"
+              role="menu"
+              aria-label="Mobile navigation menu"
+            >
+              <div className="flex flex-col space-y-2 pt-4">
+                <button
+                  onClick={() => {
                     scrollToSection("how-it-works")
                     setIsMenuOpen(false)
                   }}
+                  onKeyDown={(e) =>
+                    handleKeyDown(e, () => {
+                      scrollToSection("how-it-works")
+                      setIsMenuOpen(false)
+                    })
+                  }
+                  className="text-slate-800 hover:text-blue-600 hover:bg-blue-50 font-semibold py-2 text-left text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3"
+                  role="menuitem"
+                  aria-label="Navigate to How It Works section"
                 >
                   How It Works
-                </a>
-                <a
-                  href="#charities"
-                  className="text-slate-700 hover:text-blue-600 font-medium py-2"
-                  onClick={(e) => {
-                    e.preventDefault()
+                </button>
+                <button
+                  onClick={() => {
                     scrollToSection("charities")
                     setIsMenuOpen(false)
                   }}
+                  onKeyDown={(e) =>
+                    handleKeyDown(e, () => {
+                      scrollToSection("charities")
+                      setIsMenuOpen(false)
+                    })
+                  }
+                  className="text-slate-800 hover:text-blue-600 hover:bg-blue-50 font-semibold py-2 text-left text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3"
+                  role="menuitem"
+                  aria-label="Navigate to Our Partners section"
                 >
                   Our Partners
-                </a>
-                <a
-                  href="#governance"
-                  className="text-slate-700 hover:text-blue-600 font-medium py-2"
-                  onClick={(e) => {
-                    e.preventDefault()
+                </button>
+                <button
+                  onClick={() => {
                     scrollToSection("governance")
                     setIsMenuOpen(false)
                   }}
+                  onKeyDown={(e) =>
+                    handleKeyDown(e, () => {
+                      scrollToSection("governance")
+                      setIsMenuOpen(false)
+                    })
+                  }
+                  className="text-slate-800 hover:text-blue-600 hover:bg-blue-50 font-semibold py-2 text-left text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3"
+                  role="menuitem"
+                  aria-label="Navigate to Community section"
                 >
                   Community
-                </a>
-                <div className="flex flex-col space-y-2 pt-2">
+                </button>
+
+                {/* Mobile Action Buttons */}
+                <div className="flex flex-col space-y-2 pt-3 border-t border-gray-200">
                   <Link href="/story">
                     <Button
-                      className="bg-blue-600 hover:bg-blue-700 text-white w-full"
+                      className="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                       onClick={() => setIsMenuOpen(false)}
+                      aria-label="Read our story"
                     >
                       Our Story
                     </Button>
                   </Link>
-                  <Button className="bg-blue-600 hover:bg-blue-700 text-white w-full">Buy VMF</Button>
+                  <Button
+                    className="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    onClick={() => {
+                      setIsBuyModalOpen(true)
+                      setIsMenuOpen(false)
+                    }}
+                    aria-label="Buy VMF tokens"
+                  >
+                    Buy VMF
+                  </Button>
 
                   {/* Mobile Officers Club Button */}
                   <Link href="/officers-club">
                     <Button
-                      className="w-full relative overflow-hidden text-white font-bold px-6 py-3 shadow-lg"
+                      className="w-full relative overflow-hidden text-white font-bold px-6 py-3 shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
                       style={{
                         background:
                           "linear-gradient(45deg, #3B82F6 0%, #EF4444 25%, #3B82F6 50%, #EF4444 75%, #3B82F6 100%)",
                         backgroundSize: "200% 200%",
                         animation: "gradient-shift 3s ease infinite",
                       }}
+                      onClick={() => setIsMenuOpen(false)}
+                      aria-label="Access Officers Club"
                     >
-                      <Crown className="h-4 w-4 mr-2" />
+                      <Crown className="h-4 w-4 mr-2" aria-hidden="true" />
                       <span className="relative z-10 font-extrabold tracking-wide">OFFICERS CLUB</span>
                     </Button>
                   </Link>
 
                   {/* Mobile Wallet Connection */}
-                  {connectedWallet ? (
-                    <div className="space-y-2">
-                      <div className="flex items-center space-x-2 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="text-sm font-medium text-green-700">
-                          {connectedWallet}: {walletAddress && formatAddress(walletAddress)}
-                        </span>
-                      </div>
-                      <Button
-                        variant="outline"
-                        onClick={disconnectWallet}
-                        className="w-full text-red-600 border-red-200 hover:bg-red-50"
-                      >
-                        Disconnect Wallet
-                      </Button>
-                    </div>
-                  ) : (
-                    <>
-                      <Button
-                        variant="outline"
-                        className="border-red-600 text-red-600 w-full"
-                        onClick={() => setShowWalletOptions(!showWalletOptions)}
-                        disabled={isConnecting}
-                      >
-                        <Wallet className="h-4 w-4 mr-2" />
-                        {isConnecting ? "Connecting..." : "Connect Wallet"}
-                      </Button>
-
-                      {/* Mobile Wallet Options */}
-                      {showWalletOptions && (
-                        <div className="bg-gray-50 rounded-lg p-3 space-y-2">
-                          {walletOptions.map((wallet) => (
-                            <button
-                              key={wallet.id}
-                              onClick={() => connectWallet(wallet.id)}
-                              disabled={isConnecting}
-                              className="w-full flex items-center space-x-3 px-3 py-2 bg-white rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50"
-                            >
-                              {wallet.logo.startsWith("/") ? (
-                                <img
-                                  src={wallet.logo || "/placeholder.svg"}
-                                  alt={`${wallet.name} logo`}
-                                  className="w-5 h-5 rounded"
-                                />
-                              ) : (
-                                <span className="text-xl">{wallet.logo}</span>
-                              )}
-                              <span className="font-medium text-gray-900">{wallet.name}</span>
-                              {isConnecting && (
-                                <div className="ml-auto w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                              )}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </>
-                  )}
+                  <div className="relative">
+                    <WalletConnector size="default" className="w-full py-2" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -591,60 +457,67 @@ const Index = () => {
         </div>
       </nav>
 
-      <main id="main-content">
-        {/* Modern Hero Section */}
-        <section className="relative py-16 sm:py-24 overflow-hidden bg-gradient-to-br from-blue-50 via-white to-red-50">
+      <main id="main-content" className="pt-20">
+        {/* Enhanced Hero Section - REVERTED TO ORIGINAL SIZES */}
+        <section
+          className="relative py-16 sm:py-24 overflow-hidden bg-gradient-to-br from-blue-50 via-white to-red-50"
+          aria-labelledby="hero-heading"
+        >
           <div className="absolute inset-0" aria-hidden="true">
             <img
               src="/images/banner-vmf.jpg"
               alt=""
               className="w-full h-full object-cover"
-              style={{ opacity: 0.42 }}
+              style={{ opacity: 0.7 }}
               role="presentation"
             />
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-50/90 via-white/95 to-red-50/90"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-50/95 via-white/98 to-red-50/95"></div>
           </div>
 
-          <div className="container mx-auto px-4 sm:px-6 relative z-10">
+          <div className="container mx-auto px-2 sm:px-4 lg:px-6">
             <div className="max-w-6xl mx-auto">
-              <div className="grid lg:grid-cols-2 gap-12 items-center">
-                {/* Left Column - Content */}
+              <div className="grid lg:grid-cols-2 gap-6 lg:gap-12 items-center overflow-x-hidden">
+                {/* Left Column - Content - REVERTED TO ORIGINAL SIZES */}
                 <div className="text-center lg:text-left">
-                  <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-                    <span className="text-blue-900">Honor.</span>
-                    <br />
-                    <span className="text-red-600">Support.</span>
-                    <br />
-                    <span className="text-slate-800">Empower.</span>
-                  </h1>
+                  <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-8 shadow-lg">
+                    <h1 id="hero-heading" className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+                      <span className="text-blue-900">Honor.</span>
+                      <br />
+                      <span className="text-red-600">Support.</span>
+                      <br />
+                      <span className="text-slate-800">Empower.</span>
+                    </h1>
 
-                  <p className="text-xl text-slate-600 mb-8 leading-relaxed max-w-2xl mx-auto lg:mx-0">
-                    You buy, We match, You choose.
-                    <br />A new way to donate.
-                  </p>
+                    <p className="text-xl text-slate-600 mb-8 leading-relaxed max-w-2xl mx-auto lg:mx-0">
+                      You buy, We match, You choose.
+                      <br />A new way to donate.
+                    </p>
 
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8">
-                    <Button
-                      size="lg"
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-semibold shadow-lg"
-                    >
-                      Buy VMF
-                    </Button>
-                  </div>
-
-                  {/* Trust Indicators */}
-                  <div className="flex flex-wrap justify-center lg:justify-start gap-6 text-sm text-slate-600">
-                    <div className="flex items-center space-x-2">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
-                      <span>100% Transparent</span>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8">
+                      <Button
+                        size="lg"
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-semibold shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        onClick={() => setIsBuyModalOpen(true)}
+                        aria-label="Buy VMF tokens to support veterans"
+                      >
+                        Buy VMF
+                      </Button>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Shield className="h-5 w-5 text-blue-600" />
-                      <span>Veteran Verified</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Heart className="h-5 w-5 text-red-600" />
-                      <span>Zero Fees</span>
+
+                    {/* Trust Indicators */}
+                    <div className="flex flex-wrap justify-center lg:justify-start gap-6 text-sm text-slate-600">
+                      <div className="flex items-center space-x-2">
+                        <CheckCircle className="h-5 w-5 text-green-600" aria-hidden="true" />
+                        <span>100% Transparent</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Shield className="h-5 w-5 text-blue-600" aria-hidden="true" />
+                        <span>Veteran Verified</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Heart className="h-5 w-5 text-red-600" aria-hidden="true" />
+                        <span>Zero Fees</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -660,22 +533,28 @@ const Index = () => {
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <h3 className="text-2xl font-bold text-slate-800 mb-2">Token-Based Crowdfunding</h3>
+                      <h2 className="text-2xl font-bold text-slate-800 mb-2">Token-Based Crowdfunding</h2>
                       <p className="text-slate-600">Every VMF purchase = Direct veteran support</p>
                     </div>
 
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                    <div className="space-y-4" role="list" aria-label="Platform statistics">
+                      <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg" role="listitem">
                         <span className="text-slate-700 font-medium">Donation Efficiency</span>
-                        <span className="text-2xl font-bold text-green-600">100%</span>
+                        <span className="text-2xl font-bold text-green-600" aria-label="100 percent efficiency">
+                          100%
+                        </span>
                       </div>
-                      <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                      <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg" role="listitem">
                         <span className="text-slate-700 font-medium">Platform Fees</span>
-                        <span className="text-2xl font-bold text-blue-600">$0</span>
+                        <span className="text-2xl font-bold text-blue-600" aria-label="Zero dollars in fees">
+                          $0
+                        </span>
                       </div>
-                      <div className="flex justify-between items-center p-3 bg-red-50 rounded-lg">
+                      <div className="flex justify-between items-center p-3 bg-red-50 rounded-lg" role="listitem">
                         <span className="text-slate-700 font-medium">Veterans Helped</span>
-                        <span className="text-2xl font-bold text-red-600">5,700+</span>
+                        <span className="text-2xl font-bold text-red-600" aria-label="5,700 plus veterans helped">
+                          5,700+
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -685,21 +564,29 @@ const Index = () => {
           </div>
         </section>
 
-        {/* How It Works - Modern Cards */}
-        <section id="how-it-works" className="py-16 sm:py-20 bg-white">
-          <div className="container mx-auto px-4 sm:px-6">
+        {/* Enhanced How It Works Section */}
+        <section id="how-it-works" className="py-16 sm:py-20 bg-white" aria-labelledby="how-it-works-heading">
+          <div className="container mx-auto px-2 sm:px-4 lg:px-6">
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-16">
-                <h2 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-6">How VMF Works</h2>
+                <h2 id="how-it-works-heading" className="text-4xl sm:text-5xl font-bold text-slate-900 mb-6">
+                  How VMF Works
+                </h2>
                 <p className="text-xl text-slate-600 max-w-3xl mx-auto">
                   Simple, transparent, and global. Here's how we're impacting veteran support with real world change.
                 </p>
               </div>
 
-              <div className="grid md:grid-cols-3 gap-8 mb-16">
-                <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 group">
+              <div className="grid md:grid-cols-3 gap-8 mb-16" role="list" aria-label="How VMF works steps">
+                <Card
+                  className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 group focus-within:ring-2 focus-within:ring-blue-500"
+                  role="listitem"
+                >
                   <CardContent className="p-8 text-center">
-                    <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+                    <div
+                      className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform"
+                      aria-hidden="true"
+                    >
                       <DollarSign className="h-8 w-8 text-white" />
                     </div>
                     <h3 className="text-2xl font-bold mb-4 text-slate-800">1. Buy VMF Tokens</h3>
@@ -709,9 +596,15 @@ const Index = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 group">
+                <Card
+                  className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 group focus-within:ring-2 focus-within:ring-blue-500"
+                  role="listitem"
+                >
                   <CardContent className="p-8 text-center">
-                    <div className="w-16 h-16 bg-red-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+                    <div
+                      className="w-16 h-16 bg-red-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform"
+                      aria-hidden="true"
+                    >
                       <Zap className="h-8 w-8 text-white" />
                     </div>
                     <h3 className="text-2xl font-bold mb-4 text-slate-800">2. Instant Distribution</h3>
@@ -722,9 +615,15 @@ const Index = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 group">
+                <Card
+                  className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 group focus-within:ring-2 focus-within:ring-blue-500"
+                  role="listitem"
+                >
                   <CardContent className="p-8 text-center">
-                    <div className="w-16 h-16 bg-green-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+                    <div
+                      className="w-16 h-16 bg-green-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform"
+                      aria-hidden="true"
+                    >
                       <Eye className="h-8 w-8 text-white" />
                     </div>
                     <h3 className="text-2xl font-bold mb-4 text-slate-800">3. Track Impact</h3>
@@ -738,17 +637,23 @@ const Index = () => {
               {/* Key Benefits */}
               <div className="bg-gradient-to-r from-blue-600 to-red-600 rounded-3xl p-8 sm:p-12 text-white text-center">
                 <h3 className="text-3xl font-bold mb-6">Why VMF is Different</h3>
-                <div className="grid sm:grid-cols-3 gap-8">
-                  <div>
-                    <div className="text-4xl font-bold mb-2">0%</div>
+                <div className="grid sm:grid-cols-3 gap-8" role="list" aria-label="VMF benefits">
+                  <div role="listitem">
+                    <div className="text-4xl font-bold mb-2" aria-label="Zero percent platform fees">
+                      0%
+                    </div>
                     <div className="text-blue-100">Platform Fees</div>
                   </div>
-                  <div>
-                    <div className="text-4xl font-bold mb-2">100%</div>
+                  <div role="listitem">
+                    <div className="text-4xl font-bold mb-2" aria-label="One hundred percent your choice and impact">
+                      100%
+                    </div>
                     <div className="text-blue-100">Your Choice, 100% Impact</div>
                   </div>
-                  <div>
-                    <div className="text-4xl font-bold mb-2">24/7</div>
+                  <div role="listitem">
+                    <div className="text-4xl font-bold mb-2" aria-label="24/7 blockchain tracking">
+                      24/7
+                    </div>
                     <div className="text-blue-100">Blockchain Tracking</div>
                   </div>
                 </div>
@@ -757,25 +662,28 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Partner Charities - Modern Grid */}
-        <section id="charities" className="py-16 sm:py-20 bg-gray-50">
-          <div className="container mx-auto px-4 sm:px-6">
+        {/* Enhanced Partner Charities Section */}
+        <section id="charities" className="py-16 sm:py-20 bg-gray-50" aria-labelledby="charities-heading">
+          <div className="container mx-auto px-2 sm:px-4 lg:px-6">
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-16">
-                <h2 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-6">Our Trusted Partners</h2>
+                <h2 id="charities-heading" className="text-4xl sm:text-5xl font-bold text-slate-900 mb-6">
+                  Our Trusted Partners
+                </h2>
                 <p className="text-xl text-slate-600 max-w-3xl mx-auto">
                   Every VMF token purchase supports these verified organizations making real impact for veterans.
                 </p>
               </div>
 
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6" role="list" aria-label="Partner charities">
                 {charities.map((charity, index) => (
                   <Card
                     key={index}
-                    className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 group overflow-hidden"
+                    className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 group overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 flex flex-col h-full"
+                    role="listitem"
                   >
-                    <CardContent className="p-0">
-                      <div className="p-6 pb-4">
+                    <CardContent className="p-0 flex flex-col h-full">
+                      <div className="p-6 pb-4 flex-grow">
                         <div className="flex items-center space-x-4 mb-4">
                           <div className="w-16 h-16 rounded-xl overflow-hidden bg-white shadow-md flex-shrink-0">
                             <img
@@ -786,17 +694,23 @@ const Index = () => {
                           </div>
                           <div>
                             <h3 className="text-lg font-bold text-slate-800 leading-tight">{charity.name}</h3>
-                            <div className="text-sm text-green-600 font-semibold">{charity.impact}</div>
+                            <div
+                              className="text-sm text-green-600 font-semibold"
+                              aria-label={`Impact: ${charity.impact}`}
+                            >
+                              {charity.impact}
+                            </div>
                           </div>
                         </div>
-                        <p className="text-slate-600 text-sm leading-relaxed mb-4">{charity.description}</p>
+                        <p className="text-slate-600 text-sm leading-relaxed">{charity.description}</p>
                       </div>
-                      <div className="px-6 pb-6">
+                      <div className="px-6 pb-6 mt-auto">
                         <Button
                           size="sm"
                           variant="outline"
-                          className="w-full border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+                          className="w-full border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                           onClick={() => window.open(charity.website, "_blank")}
+                          aria-label={`Learn more about ${charity.name}, opens in new tab`}
                         >
                           Learn More
                         </Button>
@@ -809,12 +723,13 @@ const Index = () => {
           </div>
         </section>
 
-        {/* DAO Governance Section - Keep as is since Jesse liked it */}
+        {/* Enhanced DAO Governance Section */}
         <section
           id="governance"
           className="py-16 sm:py-20 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 text-white relative overflow-hidden"
+          aria-labelledby="governance-heading"
         >
-          <div className="absolute inset-0 opacity-10" aria-hidden="true">
+          <div className="absolute inset-0 opacity-10 pointer-events-none" aria-hidden="true">
             <div
               className="w-full h-full bg-repeat"
               style={{
@@ -823,37 +738,48 @@ const Index = () => {
             ></div>
           </div>
 
-          <div className="container mx-auto px-4 sm:px-6 relative z-10">
+          <div className="container mx-auto px-2 sm:px-4 lg:px-6">
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-16">
                 <Badge className="bg-yellow-500/20 text-yellow-400 px-6 py-2 text-sm font-semibold border border-yellow-400/30 mb-6">
-                  <Vote className="w-4 h-4 mr-2" />
+                  <Vote className="w-4 h-4 mr-2" aria-hidden="true" />
                   DAO Governance
                 </Badge>
-                <h2 className="text-4xl sm:text-5xl font-bold mb-6">Community-Driven Decisions</h2>
+                <h2 id="governance-heading" className="text-4xl sm:text-5xl font-bold mb-6">
+                  Community-Driven Decisions
+                </h2>
                 <p className="text-xl text-white/80 max-w-4xl mx-auto leading-relaxed mb-8">
                   Every VMF token holder has a voice in how we support veterans. Vote on funding, partnerships, and
                   platform improvements.
                 </p>
-                <Button
-                  size="lg"
-                  className="bg-yellow-500 hover:bg-yellow-600 text-black px-8 py-4 text-lg font-bold shadow-lg"
-                  onClick={() => window.open("https://vmf-governance.vercel.app/", "_blank")}
+
+                <a
+                  href="https://vmf-governance.vercel.app/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center bg-yellow-500 hover:bg-yellow-600 text-black px-8 py-4 text-lg font-bold shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 rounded-md transition-colors duration-200"
+                  aria-label="Join the DAO governance platform, opens in new tab"
                 >
                   Join the DAO
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
+                  <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />
+                </a>
               </div>
 
-              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+              <div
+                className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16"
+                role="list"
+                aria-label="Governance features"
+              >
                 {governanceFeatures.map((feature, index) => (
                   <Card
                     key={index}
-                    className="bg-white/10 border-white/20 backdrop-blur-sm hover:bg-white/15 transition-all duration-300"
+                    className="bg-white/10 border-white/20 backdrop-blur-sm hover:bg-white/15 transition-all duration-300 focus-within:ring-2 focus-within:ring-yellow-500"
+                    role="listitem"
                   >
                     <CardContent className="p-6 text-center">
                       <div
                         className={`w-14 h-14 ${feature.color} rounded-2xl flex items-center justify-center mx-auto mb-4`}
+                        aria-hidden="true"
                       >
                         {feature.icon}
                       </div>
@@ -864,17 +790,32 @@ const Index = () => {
                 ))}
               </div>
 
-              <div className="grid sm:grid-cols-3 gap-8 text-center">
-                <div>
-                  <div className="text-4xl sm:text-5xl font-bold text-yellow-400 mb-3">47</div>
+              <div className="grid sm:grid-cols-3 gap-8 text-center" role="list" aria-label="DAO statistics">
+                <div role="listitem">
+                  <div
+                    className="text-4xl sm:text-5xl font-bold text-yellow-400 mb-3"
+                    aria-label="47 community proposals"
+                  >
+                    47
+                  </div>
                   <p className="text-lg text-gray-300">Community Proposals</p>
                 </div>
-                <div>
-                  <div className="text-4xl sm:text-5xl font-bold text-blue-400 mb-3">2.8M</div>
+                <div role="listitem">
+                  <div
+                    className="text-4xl sm:text-5xl font-bold text-blue-400 mb-3"
+                    aria-label="2.8 million VMF tokens voted"
+                  >
+                    2.8M
+                  </div>
                   <p className="text-lg text-gray-300">VMF Tokens Voted</p>
                 </div>
-                <div>
-                  <div className="text-4xl sm:text-5xl font-bold text-red-400 mb-3">89%</div>
+                <div role="listitem">
+                  <div
+                    className="text-4xl sm:text-5xl font-bold text-red-400 mb-3"
+                    aria-label="89 percent proposals passed"
+                  >
+                    89%
+                  </div>
                   <p className="text-lg text-gray-300">Proposals Passed</p>
                 </div>
               </div>
@@ -882,34 +823,39 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Modern CTA Section */}
-        <section className="py-16 sm:py-20 bg-white">
-          <div className="container mx-auto px-4 sm:px-6">
+        {/* Enhanced CTA Section */}
+        <section className="py-16 sm:py-20 bg-white" aria-labelledby="cta-heading">
+          <div className="container mx-auto px-2 sm:px-4 lg:px-6">
             <div className="max-w-4xl mx-auto text-center">
-              <h2 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-6">Ready to Make a Difference?</h2>
+              <h2 id="cta-heading" className="text-4xl sm:text-5xl font-bold text-slate-900 mb-6">
+                Ready to Make a Difference?
+              </h2>
               <p className="text-xl text-slate-600 mb-10 leading-relaxed">
-                Join thousands of supporters revolutionizing how we honor and support our veterans.
+                Join thousands of supporters worldwide and honor our veterans. We Want You!
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button
                   size="lg"
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 text-lg font-semibold shadow-lg"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 text-lg font-semibold shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  onClick={() => setIsBuyModalOpen(true)}
+                  aria-label="Buy VMF tokens to support veterans"
                 >
                   Buy VMF Tokens
-                  <TrendingUp className="ml-2 h-5 w-5" />
+                  <TrendingUp className="ml-2 h-5 w-5" aria-hidden="true" />
                 </Button>
                 <Button
                   size="lg"
                   variant="outline"
-                  className="border-2 border-slate-800 text-slate-800 hover:bg-slate-800 hover:text-white px-10 py-4 text-lg font-semibold"
+                  className="border-2 border-slate-800 text-slate-800 hover:bg-slate-800 hover:text-white px-10 py-4 text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
                   onClick={() =>
                     window.open(
                       "mailto:vmf@vmfcoin.com?subject=VMF%20Inquiry&body=Hello%20VMF%20team,%0A%0AI'm%20interested%20in%20learning%20more%20about%20your%20platform.%0A%0ARegards,",
                     )
                   }
+                  aria-label="Send email to VMF team"
                 >
                   Get in Touch
-                  <Mail className="ml-2 h-5 w-5" />
+                  <Mail className="ml-2 h-5 w-5" aria-hidden="true" />
                 </Button>
               </div>
             </div>
@@ -917,46 +863,60 @@ const Index = () => {
         </section>
       </main>
 
-      {/* Footer */}
+      {/* Enhanced Footer */}
       <footer className="py-12 bg-slate-900 text-white" role="contentinfo">
-        <div className="container mx-auto px-4 sm:px-6">
+        <div className="container mx-auto px-2 sm:px-4 lg:px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             <div className="flex flex-col items-center md:items-start">
               <div className="flex items-center space-x-3 mb-4">
-                <div className="w-12 h-12 rounded-xl overflow-hidden">
-                  <img src="/images/vmf-coin-logo.png" alt="VMF Coin Logo" className="w-full h-full object-cover" />
+                <div className="w-12 h-12 rounded-xl overflow-hidden bg-white p-1">
+                  <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/New%20VMF%20Logo-HJjs5zLNzX1i3UA7BdYWX0EPUg7eWR.png" alt="VMF Logo - Patriotic star with red and white stripes" className="w-full h-full object-contain" />
                 </div>
                 <div>
                   <span className="text-xl font-bold">Veterans & Military Families</span>
                 </div>
               </div>
-              <p className="text-gray-400 text-center md:text-left">Serving Those Who Served</p>
+              <p className="text-gray-400 text-center md:text-left">Supporting Those Who Served</p>
             </div>
 
             <div className="flex flex-col items-center">
               <div className="flex items-center space-x-2 mb-3">
-                <Phone className="h-5 w-5 text-red-500" />
+                <Phone className="h-5 w-5 text-red-500" aria-hidden="true" />
                 <span className="font-bold text-red-500">VETERANS CRISIS LINE</span>
               </div>
               <p className="text-center text-gray-300 mb-1">
-                Call <span className="font-bold">988</span> and Press <span className="font-bold">1</span>
+                Call{" "}
+                <a
+                  href="tel:988"
+                  className="font-bold underline focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded"
+                >
+                  988
+                </a>{" "}
+                and Press <span className="font-bold">1</span>
               </p>
               <p className="text-center text-gray-300">
-                or Text <span className="font-bold">838255</span>
+                or Text{" "}
+                <a
+                  href="sms:838255"
+                  className="font-bold underline focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded"
+                >
+                  838255
+                </a>
               </p>
             </div>
 
             <div className="flex flex-col items-center md:items-end">
-              <h4 className="text-lg font-semibold mb-4">Connect With Us</h4>
-              <div className="flex space-x-3">
+              <h3 className="text-lg font-semibold mb-4">Connect With Us</h3>
+              <div className="flex space-x-3" role="list" aria-label="Social media links">
                 {socialLinks.map((social, index) => (
                   <a
                     key={index}
                     href={social.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-slate-800 hover:bg-slate-700 p-3 rounded-xl transition-colors"
-                    aria-label={`Visit our ${social.name} page`}
+                    className="bg-slate-800 hover:bg-slate-700 p-3 rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    aria-label={`Visit our ${social.name} page, opens in new tab`}
+                    role="listitem"
                   >
                     {social.icon}
                   </a>
@@ -973,8 +933,8 @@ const Index = () => {
         </div>
       </footer>
 
-      {/* Click outside to close wallet options */}
-      {showWalletOptions && <div className="fixed inset-0 z-40" onClick={() => setShowWalletOptions(false)} />}
+      {/* Enhanced Buy VMF Modal */}
+      <BuyVMFModal isOpen={isBuyModalOpen} onClose={() => setIsBuyModalOpen(false)} />
 
       {/* CSS for gradient animation */}
       <style jsx>{`

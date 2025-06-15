@@ -16,7 +16,6 @@ import {
   Facebook,
   Instagram,
   Linkedin,
-  Wallet,
   Menu,
   X,
   Crown,
@@ -24,14 +23,13 @@ import {
 import Link from "next/link"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { WalletConnector } from "@/components/wallet-connector"
+import { BuyVMFModal } from "@/components/buy-vmf-modal"
 
 const StoryPage = () => {
   const [activeTab, setActiveTab] = useState("vision")
-  const [showWalletOptions, setShowWalletOptions] = useState(false)
-  const [connectedWallet, setConnectedWallet] = useState<string | null>(null)
-  const [walletAddress, setWalletAddress] = useState<string | null>(null)
-  const [isConnecting, setIsConnecting] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isBuyModalOpen, setIsBuyModalOpen] = useState(false)
 
   const router = useRouter()
 
@@ -121,119 +119,10 @@ const StoryPage = () => {
     }, 100)
   }
 
-  const connectWallet = async (walletId: string) => {
-    setIsConnecting(true)
-    try {
-      let provider: any = null
-      let accounts: string[] = []
-
-      switch (walletId) {
-        case "metamask":
-          if (typeof window !== "undefined" && (window as any).ethereum) {
-            provider = (window as any).ethereum
-            accounts = await provider.request({ method: "eth_requestAccounts" })
-            setConnectedWallet("MetaMask")
-            setWalletAddress(accounts[0])
-          } else {
-            throw new Error("MetaMask not installed")
-          }
-          break
-
-        case "coinbase":
-          if (typeof window !== "undefined" && (window as any).ethereum?.isCoinbaseWallet) {
-            provider = (window as any).ethereum
-            accounts = await provider.request({ method: "eth_requestAccounts" })
-            setConnectedWallet("Coinbase")
-            setWalletAddress(accounts[0])
-          } else {
-            throw new Error("Coinbase Wallet not installed")
-          }
-          break
-
-        case "phantom":
-          if (typeof window !== "undefined" && (window as any).solana?.isPhantom) {
-            const resp = await (window as any).solana.connect()
-            setConnectedWallet("Phantom")
-            setWalletAddress(resp.publicKey.toString())
-          } else {
-            throw new Error("Phantom Wallet not installed")
-          }
-          break
-
-        case "rainbow":
-          if (typeof window !== "undefined" && (window as any).ethereum?.isRainbow) {
-            provider = (window as any).ethereum
-            accounts = await provider.request({ method: "eth_requestAccounts" })
-            setConnectedWallet("Rainbow")
-            setWalletAddress(accounts[0])
-          } else {
-            throw new Error("Rainbow Wallet not installed")
-          }
-          break
-
-        case "safe":
-          throw new Error("Safe Wallet connection requires Safe Apps environment")
-
-        default:
-          throw new Error("Unsupported wallet")
-      }
-
-      setShowWalletOptions(false)
-    } catch (error: any) {
-      console.error("Wallet connection error:", error)
-      alert(`Failed to connect ${walletId}: ${error.message}`)
-    } finally {
-      setIsConnecting(false)
-    }
-  }
-
-  const disconnectWallet = () => {
-    setConnectedWallet(null)
-    setWalletAddress(null)
-  }
-
-  const formatAddress = (address: string) => {
-    return `${address.slice(0, 6)}...${address.slice(-4)}`
-  }
-
-  const walletOptions = [
-    {
-      name: "Coinbase",
-      logo: "/images/coinbase-logo.png",
-      id: "coinbase",
-    },
-    {
-      name: "MetaMask",
-      logo: "🦊",
-      id: "metamask",
-    },
-    {
-      name: "Phantom",
-      logo: "👻",
-      id: "phantom",
-    },
-    {
-      name: "Rainbow",
-      logo: "🌈",
-      id: "rainbow",
-    },
-    {
-      name: "Safe",
-      logo: "🔒",
-      id: "safe",
-    },
-  ]
-
   useEffect(() => {
     const checkWalletConnection = async () => {
       if (typeof window !== "undefined") {
-        if ((window as any).ethereum && (window as any).ethereum.selectedAddress) {
-          setConnectedWallet("MetaMask")
-          setWalletAddress((window as any).ethereum.selectedAddress)
-        } else if ((window as any).solana?.isConnected) {
-          setConnectedWallet("Phantom")
-          setWalletAddress((window as any).solana.publicKey?.toString())
-        }
+        // Removed wallet connection check
       }
     }
 
@@ -263,18 +152,29 @@ const StoryPage = () => {
               className="flex items-center space-x-3"
               aria-label="VMF Veterans and Military Families home page"
             >
-              <div className="w-10 h-10 rounded-lg overflow-hidden">
-                <img src="/images/vmf-coin-logo.png" alt="VMF Coin Logo" className="w-full h-full object-cover" />
+              <div className="h-16 w-16">
+                <img
+                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/New%20VMF%20Logo-HJjs5zLNzX1i3UA7BdYWX0EPUg7eWR.png"
+                  alt="VMF Logo - Patriotic star with red and white stripes"
+                  className="w-full h-full object-contain"
+                />
               </div>
-              <div>
-                <span className="text-xl sm:text-2xl font-bold text-blue-900">VMF</span>
-                <p className="text-xs text-red-600 hidden sm:block">Veterans & Military Families</p>
+              <div className="flex flex-col">
+                <span className="text-3xl font-black text-black tracking-tight leading-none">VMF</span>
+                <span className="text-xl font-bold text-red-600 tracking-wide uppercase leading-none">
+                  VETERANS & MILITARY FAMILIES
+                </span>
               </div>
             </Link>
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-4">
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6">Buy VMF</Button>
+              <Button
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6"
+                onClick={() => setIsBuyModalOpen(true)}
+              >
+                Buy VMF
+              </Button>
 
               {/* Officers Club Button */}
               <Link href="/officers-club">
@@ -293,70 +193,7 @@ const StoryPage = () => {
               </Link>
 
               {/* Wallet Connection */}
-              <div className="relative">
-                {connectedWallet ? (
-                  <div className="flex items-center space-x-2">
-                    <div className="flex items-center space-x-2 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="text-sm font-medium text-green-700">
-                        {connectedWallet}: {walletAddress && formatAddress(walletAddress)}
-                      </span>
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={disconnectWallet}
-                      className="text-red-600 border-red-200 hover:bg-red-50"
-                    >
-                      Disconnect
-                    </Button>
-                  </div>
-                ) : (
-                  <>
-                    <Button
-                      variant="outline"
-                      className="border-red-600 text-red-600 hover:bg-red-50 font-semibold px-6"
-                      onClick={() => setShowWalletOptions(!showWalletOptions)}
-                      disabled={isConnecting}
-                    >
-                      <Wallet className="h-4 w-4 mr-2" />
-                      {isConnecting ? "Connecting..." : "Connect"}
-                    </Button>
-
-                    {/* Wallet Options Dropdown */}
-                    {showWalletOptions && (
-                      <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-                        <div className="px-4 py-2 border-b border-gray-100">
-                          <h3 className="font-semibold text-gray-900">Connect Wallet</h3>
-                          <p className="text-sm text-gray-600">Choose your preferred wallet</p>
-                        </div>
-                        {walletOptions.map((wallet) => (
-                          <button
-                            key={wallet.id}
-                            onClick={() => connectWallet(wallet.id)}
-                            disabled={isConnecting}
-                            className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors disabled:opacity-50"
-                          >
-                            {wallet.logo.startsWith("/") ? (
-                              <img
-                                src={wallet.logo || "/placeholder.svg"}
-                                alt={`${wallet.name} logo`}
-                                className="w-6 h-6 rounded"
-                              />
-                            ) : (
-                              <span className="text-2xl">{wallet.logo}</span>
-                            )}
-                            <span className="font-medium text-gray-900">{wallet.name}</span>
-                            {isConnecting && (
-                              <div className="ml-auto w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
+              <WalletConnector size="sm" className="px-6" />
 
               <Button
                 variant="outline"
@@ -388,7 +225,12 @@ const StoryPage = () => {
             <div className="md:hidden mt-4 pb-4 border-t border-gray-100">
               <div className="flex flex-col space-y-3 pt-4">
                 <div className="flex flex-col space-y-2">
-                  <Button className="bg-blue-600 hover:bg-blue-700 text-white w-full">Buy VMF</Button>
+                  <Button
+                    className="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    onClick={() => setIsBuyModalOpen(true)}
+                  >
+                    Buy VMF
+                  </Button>
 
                   {/* Mobile Officers Club Button */}
                   <Link href="/officers-club">
@@ -407,63 +249,7 @@ const StoryPage = () => {
                   </Link>
 
                   {/* Mobile Wallet Connection */}
-                  {connectedWallet ? (
-                    <div className="space-y-2">
-                      <div className="flex items-center space-x-2 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="text-sm font-medium text-green-700">
-                          {connectedWallet}: {walletAddress && formatAddress(walletAddress)}
-                        </span>
-                      </div>
-                      <Button
-                        variant="outline"
-                        onClick={disconnectWallet}
-                        className="w-full text-red-600 border-red-200 hover:bg-red-50"
-                      >
-                        Disconnect Wallet
-                      </Button>
-                    </div>
-                  ) : (
-                    <>
-                      <Button
-                        variant="outline"
-                        className="border-red-600 text-red-600 w-full"
-                        onClick={() => setShowWalletOptions(!showWalletOptions)}
-                        disabled={isConnecting}
-                      >
-                        <Wallet className="h-4 w-4 mr-2" />
-                        {isConnecting ? "Connecting..." : "Connect Wallet"}
-                      </Button>
-
-                      {/* Mobile Wallet Options */}
-                      {showWalletOptions && (
-                        <div className="bg-gray-50 rounded-lg p-3 space-y-2">
-                          {walletOptions.map((wallet) => (
-                            <button
-                              key={wallet.id}
-                              onClick={() => connectWallet(wallet.id)}
-                              disabled={isConnecting}
-                              className="w-full flex items-center space-x-3 px-3 py-2 bg-white rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50"
-                            >
-                              {wallet.logo.startsWith("/") ? (
-                                <img
-                                  src={wallet.logo || "/placeholder.svg"}
-                                  alt={`${wallet.name} logo`}
-                                  className="w-5 h-5 rounded"
-                                />
-                              ) : (
-                                <span className="text-xl">{wallet.logo}</span>
-                              )}
-                              <span className="font-medium text-gray-900">{wallet.name}</span>
-                              {isConnecting && (
-                                <div className="ml-auto w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                              )}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </>
-                  )}
+                  <WalletConnector size="default" className="w-full" />
 
                   <Button
                     variant="outline"
@@ -1147,6 +933,7 @@ const StoryPage = () => {
                 <Button
                   size="lg"
                   className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 text-lg font-semibold"
+                  onClick={() => setIsBuyModalOpen(true)}
                   aria-label="Purchase VMF tokens"
                 >
                   Buy VMF Tokens
@@ -1174,7 +961,7 @@ const StoryPage = () => {
             <div className="flex flex-col items-center md:items-start">
               <div className="flex items-center space-x-3 mb-4">
                 <div className="w-12 h-12 rounded-xl overflow-hidden">
-                  <img src="/images/vmf-coin-logo.png" alt="VMF Coin Logo" className="w-full h-full object-cover" />
+                  <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/New%20VMF%20Logo-HJjs5zLNzX1i3UA7BdYWX0EPUg7eWR.png" alt="VMF Logo - Patriotic star with red and white stripes" className="w-full h-full object-contain" />
                 </div>
                 <div>
                   <span className="text-xl font-bold">Veterans & Military Families</span>
@@ -1288,7 +1075,8 @@ const StoryPage = () => {
         }
       `}</style>
       {/* Click outside to close wallet options */}
-      {showWalletOptions && <div className="fixed inset-0 z-40" onClick={() => setShowWalletOptions(false)} />}
+      {/* Buy VMF Modal */}
+      <BuyVMFModal isOpen={isBuyModalOpen} onClose={() => setIsBuyModalOpen(false)} />
     </div>
   )
 }
