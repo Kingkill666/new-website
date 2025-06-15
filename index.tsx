@@ -214,7 +214,7 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Skip to main content link for screen readers */}
       <a
         href="#main-content"
@@ -231,15 +231,15 @@ const Index = () => {
         role="navigation"
         aria-label="Main navigation"
       >
-        <div className="container mx-auto px-4 sm:px-6 py-2.5">
-          <div className="flex items-center justify-between">
+        <div className="container mx-auto px-2 sm:px-4 py-2.5 overflow-x-hidden">
+          <div className="flex items-center justify-between min-w-0">
             {/* Professional Logo Section - More Prominent */}
             <Link
               href="/"
               className="flex items-center space-x-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg p-1.5"
               aria-label="VMF Veterans and Military Families home page"
             >
-              <div className="h-16 w-16">
+              <div className="h-20 w-20">
                 <img
                   src="/images/vmf-logo-patriotic.png"
                   alt="VMF Logo - Patriotic star with red and white stripes"
@@ -247,7 +247,7 @@ const Index = () => {
                 />
               </div>
               <div className="flex items-center space-x-2">
-                <span className="text-4xl font-black text-slate-900 tracking-tight">VMF</span>
+                <span className="text-5xl font-black text-slate-900 tracking-tight">VMF</span>
                 <span className="text-xs font-bold text-red-600 tracking-wide uppercase">
                   Veterans & Military Families
                 </span>
@@ -255,8 +255,8 @@ const Index = () => {
             </Link>
 
             {/* High Contrast Desktop Navigation */}
-            <div className="hidden lg:flex items-center space-x-6">
-              <div className="flex items-center space-x-6">
+            <div className="hidden lg:flex items-center space-x-2 xl:space-x-4 min-w-0">
+              <div className="flex items-center space-x-2 xl:space-x-4 min-w-0">
                 <button
                   onClick={() => scrollToSection("how-it-works")}
                   onKeyDown={(e) => handleKeyDown(e, () => scrollToSection("how-it-works"))}
@@ -284,7 +284,7 @@ const Index = () => {
               </div>
 
               {/* Compact Action Buttons */}
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1 xl:space-x-2 min-w-0">
                 <Link href="/story">
                   <Button
                     size="sm"
@@ -469,9 +469,9 @@ const Index = () => {
             <div className="absolute inset-0 bg-gradient-to-br from-blue-50/90 via-white/95 to-red-50/90"></div>
           </div>
 
-          <div className="container mx-auto px-4 sm:px-6 relative z-10">
+          <div className="container mx-auto px-2 sm:px-4 lg:px-6">
             <div className="max-w-6xl mx-auto">
-              <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div className="grid lg:grid-cols-2 gap-6 lg:gap-12 items-center overflow-x-hidden">
                 {/* Left Column - Content */}
                 <div className="text-center lg:text-left">
                   <h1 id="hero-heading" className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
@@ -559,7 +559,7 @@ const Index = () => {
 
         {/* Enhanced How It Works Section */}
         <section id="how-it-works" className="py-16 sm:py-20 bg-white" aria-labelledby="how-it-works-heading">
-          <div className="container mx-auto px-4 sm:px-6">
+          <div className="container mx-auto px-2 sm:px-4 lg:px-6">
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-16">
                 <h2 id="how-it-works-heading" className="text-4xl sm:text-5xl font-bold text-slate-900 mb-6">
@@ -657,7 +657,7 @@ const Index = () => {
 
         {/* Enhanced Partner Charities Section */}
         <section id="charities" className="py-16 sm:py-20 bg-gray-50" aria-labelledby="charities-heading">
-          <div className="container mx-auto px-4 sm:px-6">
+          <div className="container mx-auto px-2 sm:px-4 lg:px-6">
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-16">
                 <h2 id="charities-heading" className="text-4xl sm:text-5xl font-bold text-slate-900 mb-6">
@@ -731,7 +731,7 @@ const Index = () => {
             ></div>
           </div>
 
-          <div className="container mx-auto px-4 sm:px-6 relative z-10">
+          <div className="container mx-auto px-2 sm:px-4 lg:px-6">
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-16">
                 <Badge className="bg-yellow-500/20 text-yellow-400 px-6 py-2 text-sm font-semibold border border-yellow-400/30 mb-6">
@@ -816,7 +816,7 @@ const Index = () => {
 
         {/* Enhanced CTA Section */}
         <section className="py-16 sm:py-20 bg-white" aria-labelledby="cta-heading">
-          <div className="container mx-auto px-4 sm:px-6">
+          <div className="container mx-auto px-2 sm:px-4 lg:px-6">
             <div className="max-w-4xl mx-auto text-center">
               <h2 id="cta-heading" className="text-4xl sm:text-5xl font-bold text-slate-900 mb-6">
                 Ready to Make a Difference?
@@ -856,7 +856,7 @@ const Index = () => {
 
       {/* Enhanced Footer */}
       <footer className="py-12 bg-slate-900 text-white" role="contentinfo">
-        <div className="container mx-auto px-4 sm:px-6">
+        <div className="container mx-auto px-2 sm:px-4 lg:px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             <div className="flex flex-col items-center md:items-start">
               <div className="flex items-center space-x-3 mb-4">
