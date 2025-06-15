@@ -729,7 +729,7 @@ const Index = () => {
           className="py-16 sm:py-20 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 text-white relative overflow-hidden"
           aria-labelledby="governance-heading"
         >
-          <div className="absolute inset-0 opacity-10" aria-hidden="true">
+          <div className="absolute inset-0 opacity-10 pointer-events-none" aria-hidden="true">
             <div
               className="w-full h-full bg-repeat"
               style={{
