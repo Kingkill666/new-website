@@ -201,7 +201,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
 
   const executeSmartContract = async () => {
     if (!walletState.isConnected) {
-      alert("Please connect your wallet first")
+      connectWallet("coinbaseSmart")
       return
     }
 
