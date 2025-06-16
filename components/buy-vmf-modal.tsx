@@ -1,11 +1,13 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import type React from "react"
+
 import { ethers } from "ethers"
+import { useState, useEffect } from "react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { X, ChevronDown, ChevronUp, CheckCircle, Copy, Check, Minus, Plus, AlertCircle } from "lucide-react"
 import { useWallet } from "@/hooks/useWallet"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./ui/dialog"
-import { Button } from "./ui/button"
 
 interface BuyVMFModalProps {
   isOpen: boolean
@@ -13,11 +15,11 @@ interface BuyVMFModalProps {
 }
 
 interface Charity {
+  id: string
   name: string
+  shortName: string
   address: string
-  percentage: number
-  description: string
-  image: string
+  logo: string
 }
 
 interface CharityDistribution {
@@ -27,102 +29,77 @@ interface CharityDistribution {
 
 const charities: Charity[] = [
   {
-    name: "Patriots Promise",
-    address: "0x6456879a5073038b0E57ea8E498Cb0240e949fC3",
-    percentage: 16.67,
-    description: "Supporting veterans and their families",
-    image: "/charities/patriots-promise.png",
-  },
-  {
-    name: "Victory For Veterans",
-    address: "0x700B53ff9a58Ee257F9A2EFda3a373D391028007",
-    percentage: 16.67,
-    description: "Empowering veterans through support and resources",
-    image: "/charities/victory-veterans.png",
-  },
-  {
+    id: "holy-family",
     name: "Holy Family Village",
+    shortName: "Holy Family Village",
     address: "0xB697C8b4bCaE454d9dee1E83f73327D7a63600a1",
-    percentage: 16.67,
-    description: "Providing housing and support for veterans",
-    image: "/charities/holy-family.png",
+    logo: "/images/charity-logos/holy-family-village-logo.png",
   },
   {
-    name: "Camp Cowboy",
-    address: "0x5951A4160F73b8798D68e7177dF8af6a7902e725",
-    percentage: 16.67,
-    description: "Supporting veterans through outdoor activities",
-    image: "/charities/camp-cowboy.png",
+    id: "patriots-promise",
+    name: "Patriots Promise",
+    shortName: "Patriots Promise",
+    address: "0x6456879a5073038b0E57ea8E498Cb0240e949fC3",
+    logo: "/images/charity-logos/patriots-promise-logo.png",
   },
   {
+    id: "victory-veterans",
+    name: "Victory For Veterans",
+    shortName: "Victory for Veterans",
+    address: "0x700B53ff9a58Ee257F9A2EFda3a373D391028007",
+    logo: "/images/charity-logos/victory-for-veterans-logo.jpeg",
+  },
+  {
+    id: "veterans-need",
     name: "Veterans In Need Project",
+    shortName: "Veterans In Need Project",
     address: "0xfB0EF51792c36Ae1fE6636603be199788819b67D",
-    percentage: 16.67,
-    description: "Helping veterans in need with essential resources",
-    image: "/charities/veterans-need.png",
+    logo: "/images/charity-logos/veterans-in-need-logo.png",
   },
   {
+    id: "honor-her",
     name: "Honor HER Foundation",
+    shortName: "Honor HER Foundation",
     address: "0x10F01632DC709F7fA413A140739D8843b06235A1",
-    percentage: 16.65,
-    description: "Supporting female veterans and their families",
-    image: "/charities/honor-her.png",
-  }
+    logo: "/images/charity-logos/honor-her-logo.jpeg",
+  },
+  {
+    id: "camp-cowboy",
+    name: "Camp Cowboy",
+    shortName: "Camp Cowboy",
+    address: "0x5951A4160F73b8798D68e7177dF8af6a7902e725",
+    logo: "/images/charity-logos/camp-cowboy-logo.png",
+  },
 ]
 
 const CONTRACT_ADDRESS = "0x46855ec900764Dc6c05155Af0eCe45DB004E814A"
-<<<<<<< HEAD
-
-const CONTRACT_ABI = [
-  {
-    type: "function",
-    name: "buyVMF",
-    inputs: [
-      { name: "amountUSDC", type: "uint256", internalType: "uint256" }
-    ],
-    outputs: [],
-    stateMutability: "nonpayable",
-  },
-  {
-    type: "function",
-    name: "distributeToCharity",
-    inputs: [
-      { name: "charityAddress", type: "address", internalType: "address" },
-      { name: "amount", type: "uint256", internalType: "uint256" }
-    ],
-    outputs: [],
-    stateMutability: "nonpayable",
-  },
-  {
-    type: "function",
-    name: "symbol",
-    inputs: [],
-    outputs: [{ name: "", type: "string", internalType: "string" }],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "balanceOf",
-    inputs: [{ name: "account", type: "address", internalType: "address" }],
-    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
-    stateMutability: "view",
-  }
-]
-
-type TransactionStatus = "pending" | "success" | "error"
-=======
->>>>>>> 1d3fcca (Update contract address)
 
 export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
+  const [currentStep, setCurrentStep] = useState<"buy" | "verify" | "success">("buy")
   const [amount, setAmount] = useState("")
   const [selectedCharities, setSelectedCharities] = useState<string[]>([])
-  const [charityDistributions, setCharityDistributions] = useState<Array<{ charityId: string; percentage: number }>>([])
-  const [transactionStatus, setTransactionStatus] = useState<TransactionStatus>("pending")
-  const [transactionHash, setTransactionHash] = useState<string>("")
-  const [transactionError, setTransactionError] = useState<string | null>(null)
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false)
-  const [estimatedGasFees, setEstimatedGasFees] = useState("0.00")
-  const { walletState, connectWallet, formatAddress, switchNetwork } = useWallet()
+  const [charityDistributions, setCharityDistributions] = useState<CharityDistribution[]>([])
+  const [isAdvancedOpen, setIsAdvancedOpen] = useState(false)
+  const [isCharityDropdownOpen, setIsCharityDropdownOpen] = useState(false)
+  const { walletState, connectWallet, formatAddress, switchNetwork} = useWallet()
+  const [transactionHash, setTransactionHash] = useState("")
+  const [vmfAmount, setVmfAmount] = useState("")
+  const [fees] = useState("20.0")
+  const [charityPool, setCharityPool] = useState("0.00")
+  const [copied, setCopied] = useState(false)
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [needsNetworkSwitch, setNeedsNetworkSwitch] = [false, (value: boolean) => {}] as const
+
+  // Focus management for accessibility
+  useEffect(() => {
+    if (isOpen) {
+      // Focus the modal when it opens
+      const modal = document.querySelector('[role="dialog"]') as HTMLElement
+      if (modal) {
+        modal.focus()
+      }
+    }
+  }, [isOpen])
 
   // Trap focus within modal
   useEffect(() => {
@@ -162,373 +139,827 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
   }, [isOpen, onClose])
 
   useEffect(() => {
+    if (amount) {
+      const vmf = (Number.parseFloat(amount) * 1000).toFixed(4)
+      setVmfAmount(vmf)
+      setCharityPool(amount)
+    }
+  }, [amount])
+
+  useEffect(() => {
+    if (walletState.isConnected) {
+      setNeedsNetworkSwitch(walletState.chainId !== 8453)
+    }
+  }, [walletState.chainId, walletState.isConnected, walletState.walletType])
+
+  useEffect(() => {
     if (selectedCharities.length > 0) {
       const equalPercentage = Math.floor(100 / selectedCharities.length)
       const remainder = 100 - equalPercentage * selectedCharities.length
-      setCharityDistributions(
-        selectedCharities.map((charityId, index) => ({
-          charityId,
-          percentage: index === 0 ? equalPercentage + remainder : equalPercentage,
-        }))
-      )
+
+      const newDistributions = selectedCharities.map((charityId, index) => ({
+        charityId,
+        percentage: index === 0 ? equalPercentage + remainder : equalPercentage,
+      }))
+
+      setCharityDistributions(newDistributions)
     } else {
       setCharityDistributions([])
     }
   }, [selectedCharities])
+  
+  const handleCharitySelect = (charityId: string) => {
+    if (selectedCharities.includes(charityId)) {
+      setSelectedCharities(selectedCharities.filter((id) => id !== charityId))
+    } else if (selectedCharities.length < 3) {
+      setSelectedCharities([...selectedCharities, charityId])
+    }
+  }
 
-  const handleCharitySelect = (charityName: string) => {
-    setSelectedCharities((prev) => {
-      if (prev.includes(charityName)) {
-        return prev.filter((id) => id !== charityName)
-      }
-      if (prev.length < 3) {
-        return [...prev, charityName]
-      }
-      return prev
-    })
+  const updateCharityPercentage = (charityId: string, newPercentage: number) => {
+    const updatedDistributions = charityDistributions.map((dist) =>
+      dist.charityId === charityId ? { ...dist, percentage: newPercentage } : dist,
+    )
 
-    setCharityDistributions((prev) => {
-      if (prev.some((dist) => dist.charityId === charityName)) {
-        return prev.filter((dist) => dist.charityId !== charityName)
-      }
-      if (prev.length < 3) {
-        return [...prev, { charityId: charityName, percentage: 100 / (prev.length + 1) }]
-      }
-      return prev
-    })
+    const total = updatedDistributions.reduce((sum, dist) => sum + dist.percentage, 0)
+    if (total <= 100) {
+      setCharityDistributions(updatedDistributions)
+    }
+  }
+
+  const getTotalPercentage = () => {
+    return charityDistributions.reduce((sum, dist) => sum + dist.percentage, 0)
   }
 
   const getCharityAmount = (percentage: number) => {
-    return ((Number(amount) * percentage) / 100).toFixed(2)
+    if (!amount) return "0.00"
+    return ((Number.parseFloat(amount) * percentage) / 100).toFixed(2)
+  }
+
+  const handleNetworkSwitch = async () => {
+    const success = await switchNetwork("base")
+    if (success) {
+      setNeedsNetworkSwitch(false)
+    }
+  }
+
+  const handleBuyNext = () => {
+    if (amount && selectedCharities.length > 0 && walletState.isConnected && getTotalPercentage() === 100) {
+      if (needsNetworkSwitch) {
+        alert("Please switch to the correct network to continue")
+        return
+      }
+      if(!walletState.usdcBalance) {
+        alert("No USDC")
+        return
+      }
+      if(walletState.usdcBalance && Number(amount) > Number(walletState.usdcBalance)) {
+        alert(`cannot buy more than your USDC balance ${walletState.usdcBalance}, ${amount}`)
+        return
+      }
+      setCurrentStep("verify")
+    }
   }
 
   const executeSmartContract = async () => {
-    if (!walletState.isConnected) {
-      connectWallet("coinbaseSmart")
-      return
-    }
-
-    if (!amount) {
-      alert("Please enter an amount")
-      return
+    if (!walletState.isConnected || !amount) {
+      alert("Smart contract execution requires a connected wallet")
+      return false
     }
 
     try {
-      setTransactionStatus("pending")
-      setTransactionHash("")
-      setTransactionError(null)
-
-      const provider = walletState.provider
-      if (!provider) {
-        throw new Error("No provider available")
-      }
-
-      const signer = await new ethers.BrowserProvider(provider).getSigner()
-      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer)
-
-      // Prepare all transactions
-      const transactions = []
+      setIsProcessing(true)
       
-      // Add USDC approval transaction
-      const usdcContract = new ethers.Contract(
-        "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", // USDC contract address
-        ["function approve(address spender, uint256 amount) returns (bool)"],
+      // Get the provider from the wallet state
+      const provider = new ethers.BrowserProvider(walletState.provider)
+      const signer = await provider.getSigner()
+      
+      const contract = new ethers.Contract(
+        CONTRACT_ADDRESS,
+        [
+          {
+            type: "function",
+            name: "handleUSDC",
+            inputs: [
+              { name: "amountUSDC", type: "uint256", internalType: "uint256" },
+              { name: "to", type: "address", internalType: "address" },
+            ],
+            outputs: [],
+            stateMutability: "nonpayable",
+          },
+        ],
         signer
       )
-      
-      const usdcAmount = ethers.parseUnits(amount.toString(), 6) // USDC has 6 decimals
-      transactions.push({
-        to: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-        data: usdcContract.interface.encodeFunctionData("approve", [CONTRACT_ADDRESS, usdcAmount])
-      })
 
-      // Add VMF purchase transaction
-      transactions.push({
-        to: CONTRACT_ADDRESS,
-        data: contract.interface.encodeFunctionData("buyVMF", [usdcAmount])
-      })
-
-      // Add charity distribution transactions
-      for (const distribution of charityDistributions) {
-        const distributionAmount = ethers.parseUnits(
-          (Number(amount) * (distribution.percentage / 100)).toFixed(6),
+      // For each charity, send their share
+      let lastTxHash = ""
+      for (const dist of charityDistributions) {
+        const charity = charities.find((c) => c.id === dist.charityId)
+        if (!charity) continue
+        // Calculate USDC amount (assuming 6 decimals for USDC)
+        const usdcAmount = ethers.parseUnits(
+          ((Number(amount) * dist.percentage) / 100).toFixed(2),
           6
         )
-        transactions.push({
-          to: CONTRACT_ADDRESS,
-          data: contract.interface.encodeFunctionData("distributeToCharity", [
-            distribution.charityId,
-            distributionAmount
-          ])
-        })
-      }
+        const usdcContractAddress = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
+        const erc20Abi = [
+          "function balanceOf(address owner) view returns (uint256)",
+          "function approve(address spender, uint256 amount) external returns (bool)"
+        ];
+        const usdcContract = new ethers.Contract(usdcContractAddress, erc20Abi, signer);
+        const approveTx = await usdcContract.approve(CONTRACT_ADDRESS, usdcAmount);
+        await approveTx.wait();
 
-      // Execute batch transaction
-      const tx: unknown = await provider.request({
-        method: "wallet_sendCalls",
-        params: [transactions]
-      })
-
-      if (typeof tx === "string") {
-        setTransactionHash(tx)
-        setTransactionStatus("success")
-        setAmount("")
-        setShowSuccessMessage(true)
-        setTimeout(() => setShowSuccessMessage(false), 5000)
-      } else {
-        throw new Error("Invalid transaction response")
+        const tx = await contract.handleUSDC(usdcAmount, charity.address)
+        lastTxHash = tx.hash
+        await tx.wait()
       }
+      setTransactionHash(lastTxHash)
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+      return true
     } catch (error: any) {
-      console.error("Transaction error:", error)
-      setTransactionError(error.message || "Transaction failed")
-      setTransactionStatus("error")
+      console.error("Smart contract execution failed:", error)
+      alert(`Transaction failed: ${error.message || "Unknown error"}`)
+      return false
+    } finally {
+      setIsProcessing(false)
     }
+  }
+
+  const handleVerifyConfirm = async () => {
+    if (needsNetworkSwitch) {
+      alert("Please switch to the correct network first")
+      return
+    }
+
+    const success = await executeSmartContract()
+    if (success) {
+      setCurrentStep("success")
+    }
+  }
+
+  const handleCopyHash = () => {
+    navigator.clipboard.writeText(transactionHash)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
   }
 
   const handleClose = () => {
-    onClose()
+    setCurrentStep("buy")
     setAmount("")
     setSelectedCharities([])
     setCharityDistributions([])
-    setTransactionStatus("pending")
     setTransactionHash("")
-    setTransactionError(null)
-    setShowSuccessMessage(false)
+    onClose()
   }
 
-  useEffect(() => {
-    const estimateGas = async () => {
-      if (!walletState.isConnected || !amount) {
-        setEstimatedGasFees("0.00")
-        return
-      }
-
-      try {
-        const provider = walletState.provider
-        if (!provider) return
-
-        const ethProvider = new ethers.BrowserProvider(provider)
-        const signerForEstimation = await ethProvider.getSigner()
-
-        const gasPrice = (await ethProvider.getFeeData()).gasPrice
-
-        if (!gasPrice) {
-          console.warn("Could not fetch gas price, using fallback.")
-          setEstimatedGasFees("N/A")
-          return
-        }
-
-        const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signerForEstimation)
-
-        let totalGasLimit = BigInt(0)
-
-        // Estimate gas for USDC approval
-        const usdcContract = new ethers.Contract(
-          "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", // USDC contract address
-          ["function approve(address spender, uint256 amount) returns (bool)"],
-          signerForEstimation
-        )
-        const usdcAmount = ethers.parseUnits(amount.toString(), 6)
-        try {
-          const approveGas = await usdcContract.approve.estimateGas(
-            CONTRACT_ADDRESS,
-            usdcAmount
-          )
-          totalGasLimit += approveGas
-        } catch (error) {
-          console.error("Error estimating USDC approval gas:", error)
-          totalGasLimit += BigInt(50000)
-        }
-
-        // Estimate gas for VMF purchase
-        try {
-          const buyVMFGas = await contract.buyVMF.estimateGas(usdcAmount)
-          totalGasLimit += buyVMFGas
-        } catch (error) {
-          console.error("Error estimating buyVMF gas:", error)
-          totalGasLimit += BigInt(100000)
-        }
-
-        // Estimate gas for charity distributions
-        for (const distribution of charityDistributions) {
-          const distributionAmount = ethers.parseUnits(
-            (Number(amount) * (distribution.percentage / 100)).toFixed(6),
-            6
-          )
-          try {
-            const distributeGas = await contract.distributeToCharity.estimateGas(
-              distribution.charityId,
-              distributionAmount
-            )
-            totalGasLimit += distributeGas
-          } catch (error) {
-            console.error("Error estimating charity distribution gas:", error)
-            totalGasLimit += BigInt(80000)
-          }
-        }
-
-        // Add a buffer for the batch transaction overhead
-        totalGasLimit = totalGasLimit * BigInt(120) / BigInt(100)
-
-        const estimatedEth = ethers.formatEther(totalGasLimit * gasPrice)
-        setEstimatedGasFees(Number(estimatedEth).toFixed(4))
-
-      } catch (error) {
-        console.error("Failed to estimate gas:", error)
-        setEstimatedGasFees("N/A")
-      }
+  const handleKeyDown = (event: React.KeyboardEvent, action: () => void) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault()
+      action()
     }
+  }
 
-    estimateGas()
-  }, [walletState.isConnected, amount, charityDistributions])
+  if (!isOpen) return null
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Buy VMF</DialogTitle>
-          <DialogDescription>
-            Purchase VMF tokens and support our partnered charities
-          </DialogDescription>
-        </DialogHeader>
-
-        {/* Transaction Status */}
-        {transactionStatus === "pending" && (
-          <div className="flex items-center justify-center p-4">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <span className="ml-2">Processing transaction...</span>
-          </div>
-        )}
-
-        {transactionStatus === "error" && (
-          <div className="bg-red-50 p-4 rounded-lg">
-            <p className="text-red-600">{transactionError}</p>
-          </div>
-        )}
-
-        {transactionStatus === "success" && (
-          <div className="bg-green-50 p-4 rounded-lg">
-            <p className="text-green-600">Transaction successful!</p>
-            {transactionHash && (
-              <a
-                href={`https://basescan.org/tx/${transactionHash}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-800 text-sm"
-              >
-                View on BaseScan
-              </a>
-            )}
-          </div>
-        )}
-
+    <div
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+      aria-describedby="modal-description"
+    >
+      <div
+        className="bg-white rounded-3xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto focus:outline-none"
+        tabIndex={-1}
+      >
         {/* Buy Step */}
-        <div className="space-y-4">
-          {/* Amount Input */}
-          <div>
-            <label htmlFor="amount" className="block text-sm font-medium text-gray-700">
-              Amount (USDC)
-            </label>
-            <div className="mt-1">
-              <input
-                type="number"
-                name="amount"
-                id="amount"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                placeholder="Enter amount"
-                min="0"
-                step="0.01"
-              />
-            </div>
-          </div>
+        {currentStep === "buy" && (
+          <Card className="border-0 shadow-none">
+            <CardHeader className="relative pb-4">
+              <div className="flex items-center justify-between">
+                <CardTitle id="modal-title" className="text-2xl font-bold text-center flex-1">
+                  BUY VMF
+                </CardTitle>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute top-4 right-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                onClick={handleClose}
+                aria-label="Close modal"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div id="modal-description" className="sr-only">
+                Purchase VMF tokens and select charities to support veterans and military families
+              </div>
 
-          {/* Charity Selection */}
-          <div className="mt-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Select Charities (Up to 3)
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {charities.map((charity) => (
-                <Button
-                  key={charity.name}
-                  variant={selectedCharities.includes(charity.name) ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => handleCharitySelect(charity.name)}
-                  className={`text-xs p-2 h-auto whitespace-normal focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                    selectedCharities.includes(charity.name)
-                      ? "bg-blue-600 text-white"
-                      : "border-gray-300 text-gray-700 hover:bg-gray-50"
-                  }`}
-                  disabled={!selectedCharities.includes(charity.name) && selectedCharities.length >= 3}
-                  aria-pressed={selectedCharities.includes(charity.name)}
-                  aria-label={`${selectedCharities.includes(charity.name) ? "Deselect" : "Select"} ${charity.name}`}
-                >
-                  {charity.name}
-                </Button>
-              ))}
-            </div>
-          </div>
+              {!walletState.isConnected ? (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4" role="alert">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <AlertCircle className="h-4 w-4 text-blue-600" aria-hidden="true" />
+                    <span className="font-medium text-blue-800">Connect Your Wallet</span>
+                  </div>
+                  <p className="text-sm text-blue-700 mb-3">
+                    Please connect your Coinbase Smart Wallet to continue with the purchase.
+                  </p>
+                  <Button
+                    onClick={() => connectWallet("coinbaseSmart")}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    aria-label="Connect Coinbase Smart Wallet"
+                  >
+                    Connect Coinbase Smart Wallet
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  {/* Connected Wallet Display */}
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4" role="status" aria-live="polite">
+                    <div className="flex items-center space-x-2">
+                      <CheckCircle className="h-4 w-4 text-green-600" aria-hidden="true" />
+                      <span className="font-medium text-green-800">
+                        {walletState.walletType}: {formatAddress(walletState.address!)}
+                      </span>
+                    </div>
+                    {walletState.balance && (
+                      
+                      <p className="text-sm text-green-700 mt-1">
+                        Balance: {walletState.balance} ETH
+                      </p>
+                    )}
+                    {walletState.usdcBalance && (
+                      <p className="text-sm text-green-700 mt-1">
+                        ${walletState.usdcBalance}
+                      </p>)}
+                  </div>
 
-          {/* Charity Distribution */}
-          {selectedCharities.length > 0 && (
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Charity Distribution
-              </h3>
-              <div className="space-y-4">
-                {charityDistributions.map((distribution) => {
-                  const charity = charities.find((c) => c.name === distribution.charityId)
-                  return (
-                    <div
-                      key={distribution.charityId}
-                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-                    >
-                      <div className="flex items-center space-x-3">
-                        <img
-                          src={charity?.image || "/placeholder.svg"}
-                          alt={`${charity?.name} logo`}
-                          className="w-10 h-10 rounded-full"
-                        />
-                        <div>
-                          <p className="font-medium text-gray-900">{charity?.name}</p>
-                          <p className="text-sm text-gray-500">
-                            {charity?.description}
-                          </p>
-                        </div>
+                  {/* USDC Balance Warning */}
+                  {(!walletState.usdcBalance || Number(walletState.usdcBalance) === 0) && (
+                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-4" role="alert">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <AlertCircle className="h-4 w-4 text-orange-600" aria-hidden="true" />
+                        <span className="font-medium text-orange-800">No USDC Balance</span>
                       </div>
-                      <div className="text-right">
-                        <p className="font-medium text-gray-900">
-                          {distribution.percentage}%
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          {getCharityAmount(distribution.percentage)} USDC
-                        </p>
+                      <p className="text-sm text-orange-700 mb-3">
+                        You need USDC to purchase VMF tokens. Get USDC directly on Base network.
+                      </p>
+                      <div className="flex flex-col gap-2">
+                        <Button
+                          variant="outline"
+                          onClick={() => window.open("https://coinbase.com/buy/usdc", "_blank")}
+                          className="w-full text-orange-700 border-orange-300 hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                          aria-label="Buy USDC on Coinbase, opens in new tab"
+                        >
+                          Buy USDC on Coinbase
+                        </Button>
                       </div>
                     </div>
-                  )
-                })}
+                  )}
+
+                  {/* Network Warning for Ethereum wallets */}
+                  {walletState.walletType !== "Phantom" && needsNetworkSwitch && (
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4" role="alert">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <AlertCircle className="h-4 w-4 text-yellow-600" aria-hidden="true" />
+                        <span className="font-medium text-yellow-800">Wrong Network</span>
+                      </div>
+                      <p className="text-sm text-yellow-700 mb-3">Please switch to the correct network to continue.</p>
+                      <Button
+                        onClick={handleNetworkSwitch}
+                        className="w-full bg-yellow-600 hover:bg-yellow-700 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
+                        aria-label="Switch to new network"
+                      >
+                        Switch Network
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* Phantom Wallet Warning */}
+                  {walletState.walletType === "Phantom" && (
+                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-4" role="alert">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <AlertCircle className="h-4 w-4 text-orange-600" aria-hidden="true" />
+                        <span className="font-medium text-orange-800">Solana Wallet Detected</span>
+                      </div>
+                      <p className="text-sm text-orange-700">
+                        Smart contract execution requires an Ethereum wallet. Please connect MetaMask, Coinbase, or
+                        Rainbow wallet.
+                      </p>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {/* Amount Input */}
+              <div>
+                <label htmlFor="amount-input" className="block text-sm font-medium text-gray-700 mb-2">
+                  AMOUNT $
+                </label>
+                <input
+                  id="amount-input"
+                  type="number"
+                  value={amount}
+                  max={walletState.usdcBalance || ""}
+                  min="0"
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="Enter amount"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-lg"
+                  aria-describedby="amount-description"
+                />
+                <div id="amount-description" className="sr-only">
+                  Enter the dollar amount you want to spend on VMF tokens
+                </div>
               </div>
-            </div>
-          )}
 
-          {/* Estimated Gas Fees */}
-          <div className="mt-4 flex justify-between items-center text-sm text-gray-600">
-            <span>Estimated Gas Fees:</span>
-            <span>{estimatedGasFees !== "N/A" ? `$${estimatedGasFees}` : "N/A"}</span>
-          </div>
+              {/* Description */}
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <p className="text-sm text-blue-800 leading-relaxed">
+                  When you buy VMF, you get to donate an equal amount of USDC to our partnered charities{" "}
+                  <span className="font-bold">for FREE!</span>
+                </p>
+              </div>
 
-          {/* Buy Button */}
-          <Button
-            onClick={executeSmartContract}
-            disabled={!amount || selectedCharities.length === 0 || transactionStatus === "pending"}
-            className="w-full"
-          >
-            Buy VMF
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+              {/* Charity Selection */}
+              <fieldset>
+                <legend className="text-lg font-semibold mb-3">Pick Up To 3 Charities</legend>
+                <div className="grid grid-cols-2 gap-2" role="group" aria-labelledby="charity-selection">
+                  {charities.map((charity) => (
+                    <Button
+                      key={charity.id}
+                      variant={selectedCharities.includes(charity.id) ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => handleCharitySelect(charity.id)}
+                      onKeyDown={(e) => handleKeyDown(e, () => handleCharitySelect(charity.id))}
+                      className={`text-xs p-2 h-auto whitespace-normal focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                        selectedCharities.includes(charity.id)
+                          ? "bg-blue-600 text-white"
+                          : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                      }`}
+                      disabled={!selectedCharities.includes(charity.id) && selectedCharities.length >= 3}
+                      aria-pressed={selectedCharities.includes(charity.id)}
+                      aria-label={`${selectedCharities.includes(charity.id) ? "Deselect" : "Select"} ${charity.shortName}`}
+                    >
+                      {charity.shortName}
+                    </Button>
+                  ))}
+                </div>
+                <p className="text-xs text-gray-500 mt-2" aria-live="polite">
+                  Selected: {selectedCharities.length}/3
+                </p>
+              </fieldset>
+
+              {/* Charity Distribution */}
+              {selectedCharities.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold mb-3">Distribute Your Donation</h3>
+                  <div className="space-y-3" role="list" aria-label="Charity distribution settings">
+                    {charityDistributions.map((distribution) => {
+                      const charity = charities.find((c) => c.id === distribution.charityId)
+                      return (
+                        <div key={distribution.charityId} className="bg-gray-50 p-3 rounded-lg" role="listitem">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center space-x-2">
+                              <img
+                                src={charity?.logo || "/placeholder.svg"}
+                                alt=""
+                                className="w-6 h-6 rounded object-contain"
+                                aria-hidden="true"
+                              />
+                              <span className="text-sm font-medium">{charity?.shortName}</span>
+                            </div>
+                            <span
+                              className="text-sm font-bold text-green-600"
+                              aria-label={`${charity?.shortName} will receive $${getCharityAmount(distribution.percentage)}`}
+                            >
+                              ${getCharityAmount(distribution.percentage)}
+                            </span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-6 w-6 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                              onClick={() =>
+                                updateCharityPercentage(
+                                  distribution.charityId,
+                                  Math.max(0, distribution.percentage - 5),
+                                )
+                              }
+                              aria-label={`Decrease ${charity?.shortName} percentage by 5%`}
+                            >
+                              <Minus className="h-3 w-3" />
+                            </Button>
+                            <div
+                              className="flex-1 bg-white rounded px-2 py-1 text-center text-sm font-medium"
+                              aria-label={`${charity?.shortName} receives ${distribution.percentage} percent`}
+                            >
+                              {distribution.percentage}%
+                            </div>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-6 w-6 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                              onClick={() =>
+                                updateCharityPercentage(
+                                  distribution.charityId,
+                                  Math.min(100, distribution.percentage + 5),
+                                )
+                              }
+                              aria-label={`Increase ${charity?.shortName} percentage by 5%`}
+                            >
+                              <Plus className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                  <div className="mt-3 p-2 bg-blue-50 rounded-lg" role="status" aria-live="polite">
+                    <div className="flex justify-between text-sm">
+                      <span>Total Distribution:</span>
+                      <span className={`font-bold ${getTotalPercentage() === 100 ? "text-green-600" : "text-red-600"}`}>
+                        {getTotalPercentage()}%
+                      </span>
+                    </div>
+                    {getTotalPercentage() !== 100 && (
+                      <p className="text-xs text-red-600 mt-1" role="alert">
+                        Distribution must equal 100% to continue
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Next Button */}
+              <Button
+                onClick={handleBuyNext}
+                disabled={
+                  !amount ||
+                  selectedCharities.length === 0 ||
+                  !walletState.isConnected ||
+                  getTotalPercentage() !== 100 ||
+                  walletState.walletType === "Phantom" ||
+                  needsNetworkSwitch
+                }
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg font-semibold disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                aria-label="Continue to verification step"
+              >
+                Continue
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Verify Step */}
+        {currentStep === "verify" && (
+          <Card className="border-0 shadow-none">
+            <CardHeader className="relative pb-4">
+              <CardTitle id="modal-title" className="text-2xl font-bold text-center">
+                Verify
+                <br />
+                VMF Purchase
+              </CardTitle>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute top-4 right-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                onClick={handleClose}
+                aria-label="Close modal"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* VMF Amount - Centered */}
+              <div className="text-center">
+                <div className="bg-gray-100 rounded-lg p-4">
+                  <label className="block text-sm font-medium text-gray-600 mb-1">VMF</label>
+                  <div
+                    className="text-2xl font-bold text-gray-900"
+                    aria-label={`You will receive ${vmfAmount} VMF tokens`}
+                  >
+                    {vmfAmount}
+                  </div>
+                </div>
+              </div>
+
+              {/* Transaction Details */}
+              <div role="list" aria-label="Transaction details">
+                <div className="flex justify-between items-center py-2 border-b border-gray-200" role="listitem">
+                  <span className="font-medium text-gray-700">Amount:</span>
+                  <span className="font-semibold">${amount}</span>
+                </div>
+
+                <div className="flex justify-between items-center py-2 border-b border-gray-200" role="listitem">
+                  <span className="font-medium text-gray-700">Network:</span>
+                </div>
+
+                <div className="flex justify-between items-center py-2 border-b border-gray-200" role="listitem">
+                  <span className="font-medium text-gray-700">Contract:</span>
+                  <div className="flex items-center space-x-2">
+                    <span className="font-mono text-xs">{formatAddress(CONTRACT_ADDRESS)}</span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => navigator.clipboard.writeText(CONTRACT_ADDRESS)}
+                      className="h-6 w-6 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                      aria-label="Copy contract address to clipboard"
+                    >
+                      <Copy className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center py-2 border-b border-gray-200" role="listitem">
+                  <span className="font-medium text-gray-700">Gas Fees (Est.):</span>
+                  <span className="font-semibold">${fees}</span>
+                </div>
+
+                <div className="flex justify-between items-center py-2 border-b border-gray-200" role="listitem">
+                  <span className="font-medium text-gray-700">Charity Pool:</span>
+                  <span className="font-semibold">${charityPool}</span>
+                </div>
+              </div>
+
+              {/* Charity Distribution Details */}
+              <div className="border border-gray-200 rounded-lg">
+                <Button
+                  variant="ghost"
+                  onClick={() => setIsCharityDropdownOpen(!isCharityDropdownOpen)}
+                  className="w-full justify-between p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  aria-expanded={isCharityDropdownOpen}
+                  aria-controls="charity-distribution-details"
+                  aria-label="Toggle charity distribution details"
+                >
+                  <span className="font-medium">Charity Distribution</span>
+                  {isCharityDropdownOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                </Button>
+                {isCharityDropdownOpen && (
+                  <div id="charity-distribution-details" className="p-3 border-t border-gray-200 bg-gray-50">
+                    <div className="space-y-2" role="list" aria-label="Charity distribution breakdown">
+                      {charityDistributions.map((distribution) => {
+                        const charity = charities.find((c) => c.id === distribution.charityId)
+                        return (
+                          <div
+                            key={distribution.charityId}
+                            className="flex justify-between items-center"
+                            role="listitem"
+                          >
+                            <div className="flex items-center space-x-2">
+                              <img
+                                src={charity?.logo || "/placeholder.svg"}
+                                alt=""
+                                className="w-4 h-4 rounded object-contain"
+                                aria-hidden="true"
+                              />
+                              <span className="text-sm">{charity?.name}</span>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-sm font-semibold">${getCharityAmount(distribution.percentage)}</div>
+                              <div className="text-xs text-gray-500">{distribution.percentage}%</div>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Advanced Dropdown */}
+              <div className="border border-gray-200 rounded-lg">
+                <Button
+                  variant="ghost"
+                  onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
+                  className="w-full justify-between p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  aria-expanded={isAdvancedOpen}
+                  aria-controls="advanced-details"
+                  aria-label="Toggle advanced transaction details"
+                >
+                  <span className="font-medium">Advanced</span>
+                  {isAdvancedOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                </Button>
+                {isAdvancedOpen && (
+                  <div id="advanced-details" className="p-3 border-t border-gray-200 bg-gray-50">
+                    <div className="space-y-2 text-xs" role="list" aria-label="Advanced transaction details">
+                      <div className="flex justify-between" role="listitem">
+                        <span>Contract Address:</span>
+                        <span className="font-mono">{formatAddress(CONTRACT_ADDRESS)}</span>
+                      </div>
+                      <div className="flex justify-between" role="listitem">
+                        <span>Function:</span>
+                        <span className="font-mono">handleUSDC</span>
+                      </div>
+                      <div className="flex justify-between" role="listitem">
+                        <span>Connected Wallet:</span>
+                        <span className="font-mono">{formatAddress(walletState.address!)}</span>
+                      </div>
+                      <div className="flex justify-between" role="listitem">
+                        <span>Chain ID:</span>
+                        <span className="font-mono">{walletState.chainId}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex space-x-3 pt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => setCurrentStep("buy")}
+                  className="flex-1 border-black text-black hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                  disabled={isProcessing}
+                  aria-label="Go back to purchase step"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleVerifyConfirm}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  disabled={isProcessing || needsNetworkSwitch}
+                  aria-label={isProcessing ? "Processing transaction" : "Confirm and execute transaction"}
+                >
+                  {isProcessing ? "Processing..." : "Confirm"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Success Step */}
+        {currentStep === "success" && (
+          <Card className="border-0 shadow-none">
+            <CardHeader className="relative pb-4">
+              <CardTitle id="modal-title" className="text-2xl font-bold text-center text-green-600">
+                Success!
+              </CardTitle>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute top-4 right-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                onClick={handleClose}
+                aria-label="Close modal"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Success Details */}
+              <div role="list" aria-label="Transaction success details">
+                <div className="flex justify-between items-center py-2 border-b border-gray-200" role="listitem">
+                  <span className="font-medium text-gray-700">VMF Total Amount:</span>
+                  <span className="font-semibold">{vmfAmount}</span>
+                </div>
+
+                <div className="flex justify-between items-center py-2 border-b border-gray-200" role="listitem">
+                  <span className="font-medium text-gray-700">Amount:</span>
+                  <span className="font-semibold">${amount}</span>
+                </div>
+
+                {transactionHash && (
+                  <div className="flex justify-between items-center py-2 border-b border-gray-200" role="listitem">
+                    <span className="font-medium text-gray-700">Transaction:</span>
+                    <div className="flex items-center space-x-2">
+                      <span className="font-mono text-sm">{formatAddress(transactionHash)}</span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={handleCopyHash}
+                        className="h-6 w-6 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        aria-label={copied ? "Transaction hash copied" : "Copy transaction hash"}
+                      >
+                        {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Charity Distribution */}
+              <div className="border border-gray-200 rounded-lg">
+                <Button
+                  variant="ghost"
+                  onClick={() => setIsCharityDropdownOpen(!isCharityDropdownOpen)}
+                  className="w-full justify-between p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  aria-expanded={isCharityDropdownOpen}
+                  aria-controls="success-charity-distribution"
+                  aria-label="Toggle charity distribution details"
+                >
+                  <span className="font-medium">Charity Distribution</span>
+                  {isCharityDropdownOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                </Button>
+                {isCharityDropdownOpen && (
+                  <div id="success-charity-distribution" className="p-3 border-t border-gray-200 bg-gray-50">
+                    <div className="space-y-2" role="list" aria-label="Successful charity distributions">
+                      {charityDistributions.map((distribution) => {
+                        const charity = charities.find((c) => c.id === distribution.charityId)
+                        return (
+                          <div
+                            key={distribution.charityId}
+                            className="flex justify-between items-center"
+                            role="listitem"
+                          >
+                            <div className="flex items-center space-x-2">
+                              <CheckCircle className="h-4 w-4 text-green-600" aria-label="Successfully donated" />
+                              <img
+                                src={charity?.logo || "/placeholder.svg"}
+                                alt=""
+                                className="w-4 h-4 rounded object-contain"
+                                aria-hidden="true"
+                              />
+                              <span className="text-sm">{charity?.name}</span>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-sm font-semibold text-green-600">
+                                ${getCharityAmount(distribution.percentage)}
+                              </div>
+                              <div className="text-xs text-gray-500">{distribution.percentage}%</div>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Advanced Dropdown */}
+              <div className="border border-gray-200 rounded-lg">
+                <Button
+                  variant="ghost"
+                  onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
+                  className="w-full justify-between p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  aria-expanded={isAdvancedOpen}
+                  aria-controls="success-advanced-details"
+                  aria-label="Toggle advanced transaction details"
+                >
+                  <span className="font-medium">Advanced</span>
+                  {isAdvancedOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                </Button>
+                {isAdvancedOpen && (
+                  <div id="success-advanced-details" className="p-3 border-t border-gray-200 bg-gray-50">
+                    <div className="space-y-2 text-xs" role="list" aria-label="Advanced transaction details">
+                      <div className="flex justify-between" role="listitem">
+                        <span>Network:</span>
+                      </div>
+                      <div className="flex justify-between" role="listitem">
+                        <span>Contract:</span>
+                        <span className="font-mono">{formatAddress(CONTRACT_ADDRESS)}</span>
+                      </div>
+                      {transactionHash && (
+                        <div className="flex justify-between" role="listitem">
+                          <span>Tx Hash:</span>
+                          <span className="font-mono">{formatAddress(transactionHash)}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Baldy NFT Button */}
+              <div className="text-center">
+                <Button
+                  variant="outline"
+                  className="bg-yellow-100 border-yellow-300 text-yellow-800 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
+                  onClick={() => window.open("#", "_blank")}
+                  aria-label="View Baldy NFT, opens in new tab"
+                >
+                  <div
+                    className="w-6 h-6 rounded-full bg-yellow-400 mr-2 flex items-center justify-center"
+                    aria-hidden="true"
+                  >
+                    <span className="text-xs font-bold">B</span>
+                  </div>
+                  Baldy NFT
+                </Button>
+              </div>
+
+              {/* Thank You Message */}
+              <div className="bg-green-50 p-4 rounded-lg text-center" role="status" aria-live="polite">
+                <p className="text-sm text-green-800 leading-relaxed">
+                  <span className="font-bold">VMF</span> Thanks you for your support and donation to help our partnered
+                  charities <span className="font-bold">HODL</span>
+                </p>
+              </div>
+
+              {/* Close Button */}
+              <Button
+                onClick={handleClose}
+                className="w-full bg-green-600 hover:bg-green-700 text-white py-3 text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                aria-label="Complete transaction and close modal"
+              >
+                Complete
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    </div>
   )
 }
