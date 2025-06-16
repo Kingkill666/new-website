@@ -72,7 +72,7 @@ const charities: Charity[] = [
   },
 ]
 
-const CONTRACT_ADDRESS = "0xB9c4f47c1987ef50FB9D4aa9ae3A9a929DE42A77"
+const CONTRACT_ADDRESS = "0x5dA3a9Ca8db3ACdE5A64077AA1D7A2408c5DE24C"
 
 export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
   const [currentStep, setCurrentStep] = useState<"buy" | "verify" | "success">("buy")
