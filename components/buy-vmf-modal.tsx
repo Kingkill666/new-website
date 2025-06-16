@@ -71,6 +71,7 @@ const charities: Charity[] = [
 ]
 
 const CONTRACT_ADDRESS = "0x46855ec900764Dc6c05155Af0eCe45DB004E814A"
+<<<<<<< HEAD
 
 const CONTRACT_ABI = [
   {
@@ -109,6 +110,8 @@ const CONTRACT_ABI = [
 ]
 
 type TransactionStatus = "pending" | "success" | "error"
+=======
+>>>>>>> 1d3fcca (Update contract address)
 
 export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
   const [amount, setAmount] = useState("")
