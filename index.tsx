@@ -30,7 +30,6 @@ import {
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { BuyVMFModal } from "@/components/buy-vmf-modal"
-import { WalletConnector } from "@/components/wallet-connector"
 
 const Index = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -322,11 +321,6 @@ const Index = () => {
                     <span className="relative z-10 font-extrabold tracking-wide">OFFICERS CLUB</span>
                   </Button>
                 </Link>
-
-                {/* Compact Wallet Connection */}
-                <div className="relative">
-                  <WalletConnector size="sm" className="px-2 py-1.5 text-xs" />
-                </div>
               </div>
             </div>
 
@@ -446,11 +440,6 @@ const Index = () => {
                       <span className="relative z-10 font-extrabold tracking-wide">OFFICERS CLUB</span>
                     </Button>
                   </Link>
-
-                  {/* Mobile Wallet Connection */}
-                  <div className="relative">
-                    <WalletConnector size="default" className="w-full py-2" />
-                  </div>
                 </div>
               </div>
             </div>

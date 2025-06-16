@@ -92,11 +92,6 @@ const OfficersClubPage = () => {
                 Buy VMF
               </Button>
 
-              {/* Wallet Connection */}
-              <div className="relative">
-                <WalletConnector size="sm" className="px-6" showBalance={true} />
-              </div>
-
               <Button
                 variant="outline"
                 className="flex items-center space-x-2 border-white/20 text-black bg-white/80 hover:bg-white"
@@ -130,7 +125,6 @@ const OfficersClubPage = () => {
                 >
                   Buy VMF
                 </Button>
-                <WalletConnector size="default" className="w-full" showBalance={true} />
                 <Button
                   variant="outline"
                   className="w-full border-white/20 text-black bg-white/80 hover:bg-white"

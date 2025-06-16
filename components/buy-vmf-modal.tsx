@@ -223,33 +223,29 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
 
   const executeSmartContract = async () => {
     if (!walletState.isConnected || !amount) {
-      alert("Smart contract execution requires an Ethereum wallet")
+      alert("Smart contract execution requires a connected wallet")
       return false
     }
 
     try {
       setIsProcessing(true)
-      // Import ethers only when needed (client-side)
-      // Prompt user for Ethereum provider (MetaMask)
-      if (!window.ethereum) {
-        console.log("no eth")
-        return
-      }
-      const provider = new ethers.BrowserProvider(window.ethereum)
+      
+      // Get the provider from the wallet state
+      const provider = new ethers.BrowserProvider(walletState.provider)
       const signer = await provider.getSigner()
-      console.log("signer", signer)
+      
       const contract = new ethers.Contract(
         CONTRACT_ADDRESS,
         [
           {
-        type: "function",
-        name: "handleUSDC",
-        inputs: [
-          { name: "amountUSDC", type: "uint256", internalType: "uint256" },
-          { name: "to", type: "address", internalType: "address" },
-        ],
-        outputs: [],
-        stateMutability: "nonpayable",
+            type: "function",
+            name: "handleUSDC",
+            inputs: [
+              { name: "amountUSDC", type: "uint256", internalType: "uint256" },
+              { name: "to", type: "address", internalType: "address" },
+            ],
+            outputs: [],
+            stateMutability: "nonpayable",
           },
         ],
         signer
@@ -370,14 +366,14 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                     <span className="font-medium text-blue-800">Connect Your Wallet</span>
                   </div>
                   <p className="text-sm text-blue-700 mb-3">
-                    Please connect your wallet to continue with the purchase.
+                    Please connect your Coinbase Smart Wallet to continue with the purchase.
                   </p>
                   <Button
-                    onClick={() => connectWallet("metamask")}
+                    onClick={() => connectWallet("coinbaseSmart")}
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                    aria-label="Connect MetaMask wallet"
+                    aria-label="Connect Coinbase Smart Wallet"
                   >
-                    Connect Wallet
+                    Connect Coinbase Smart Wallet
                   </Button>
                 </div>
               ) : (
@@ -413,13 +409,6 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                         You need USDC to purchase VMF tokens. Get USDC directly on Base network.
                       </p>
                       <div className="flex flex-col gap-2">
-                        <Button
-                          onClick={() => connectWallet("coinbaseSmart")}
-                          className="w-full bg-blue-600 hover:bg-blue-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                          aria-label="Connect Coinbase Smart Wallet"
-                        >
-                          Connect Coinbase Smart Wallet
-                        </Button>
                         <Button
                           variant="outline"
                           onClick={() => window.open("https://coinbase.com/buy/usdc", "_blank")}

@@ -20,6 +20,7 @@ export interface WalletState {
   chainId: number | null
   isConnecting: boolean
   error: string | null
+  provider: any | null
 }
 
 export const WALLET_OPTIONS: WalletInfo[] = [
@@ -39,6 +40,7 @@ export function useWallet() {
     chainId: null,
     isConnecting: false,
     error: null,
+    provider: null,
   })
 
   const formatAddress = useCallback((address: string) => {
@@ -119,57 +121,57 @@ export function useWallet() {
         console.warn("Could not fetch balance:", balanceError)
       }
       
-    // Get USDC Balance
-    const usdcContractAddress = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
-    console.log("(wallet) Fetching USDC balance for address:", address, usdcContractAddress)
-    const erc20Abi = [
-      "function balanceOf(address owner) view returns (uint256)",
-    ];
-    const ethProvider = new ethers.BrowserProvider(provider);
-    const network = await ethProvider.getNetwork();
+      // Get USDC Balance
+      const usdcContractAddress = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
+      console.log("(wallet) Fetching USDC balance for address:", address, usdcContractAddress)
+      const erc20Abi = [
+        "function balanceOf(address owner) view returns (uint256)",
+      ];
+      const ethProvider = new ethers.BrowserProvider(provider);
+      const network = await ethProvider.getNetwork();
 
-    // Base Mainnet chainId is 8453 (decimal) or 0x2105 (hex)
-    const BASE_MAINNET_CHAIN_ID = 8453;
-    if (network.chainId !== BigInt(BASE_MAINNET_CHAIN_ID)) {
-      try {
-      await provider.request({
-        method: "wallet_switchEthereumChain",
-        params: [{ chainId: "0x2105" }],
-      });
-      // Refresh provider/network after switching
-      const updatedNetwork = await ethProvider.getNetwork();
-      if (updatedNetwork.chainId !== BigInt(BASE_MAINNET_CHAIN_ID)) {
-        throw new Error(`Failed to switch to Base Mainnet. ${updatedNetwork.chainId} ${BASE_MAINNET_CHAIN_ID}`);
+      // Base Mainnet chainId is 8453 (decimal) or 0x2105 (hex)
+      const BASE_MAINNET_CHAIN_ID = 8453;
+      if (network.chainId !== BigInt(BASE_MAINNET_CHAIN_ID)) {
+        try {
+          await provider.request({
+            method: "wallet_switchEthereumChain",
+            params: [{ chainId: "0x2105" }],
+          });
+          // Refresh provider/network after switching
+          const updatedNetwork = await ethProvider.getNetwork();
+          if (updatedNetwork.chainId !== BigInt(BASE_MAINNET_CHAIN_ID)) {
+            throw new Error(`Failed to switch to Base Mainnet. ${updatedNetwork.chainId} ${BASE_MAINNET_CHAIN_ID}`);
+          }
+        } catch (switchError: any) {
+          if (switchError.code === 4902) {
+            // Chain not added, try to add Base Mainnet
+            await provider.request({
+              method: "wallet_addEthereumChain",
+              params: [{
+                chainId: "0x2105",
+                chainName: "Base Mainnet",
+                nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+                rpcUrls: ["https://mainnet.base.org"],
+                blockExplorerUrls: ["https://basescan.org"],
+              }],
+            });
+          } else {
+            throw switchError;
+          }
+        }
       }
-      } catch (switchError: any) {
-      if (switchError.code === 4902) {
-        // Chain not added, try to add Base Mainnet
-        await provider.request({
-        method: "wallet_addEthereumChain",
-        params: [{
-          chainId: "0x2105",
-          chainName: "Base Mainnet",
-          nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
-          rpcUrls: ["https://mainnet.base.org"],
-          blockExplorerUrls: ["https://basescan.org"],
-        }],
-        });
-      } else {
-        throw switchError;
-      }
-      }
-    }
   
-    const usdcContract = new ethers.Contract(usdcContractAddress, erc20Abi, ethProvider);
+      const usdcContract = new ethers.Contract(usdcContractAddress, erc20Abi, ethProvider);
 
-    const rawUsdcBalance = await usdcContract.balanceOf(address);
-    console.log(`The (raw) USDC balance is: ${rawUsdcBalance}`);
+      const rawUsdcBalance = await usdcContract.balanceOf(address);
+      console.log(`The (raw) USDC balance is: ${rawUsdcBalance}`);
 
-    // Format the balance using the 6 decimals for USDC
-    const usdcFormattedBalance = ethers.formatUnits(rawUsdcBalance, 6);
+      // Format the balance using the 6 decimals for USDC
+      const usdcFormattedBalance = ethers.formatUnits(rawUsdcBalance, 6);
 
-    console.log(`The USDC balance is: ${usdcFormattedBalance}`);
-    console.log("ADDRSS", address)
+      console.log(`The USDC balance is: ${usdcFormattedBalance}`);
+      console.log("ADDRSS", address)
 
       setWalletState({
         isConnected: true,
@@ -180,6 +182,7 @@ export function useWallet() {
         chainId: Number.parseInt(chainId, 16),
         isConnecting: false,
         error: null,
+        provider,
       })
 
       // Store connection info
@@ -230,6 +233,7 @@ export function useWallet() {
         chainId: null,
         isConnecting: false,
         error: null,
+        provider: null,
       })
 
       // Clear storage

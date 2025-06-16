@@ -193,9 +193,6 @@ const StoryPage = () => {
                 </Button>
               </Link>
 
-              {/* Wallet Connection */}
-              <WalletConnector size="sm" className="px-6" />
-
               <Button
                 variant="outline"
                 className="flex items-center space-x-2"
@@ -248,21 +245,6 @@ const StoryPage = () => {
                       <span className="relative z-10 font-extrabold tracking-wide">OFFICERS CLUB</span>
                     </Button>
                   </Link>
-
-                  {/* Mobile Wallet Connection */}
-                  <WalletConnector size="default" className="w-full" />
-
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => {
-                      handleBackToHome()
-                      setIsMenuOpen(false)
-                    }}
-                  >
-                    <ArrowLeft className="h-4 w-4 mr-2" />
-                    Back to Home
-                  </Button>
                 </div>
               </div>
             </div>
