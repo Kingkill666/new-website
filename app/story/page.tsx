@@ -78,7 +78,7 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
     },
     {
       year: "June 15th 2025",
-      title: "VMF Goes Live",
+      title: "VMF Launches on Base",
       description: "VMF went live on Base and the system works. Charities receive 100% of their donations and donors receive VMF.",
     },
   ]
