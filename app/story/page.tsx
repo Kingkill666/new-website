@@ -76,6 +76,11 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
         "VMF placed 2nd in the prestigious Base batch Build competition, validating our innovative approach to veteran support through blockchain technology.",
       link: "https://x.com/VMFCoin/status/1930890256888590525",
     },
+    {
+      year: "June 15th 2025",
+      title: "VMF Goes Live",
+      description: "VMF went live on Base and the system works. Charities receive 100% of their donations and donors receive VMF.",
+    },
   ]
 
   const values = [
