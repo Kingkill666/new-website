@@ -48,29 +48,29 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
 
   const milestones = [
     {
-      year: "2023",
+      year: "Jan 2025",
       title: "The Vision",
       description:
         "Michael Gray recognized the inefficiencies in traditional charity donation systems and envisioned a blockchain solution.",
     },
     {
-      year: "2025",
+      year: "Feb 2025",
       title: "Foundation Built",
       description:
         "VMF was officially founded with the core principle of 100% donation transparency and zero fees for veteran charities.",
     },
     {
-      year: "2025",
+      year: "April 2025",
       title: "Partner Network",
       description: "Established partnerships with six verified veteran support organizations across the United States.",
     },
     {
-      year: "2025",
+      year: "May 2025",
       title: "Community Growth",
       description: "Building a strong community of supporters committed to honoring those who served our country.",
     },
     {
-      year: "2025",
+      year: "June 2025",
       title: "Base Batch Build Success",
       description:
         "VMF placed 2nd in the prestigious Base batch Build competition, validating our innovative approach to veteran support through blockchain technology.",
