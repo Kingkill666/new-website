@@ -125,7 +125,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
             e.preventDefault()
             lastElement.focus()
           }
-        } else {
+      } else {
           if (document.activeElement === lastElement) {
             e.preventDefault()
             firstElement.focus()
@@ -158,16 +158,16 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
       const remainder = 100 - equalPercentage * selectedCharities.length
 
       const newDistributions = selectedCharities.map((charityId, index) => ({
-        charityId,
-        percentage: index === 0 ? equalPercentage + remainder : equalPercentage,
-      }))
+          charityId,
+          percentage: index === 0 ? equalPercentage + remainder : equalPercentage,
+        }))
 
       setCharityDistributions(newDistributions)
     } else {
       setCharityDistributions([])
     }
   }, [selectedCharities])
-  
+
   const handleCharitySelect = (charityId: string) => {
     if (selectedCharities.includes(charityId)) {
       setSelectedCharities(selectedCharities.filter((id) => id !== charityId))
@@ -250,7 +250,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
         ],
         signer
       )
-
+      
       // For each charity, send their share
       let lastTxHash = ""
       for (const dist of charityDistributions) {
@@ -367,14 +367,14 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                   <p className="text-sm text-blue-700 mb-3">
                     Please connect your Coinbase Smart Wallet to continue with the purchase.
                   </p>
-                  <Button
-                    onClick={() => connectWallet("coinbaseSmart")}
+            <Button
+              onClick={() => connectWallet("coinbaseSmart")}
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                     aria-label="Connect Coinbase Smart Wallet"
-                  >
-                    Connect Coinbase Smart Wallet
-                  </Button>
-                </div>
+            >
+              Connect Coinbase Smart Wallet
+            </Button>
+          </div>
               ) : (
                 <>
                   {/* Connected Wallet Display */}
@@ -417,8 +417,8 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                           Buy USDC on Coinbase
                         </Button>
                       </div>
-                    </div>
-                  )}
+              </div>
+            )}
 
                   {/* Network Warning for Ethereum wallets */}
                   {walletState.walletType !== "Phantom" && needsNetworkSwitch && (
@@ -435,7 +435,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                       >
                         Switch Network
                       </Button>
-                    </div>
+              </div>
                   )}
 
                   {/* Phantom Wallet Warning */}
@@ -452,13 +452,13 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                     </div>
                   )}
                 </>
-              )}
+            )}
 
-              {/* Amount Input */}
-              <div>
+            {/* Amount Input */}
+            <div>
                 <label htmlFor="amount-input" className="block text-sm font-medium text-gray-700 mb-2">
                   AMOUNT $
-                </label>
+              </label>
                 <input
                   id="amount-input"
                   type="number"
@@ -473,7 +473,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                 <div id="amount-description" className="sr-only">
                   Enter the dollar amount you want to spend on VMF tokens
                 </div>
-              </div>
+            </div>
 
               {/* Description */}
               <div className="bg-blue-50 p-4 rounded-lg">
@@ -483,22 +483,22 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                 </p>
               </div>
 
-              {/* Charity Selection */}
+            {/* Charity Selection */}
               <fieldset>
                 <legend className="text-lg font-semibold mb-3">Pick Up To 3 Charities</legend>
                 <div className="grid grid-cols-2 gap-2" role="group" aria-labelledby="charity-selection">
-                  {charities.map((charity) => (
-                    <Button
+                {charities.map((charity) => (
+                  <Button
                       key={charity.id}
                       variant={selectedCharities.includes(charity.id) ? "default" : "outline"}
-                      size="sm"
+                    size="sm"
                       onClick={() => handleCharitySelect(charity.id)}
                       onKeyDown={(e) => handleKeyDown(e, () => handleCharitySelect(charity.id))}
-                      className={`text-xs p-2 h-auto whitespace-normal focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                    className={`text-xs p-2 h-auto whitespace-normal focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
                         selectedCharities.includes(charity.id)
-                          ? "bg-blue-600 text-white"
-                          : "border-gray-300 text-gray-700 hover:bg-gray-50"
-                      }`}
+                        ? "bg-blue-600 text-white"
+                        : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                    }`}
                       disabled={!selectedCharities.includes(charity.id) && selectedCharities.length >= 3}
                       aria-pressed={selectedCharities.includes(charity.id)}
                       aria-label={`${selectedCharities.includes(charity.id) ? "Deselect" : "Select"} ${charity.shortName}`}
@@ -670,7 +670,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                       aria-label="Copy contract address to clipboard"
                     >
                       <Copy className="h-3 w-3" />
-                    </Button>
+                  </Button>
                   </div>
                 </div>
 
@@ -728,7 +728,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                     </div>
                   </div>
                 )}
-              </div>
+            </div>
 
               {/* Advanced Dropdown */}
               <div className="border border-gray-200 rounded-lg">
@@ -765,7 +765,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                     </div>
                   </div>
                 )}
-              </div>
+            </div>
 
               {/* Action Buttons */}
               <div className="flex space-x-3 pt-4">
@@ -778,21 +778,21 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                 >
                   Cancel
                 </Button>
-                <Button
+            <Button
                   onClick={handleVerifyConfirm}
                   className="flex-1 bg-blue-600 hover:bg-blue-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   disabled={isProcessing || needsNetworkSwitch}
                   aria-label={isProcessing ? "Processing transaction" : "Confirm and execute transaction"}
                 >
                   {isProcessing ? "Processing..." : "Confirm"}
-                </Button>
-              </div>
+            </Button>
+          </div>
             </CardContent>
           </Card>
         )}
 
         {/* Success Step */}
-        {currentStep === "success" && (
+      {currentStep === "success" && (
           <Card className="border-0 shadow-none">
             <CardHeader className="relative pb-4">
               <CardTitle id="modal-title" className="text-2xl font-bold text-center text-green-600">
@@ -821,7 +821,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                   <span className="font-semibold">${amount}</span>
                 </div>
 
-                {transactionHash && (
+          {transactionHash && (
                   <div className="flex justify-between items-center py-2 border-b border-gray-200" role="listitem">
                     <span className="font-medium text-gray-700">Transaction:</span>
                     <div className="flex items-center space-x-2">
@@ -918,8 +918,8 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                         </div>
                       )}
                     </div>
-                  </div>
-                )}
+        </div>
+      )}
               </div>
 
               {/* Baldy NFT Button */}

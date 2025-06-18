@@ -370,7 +370,7 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
                             className="bg-slate-50 border-l-4 border-blue-700 px-8 py-6 rounded-2xl shadow-lg font-serif text-xl text-slate-800 leading-tight tracking-tight max-w-2xl mx-auto relative"
                             style={{ fontFamily: 'Merriweather, serif', lineHeight: '1.25', letterSpacing: '-0.01em', marginTop: '1.5rem', marginBottom: '1.5rem' }}
                           >
-                            <span>"I couldn't stand by and watch as bureaucracy and fees reduced the impact of people's generosity."</span>
+                            <span>"It really upset me watching bureaucracy and fees reduce the impact of people's donations."</span>
                             <span className="block text-base text-slate-600 font-semibold mt-4" style={{ fontFamily: 'Merriweather, serif', fontWeight: 500, letterSpacing: '-0.01em' }}>— Michael reflects</span>
                           </blockquote>
                         </div>
@@ -410,10 +410,12 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
                       </div>
 
                       <div className="flex justify-center space-x-4 pt-4">
-                        <Button variant="outline" size="sm" aria-label="Contact Michael Gray">
-                          <Mail className="h-4 w-4 mr-2" aria-hidden="true" />
-                          Contact
-                        </Button>
+                        <a href="mailto:vmf@vmfcoin.com" aria-label="Email VMF">
+                          <Button variant="outline" size="sm">
+                            <Mail className="h-4 w-4 mr-2" aria-hidden="true" />
+                            Contact
+                          </Button>
+                        </a>
                         <a
                           href={michaelGray.linkedin}
                           target="_blank"
