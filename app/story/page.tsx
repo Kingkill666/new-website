@@ -33,16 +33,18 @@ const StoryPage = () => {
 
   const router = useRouter()
 
-  const teamMembers = [
-    {
-      name: "Michael Gray",
-      role: "Founder & CEO",
-      bio: "A passionate advocate for veterans and military families, Michael founded VMF with the vision of revolutionizing charitable giving through blockchain technology. His commitment to transparency and efficiency drives VMF's mission to ensure every donation reaches those who served our country.",
-      image: "/images/michael-gray.png",
-      linkedin: "https://x.com/VMFCoin",
-    },
-    // Add more team members as needed
-  ]
+  // Michael Gray - Founder & CEO
+  const michaelGray = {
+    name: "Michael Gray",
+    role: "Founder & CEO",
+    bio: `I'm Michael Gray, a proud husband and father of two incredible kids. While I am not a Veteran myself, I come from a family of service members and hold the utmost respect for those who serve. My commitment to supporting Veterans drives my work with the VMF Coin Project 2025, where I aim to provide meaningful resources and support.
+
+By day, I'm a grip in Hollywood (Local 80), where integrity and honesty are non-negotiable. Working unsupervised on film sets has instilled in me a steadfast commitment to doing the right thing, a principle that guides every aspect of my life. Beyond the set, I'm passionate about technology, with a decade of experience in the crypto space, which inspired the creation of VMF Coin.
+
+When I'm not working, you'll find me camping with my family in our rooftop tent, exploring nature, or soaking in hot springs—having visited over 150 with my kids. I also help run the Ultimate Hot Springs Guide website. My family's love for adventure and my dedication to integrity fuel everything I do, from supporting Veterans to pursuing projects with purpose.`,
+    image: "/images/michael-gray.png",
+    linkedin: "https://x.com/VMFCoin",
+  }
 
   const milestones = [
     {
@@ -359,30 +361,21 @@ const StoryPage = () => {
                       </div>
                       <h2 className="text-4xl font-bold text-slate-900 mb-6">The Vision Behind VMF</h2>
 
-                      <div className="prose prose-lg text-slate-700 max-w-none">
-                        <p className="font-medium text-slate-900 text-xl mb-4">
-                          VMF was born from a simple but powerful realization: our veterans and military families
-                          deserve better than the current charitable giving system.
+                      <div className="max-w-3xl mx-auto text-center mb-16">
+                        <p className="text-lg mb-6">
+                          One evening, while watching a military documentary and studying crypto charts, I was struck by the idea of combining these two worlds to address a critical issue: traditional donation platforms taking fees from funds meant for Veterans.
                         </p>
-
-                        <p className="mb-6">
-                          When Michael Gray, our founder and CEO, witnessed firsthand how traditional donation platforms
-                          were taking fees from money meant for veterans, he knew something had to change. Every dollar
-                          taken in fees was a dollar not reaching the heroes who sacrificed for our freedom.
-                        </p>
-
-                        <div className="bg-blue-50 border-l-4 border-blue-600 p-4 my-6">
-                          <p className="italic text-blue-800 font-medium">
-                            "I couldn't stand by and watch as bureaucracy and fees reduced the impact of people's
-                            generosity."
-                          </p>
-                          <cite className="text-slate-600 text-sm not-italic block mt-2">— Michael reflects</cite>
+                        <div className="flex justify-center my-10">
+                          <blockquote
+                            className="bg-slate-50 border-l-4 border-blue-700 px-8 py-6 rounded-2xl shadow-lg font-serif text-xl text-slate-800 leading-tight tracking-tight max-w-2xl mx-auto relative"
+                            style={{ fontFamily: 'Merriweather, serif', lineHeight: '1.25', letterSpacing: '-0.01em', marginTop: '1.5rem', marginBottom: '1.5rem' }}
+                          >
+                            <span>"I couldn't stand by and watch as bureaucracy and fees reduced the impact of people's generosity."</span>
+                            <span className="block text-base text-slate-600 font-semibold mt-4" style={{ fontFamily: 'Merriweather, serif', fontWeight: 500, letterSpacing: '-0.01em' }}>— Michael reflects</span>
+                          </blockquote>
                         </div>
-
-                        <p>
-                          This frustration sparked an idea: What if blockchain technology could eliminate these
-                          inefficiencies? What if we could create a system where 100% of donations reach veteran
-                          charities, with complete transparency and zero fees?
+                        <p className="text-lg mb-6">
+                          This sparked the creation of VMF, leveraging blockchain technology to ensure 100% of donations reach veteran charities with complete transparency and zero fees. Our vision is to build a transparent, efficient platform that rewards generosity and invites non-tech-savvy individuals to confidently engage with cryptocurrency, making donations easy and approachable. VMF is dedicated to maximizing support for Veterans and their families, ensuring every dollar makes a meaningful impact.
                         </p>
                       </div>
                     </div>
@@ -403,61 +396,37 @@ const StoryPage = () => {
                       <div className="text-center mb-8">
                         <div className="w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden bg-white shadow-lg">
                           <img
-                            src="/images/michael-gray.png"
+                            src={michaelGray.image}
                             alt="Michael Gray, Founder and CEO of VMF"
                             className="w-full h-full object-cover"
                           />
                         </div>
-                        <h3 className="text-2xl font-bold text-slate-800 mb-1">Michael Gray</h3>
-                        <p className="text-blue-600 font-semibold mb-4">Founder & CEO</p>
+                        <h3 className="text-2xl font-bold text-slate-800 mb-1">{michaelGray.name}</h3>
+                        <p className="text-blue-600 font-semibold mb-4">{michaelGray.role}</p>
                       </div>
 
-                      <div className="space-y-6">
-                        <div className="flex">
-                          <Quote className="h-8 w-8 text-blue-300 flex-shrink-0 mr-4 mt-1" />
-                          <blockquote className="text-slate-700">
-                            "Every veteran deserves to know their sacrifice is honored not just in words, but in
-                            actions. VMF is our action."
-                          </blockquote>
-                        </div>
+                      <div className="prose prose-lg text-slate-700 max-w-none mx-auto mb-6 whitespace-pre-line">
+                        {michaelGray.bio}
+                      </div>
 
-                        <div className="bg-white rounded-xl p-6 shadow-sm">
-                          <h4 className="font-semibold text-slate-900 mb-2">The Problem We're Solving</h4>
-                          <ul className="space-y-3 text-slate-700">
-                            <li className="flex items-start">
-                              <ChevronRight className="h-5 w-5 text-red-500 mt-0.5 mr-2 flex-shrink-0" />
-                              <span>Traditional platforms take 2-5% in processing fees</span>
-                            </li>
-                            <li className="flex items-start">
-                              <ChevronRight className="h-5 w-5 text-red-500 mt-0.5 mr-2 flex-shrink-0" />
-                              <span>Lack of transparency in how donations are used</span>
-                            </li>
-                            <li className="flex items-start">
-                              <ChevronRight className="h-5 w-5 text-red-500 mt-0.5 mr-2 flex-shrink-0" />
-                              <span>Donors have limited choice in directing their support</span>
-                            </li>
-                          </ul>
-                        </div>
-
-                        <div className="flex justify-center space-x-4 pt-4">
-                          <Button variant="outline" size="sm" aria-label="Contact Michael Gray">
-                            <Mail className="h-4 w-4 mr-2" aria-hidden="true" />
-                            Contact
+                      <div className="flex justify-center space-x-4 pt-4">
+                        <Button variant="outline" size="sm" aria-label="Contact Michael Gray">
+                          <Mail className="h-4 w-4 mr-2" aria-hidden="true" />
+                          Contact
+                        </Button>
+                        <a
+                          href={michaelGray.linkedin}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label="Follow VMF on X, opens in new tab"
+                        >
+                          <Button variant="outline" size="sm">
+                            <svg className="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                            </svg>
+                            X
                           </Button>
-                          <a
-                            href="https://x.com/VMFCoin"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="Follow VMF on X, opens in new tab"
-                          >
-                            <Button variant="outline" size="sm">
-                              <svg className="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                              </svg>
-                              X
-                            </Button>
-                          </a>
-                        </div>
+                        </a>
                       </div>
                     </div>
                   </div>
