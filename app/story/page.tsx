@@ -676,7 +676,7 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
                               aria-hidden="true"
                             ></div>
                             <p className="text-blue-200 font-semibold text-lg px-4 py-1 bg-blue-500/20 rounded-full border border-blue-300/30">
-                              Beloved Family Member & Veteran
+                              Beloved Grandpa & POW Hero
                             </p>
                             <div
                               className="h-px bg-gradient-to-r from-transparent via-blue-300 to-transparent w-16"
@@ -753,7 +753,7 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
                               aria-hidden="true"
                             ></div>
                             <p className="text-red-200 font-semibold text-lg px-4 py-1 bg-red-500/20 rounded-full border border-red-300/30">
-                              Cherished Family Member & Hero
+                              Cherished Grandpa & Veteran
                             </p>
                             <div
                               className="h-px bg-gradient-to-r from-transparent via-red-300 to-transparent w-16"
