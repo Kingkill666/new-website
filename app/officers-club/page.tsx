@@ -85,13 +85,19 @@ const OfficersClubPage = () => {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-4">
+              <Link href="/story">
+                <Button
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6"
+                >
+                  Our Story
+                </Button>
+              </Link>
               <Button
                 className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6"
                 onClick={() => setIsBuyModalOpen(true)}
               >
                 Buy VMF
               </Button>
-
               <Button
                 variant="outline"
                 className="flex items-center space-x-2 border-white/20 text-black bg-white/80 hover:bg-white"
@@ -119,6 +125,13 @@ const OfficersClubPage = () => {
           {isMenuOpen && (
             <div className="md:hidden mt-4 pb-4 border-t border-gray-700">
               <div className="flex flex-col space-y-3 pt-4">
+                <Link href="/story">
+                  <Button
+                    className="bg-blue-600 hover:bg-blue-700 text-white w-full"
+                  >
+                    Our Story
+                  </Button>
+                </Link>
                 <Button
                   className="bg-blue-600 hover:bg-blue-700 text-white w-full"
                   onClick={() => setIsBuyModalOpen(true)}
