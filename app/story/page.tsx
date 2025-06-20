@@ -154,26 +154,23 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
       >
         <div className="container mx-auto px-4 sm:px-6 py-3">
           <div className="flex items-center justify-between">
-            <button
-              type="button"
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="flex items-center space-x-3"
-              aria-label="Scroll to top of page"
-            >
-              <div className="h-16 w-16">
-                <img
-                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/New%20VMF%20Logo-HJjs5zLNzX1i3UA7BdYWX0EPUg7eWR.png"
-                  alt="VMF Logo - Patriotic star with red and white stripes"
-                  className="w-full h-full object-contain"
-                />
+            <Link href="/" aria-label="Go to home page">
+              <div className="flex items-center space-x-3 cursor-pointer">
+                <div className="h-16 w-16">
+                  <img
+                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/New%20VMF%20Logo-HJjs5zLNzX1i3UA7BdYWX0EPUg7eWR.png"
+                    alt="VMF Logo - Patriotic star with red and white stripes"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-3xl font-black text-black tracking-tight leading-none">VMF</span>
+                  <span className="text-xl font-bold text-red-600 tracking-wide uppercase leading-none">
+                    VETERANS & MILITARY FAMILIES
+                  </span>
+                </div>
               </div>
-              <div className="flex flex-col">
-                <span className="text-3xl font-black text-black tracking-tight leading-none">VMF</span>
-                <span className="text-xl font-bold text-red-600 tracking-wide uppercase leading-none">
-                  VETERANS & MILITARY FAMILIES
-                </span>
-              </div>
-            </button>
+            </Link>
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-4">
@@ -806,7 +803,7 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
                       </div>
                       <blockquote className="text-2xl sm:text-3xl lg:text-4xl font-light italic text-white mb-8 leading-relaxed">
                         "We carry forward their legacy of service, ensuring that their sacrifice and the sacrifice of
-                        all veterans is never forgotten. Every VMF token purchased honors their memory and supports
+                        all veterans is never forgotten. Every VMF Coin purchased honors their memory and supports
                         those who continue to serve."
                       </blockquote>
                       <cite className="text-yellow-300 font-semibold text-xl">— The VMF Family</cite>
@@ -814,7 +811,7 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
                   </div>
                 </div>
 
-                {/* Legacy Values */}
+               {/* Legacy Values */}
                 <div className="text-center">
                   <h3 className="text-3xl sm:text-4xl font-bold text-white mb-12">Their Legacy Lives On</h3>
                   <div className="grid sm:grid-cols-3 gap-8 lg:gap-12" role="list">
@@ -885,7 +882,7 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
             <div className="max-w-4xl mx-auto text-center">
               <h2 className="text-3xl sm:text-4xl font-bold text-blue-900 mb-4">Join Our Mission</h2>
               <p className="text-lg text-slate-600 mb-8 leading-relaxed">
-                VMF is more than a token—it's a community of people who believe our veterans deserve better. Join us in
+                VMF is more than a Coin—it's a community of people who believe our veterans deserve better. Join us in
                 revolutionizing how we support those who served.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -893,9 +890,9 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
                   size="lg"
                   className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 text-lg font-semibold"
                   onClick={() => setIsBuyModalOpen(true)}
-                  aria-label="Purchase VMF tokens"
+                  aria-label="Purchase VMF Coins"
                 >
-                  Buy VMF Tokens
+                  Buy VMF Coins
                   <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />
                 </Button>
                 <Button

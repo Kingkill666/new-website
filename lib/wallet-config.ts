@@ -54,7 +54,7 @@ export const connectCoinbaseSmartWallet = async () => {
     const { CoinbaseWalletSDK } = await import('@coinbase/wallet-sdk')
     
     const coinbaseWallet = new CoinbaseWalletSDK({
-      appName: "VMF Token",
+      appName: "VMF Coin",
       appLogoUrl: "https://your-app-logo-url.com/logo.png", // Replace with your app logo
     })
 

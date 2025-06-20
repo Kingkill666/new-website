@@ -169,13 +169,13 @@ const Index = () => {
     {
       icon: <Vote className="h-8 w-8 text-white" />,
       title: "Proportional Voting",
-      description: "Every token equals one vote - perfect mathematical fairness regardless of holding size",
+      description: "Every coin equals one vote - perfect mathematical fairness regardless of holding size",
       color: "bg-blue-600",
     },
     {
       icon: <UserCheck className="h-8 w-8 text-white" />,
       title: "Open Participation",
-      description: "No minimum token threshold required - every community member has a voice",
+      description: "No minimum coin threshold required - every community member has a voice",
       color: "bg-red-600",
     },
     {
@@ -234,26 +234,23 @@ const Index = () => {
         <div className="container mx-auto px-2 sm:px-4 py-2 overflow-x-hidden">
           <div className="flex items-center justify-between min-w-0">
             {/* Compact Logo Section */}
-            <button
-              type="button"
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg p-1 flex-shrink-0"
-              aria-label="Scroll to top of page"
-            >
-              <div className="h-16 w-16">
-                <img
-                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/New%20VMF%20Logo-HJjs5zLNzX1i3UA7BdYWX0EPUg7eWR.png"
-                  alt="VMF Logo - Patriotic star with red and white stripes"
-                  className="w-full h-full object-contain"
-                />
+            <Link href="/" aria-label="Go to home page">
+              <div className="flex items-center space-x-3 cursor-pointer">
+                <div className="h-16 w-16">
+                  <img
+                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/New%20VMF%20Logo-HJjs5zLNzX1i3UA7BdYWX0EPUg7eWR.png"
+                    alt="VMF Logo - Patriotic star with red and white stripes"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-3xl font-black text-black tracking-tight leading-none">VMF</span>
+                  <span className="text-xl font-bold text-red-600 tracking-wide uppercase leading-none">
+                    VETERANS & MILITARY FAMILIES
+                  </span>
+                </div>
               </div>
-              <div className="flex flex-col">
-                <span className="text-3xl font-black text-black tracking-tight leading-none">VMF</span>
-                <span className="text-xs font-bold text-red-600 tracking-wide uppercase leading-none">
-                  Veterans & Military Families
-                </span>
-              </div>
-            </button>
+            </Link>
 
             {/* Compact Desktop Navigation */}
             <div className="hidden lg:flex items-center space-x-1 min-w-0">
@@ -299,7 +296,7 @@ const Index = () => {
                   size="sm"
                   className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   onClick={() => setIsBuyModalOpen(true)}
-                  aria-label="Buy VMF tokens"
+                  aria-label="Buy VMF coins"
                 >
                   Buy VMF
                 </Button>
@@ -418,7 +415,7 @@ const Index = () => {
                       setIsBuyModalOpen(true)
                       setIsMenuOpen(false)
                     }}
-                    aria-label="Buy VMF tokens"
+                    aria-label="Buy VMF coins"
                   >
                     Buy VMF
                   </Button>
@@ -471,9 +468,11 @@ const Index = () => {
                 <div className="text-center lg:text-left">
                   <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-8 shadow-lg">
                     <h1 id="hero-heading" className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-                      <span className="text-red-600">Real Help.</span>
+                      <span className="text-red-600">Zero Fees.</span>
                       <br />
-                      <span className="text-blue-900">For Real Veterans.</span>
+                      <span className="text-blue-900 text-4xl sm:text-5xl lg:text-6xl">100% Donation</span>
+                      <br />
+                      <span className="text-blue-900 text-4xl sm:text-5xl lg:text-6xl">For Veterans.</span>
                     </h1>
 
                     <p className="text-[20px] font-bold text-black mb-6 leading-snug max-w-2xl mx-auto lg:mx-0 text-center lg:text-left">
@@ -487,7 +486,7 @@ const Index = () => {
                         size="lg"
                         className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-semibold shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                         onClick={() => setIsBuyModalOpen(true)}
-                        aria-label="Buy VMF tokens to support veterans"
+                        aria-label="Buy VMF coins to support veterans"
                       >
                         Buy VMF
                       </Button>
@@ -522,7 +521,7 @@ const Index = () => {
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <h2 className="text-2xl font-bold text-slate-800 mb-2">Token-Based Crowdfunding</h2>
+                      <h2 className="text-2xl font-bold text-slate-800 mb-2">Coin-Based Crowdfunding</h2>
                       <span className="block text-blue-800 bg-blue-100 rounded px-2 py-1 text-base font-medium w-fit mx-auto mb-4">
                         Real donations. Direct impact.
                       </span>
@@ -536,9 +535,9 @@ const Index = () => {
                         </span>
                       </div>
                       <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg" role="listitem">
-                        <span className="text-slate-700 font-medium">Platform Fees</span>
-                        <span className="text-2xl font-bold text-blue-600" aria-label="Zero dollars in fees">
-                          $0
+                        <span className="text-slate-700 font-medium">Amount Given</span>
+                        <span className="text-2xl font-bold text-blue-600" aria-label="Amount given">
+                          $1500+
                         </span>
                       </div>
                       <div className="flex justify-between items-center p-3 bg-red-50 rounded-lg" role="listitem">
@@ -580,9 +579,9 @@ const Index = () => {
                     >
                       <DollarSign className="h-8 w-8 text-white" />
                     </div>
-                    <h3 className="text-2xl font-bold mb-4 text-slate-800">1. Buy VMF Tokens</h3>
+                    <h3 className="text-2xl font-bold mb-4 text-slate-800">1. Buy VMF Coins</h3>
                     <p className="text-slate-600 leading-relaxed">
-                      Purchase VMF tokens through our secure platform. VMF matches your purchase with USDC donations.
+                      Purchase VMF coins through our secure platform. VMF matches your purchase with USDC donations.
                     </p>
                   </CardContent>
                 </Card>
@@ -662,7 +661,7 @@ const Index = () => {
                   Our Trusted Partners
                 </h2>
                 <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-                  Every VMF token purchase supports these verified organizations making real impact for veterans.
+                  Every VMF coin purchase supports these verified organizations making real impact for veterans.
                 </p>
               </div>
 
@@ -740,7 +739,7 @@ const Index = () => {
                   Community-Driven Decisions
                 </h2>
                 <p className="text-xl text-white/80 max-w-4xl mx-auto leading-relaxed mb-8">
-                  Every VMF token holder has a voice in how we support veterans. Vote on funding, partnerships, and
+                  Every VMF coin holder has a voice in how we support veterans. Vote on funding, partnerships, and
                   platform improvements.
                 </p>
 
@@ -794,11 +793,11 @@ const Index = () => {
                 <div role="listitem">
                   <div
                     className="text-4xl sm:text-5xl font-bold text-blue-400 mb-3"
-                    aria-label="2.8 million VMF tokens voted"
+                    aria-label="2.8 million VMF coins voted"
                   >
                     2.8M
                   </div>
-                  <p className="text-lg text-gray-300">VMF Tokens Voted</p>
+                  <p className="text-lg text-gray-300">VMF Coins Voted</p>
                 </div>
                 <div role="listitem">
                   <div
@@ -829,9 +828,9 @@ const Index = () => {
                   size="lg"
                   className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 text-lg font-semibold shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   onClick={() => setIsBuyModalOpen(true)}
-                  aria-label="Buy VMF tokens to support veterans"
+                  aria-label="Buy VMF coins to support veterans"
                 >
-                  Buy VMF Tokens
+                  Buy VMF Coins
                   <TrendingUp className="ml-2 h-5 w-5" aria-hidden="true" />
                 </Button>
                 <Button

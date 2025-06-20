@@ -355,7 +355,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
             </CardHeader>
             <CardContent className="space-y-6">
               <div id="modal-description" className="sr-only">
-                Purchase VMF tokens and select charities to support veterans and military families
+                Purchase VMF coins and select charities to support veterans and military families
               </div>
 
               {!walletState.isConnected ? (
@@ -405,7 +405,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                         <span className="font-medium text-orange-800">No USDC Balance</span>
                       </div>
                       <p className="text-sm text-orange-700 mb-3">
-                        You need USDC to purchase VMF tokens. Get USDC directly on Base network.
+                        You need USDC to purchase VMF coins. Get USDC directly on Base network.
                       </p>
                       <div className="flex flex-col gap-2">
                         <Button
@@ -471,7 +471,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                   aria-describedby="amount-description"
                 />
                 <div id="amount-description" className="sr-only">
-                  Enter the dollar amount you want to spend on VMF tokens
+                  Enter the dollar amount you want to spend on VMF coins
                 </div>
             </div>
 
@@ -640,7 +640,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                   <label className="block text-sm font-medium text-gray-600 mb-1">VMF</label>
                   <div
                     className="text-2xl font-bold text-gray-900"
-                    aria-label={`You will receive ${vmfAmount} VMF tokens`}
+                    aria-label={`You will receive ${vmfAmount} VMF coins`}
                   >
                     {vmfAmount}
                   </div>
