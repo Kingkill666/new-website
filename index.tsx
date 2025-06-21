@@ -477,7 +477,7 @@ const Index = () => {
 
                     <p className="text-[20px] font-bold text-black mb-6 leading-snug max-w-2xl mx-auto lg:mx-0 text-center lg:text-left">
                       <span className="block whitespace-nowrap">You buy. We match. You choose.</span>
-                      <span className="block whitespace-nowrap">Empowering Change, one transaction at a time.</span>
+                      <span className="block whitespace-nowrap">Empowering change, one transaction at a time.</span>
                       <span className="block whitespace-nowrap">With VMF, your purchase supports Veterans.</span>
                     </p>
 
