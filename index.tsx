@@ -563,7 +563,8 @@ const Index = () => {
                   How VMF Works
                 </h2>
                 <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-                  Simple, transparent, and global. Here's how we're impacting veteran support with real world change.
+                  VMF offers our platform for free to our partners. We give money to our Veterans and ask for nothing in
+                  return.
                 </p>
               </div>
 

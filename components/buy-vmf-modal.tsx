@@ -485,7 +485,11 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
 
             {/* Charity Selection */}
               <fieldset>
-                <legend className="text-lg font-semibold mb-3">Pick Up To 3 Charities</legend>
+                <legend className="text-lg font-semibold mb-3 text-center">
+                  Pick Up To 3 Trusted And
+                  <br />
+                  Verified Partnered Charities
+                </legend>
                 <div className="grid grid-cols-2 gap-2" role="group" aria-labelledby="charity-selection">
                 {charities.map((charity) => (
                   <Button
