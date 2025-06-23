@@ -233,8 +233,8 @@ const OfficersClubPage = () => {
                     <img
                       src="/images/secret-officers-club.jpeg"
                       alt="Secret Officers Club interior"
-                      className="w-full object-cover object-top"
-                      style={{ marginTop: "-150px" }}
+                      className="w-full object-cover object-[center_top]"
+                      style={{ objectPosition: 'center top' }}
                     />
                   </div>
                 </div>
