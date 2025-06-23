@@ -169,25 +169,25 @@ const Index = () => {
     {
       icon: <Vote className="h-8 w-8 text-white" />,
       title: "Proportional Voting",
-      description: "Every coin equals one vote - perfect mathematical fairness regardless of holding size",
+      description: "Every coin equals one vote - perfect mathematical fairness regardless of holding size.",
       color: "bg-blue-600",
     },
     {
       icon: <UserCheck className="h-8 w-8 text-white" />,
       title: "Open Participation",
-      description: "No minimum coin threshold required - every community member has a voice",
+      description: "No minimum coin threshold required - every community member has a voice.",
       color: "bg-red-600",
     },
     {
       icon: <Gavel className="h-8 w-8 text-white" />,
-      title: "Management Bodies",
-      description: "Secretary Body, Executive Board, and Guardian Council ensure proper governance",
+      title: "Community Decisions",
+      description: "Everyone can make proposals and vote, ensuring we stay true to mission.",
       color: "bg-slate-700",
     },
     {
       icon: <Scale className="h-8 w-8 text-white" />,
       title: "Vote, Be Heard",
-      description: "VMF pays all fees for you. Your voice matters.",
+      description: "VMF pays all fees for you. Your voice matters. We need your support and voice.",
       color: "bg-purple-600",
     },
   ]
