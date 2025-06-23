@@ -231,12 +231,44 @@ export function useWallet() {
   // Main connect function
   const connectWallet = useCallback(
     async (walletId: string) => {
+      if (walletId === "coinbaseSmart" && isMobile()) {
+        // WalletConnect v1 for Coinbase Wallet deep link
+        const connector = new WalletConnect({
+          bridge: "https://bridge.walletconnect.org",
+        });
+        if (!connector.connected) {
+          await connector.createSession();
+        }
+        const uri = connector.uri;
+        // Listen for connection event
+        connector.on("connect", async (error, payload) => {
+          if (error) {
+            setWalletState((prev) => ({ ...prev, error: error.message, isConnecting: false }));
+            return;
+          }
+          const { accounts, chainId } = payload.params[0];
+          setWalletState({
+            isConnected: true,
+            address: accounts[0],
+            walletType: "Coinbase Smart Wallet",
+            balance: null, // You can fetch balance if needed
+            usdcBalance: null, // You can fetch USDC balance if needed
+            chainId: chainId,
+            isConnecting: false,
+            error: null,
+            provider: connector,
+          });
+        });
+        // Open Coinbase Wallet app with WalletConnect URI
+        window.location.href = `https://go.cb-w.com/walletlink?uri=${encodeURIComponent(uri)}`;
+        return;
+      }
       // Only allow Coinbase Smart Wallet on mobile
       if (isMobile() && walletId !== "coinbaseSmart") {
         alert("Only Coinbase Smart Wallet is supported on mobile.");
         return;
       }
-      // Always use the SDK/web flow for Coinbase Smart Wallet
+      // Desktop and fallback: use SDK/web flow
       await connectEthereumWallet(walletId);
     },
     [connectEthereumWallet],
