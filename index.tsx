@@ -764,7 +764,7 @@ const Index = () => {
                   Community-Driven Decisions
                 </h2>
                 <p className="text-xl text-white/80 max-w-4xl mx-auto leading-relaxed mb-8">
-                  Every VMF coin holder has a voice in how we support veterans. Vote on funding, partnerships, and
+                  When you hold VMF, you have a voice in how we support veterans. Vote on funding, partnerships, and
                   platform improvements.
                 </p>
 

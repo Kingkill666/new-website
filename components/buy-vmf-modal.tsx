@@ -359,22 +359,44 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
               </div>
 
               {!walletState.isConnected ? (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4" role="alert">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <AlertCircle className="h-4 w-4 text-blue-600" aria-hidden="true" />
-                    <span className="font-medium text-blue-800">Connect Your Wallet</span>
-                  </div>
-                  <p className="text-sm text-blue-700 mb-3">
-                    Please connect your Coinbase Smart Wallet to continue with the purchase.
-                  </p>
-            <Button
-              onClick={() => connectWallet("coinbaseSmart")}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                    aria-label="Connect Coinbase Smart Wallet"
-            >
-              Connect Coinbase Smart Wallet
-            </Button>
-          </div>
+                <>
+                  {walletState.error && walletState.error.includes("Coinbase Wallet app not detected") ? (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4" role="alert">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <AlertCircle className="h-4 w-4 text-red-600" aria-hidden="true" />
+                        <span className="font-medium text-red-800">Coinbase Wallet Not Detected</span>
+                      </div>
+                      <p className="text-sm text-red-700 mb-3">
+                        To buy VMF, you need the Coinbase Wallet app installed on your device.
+                      </p>
+                      <Button
+                        variant="outline"
+                        onClick={() => window.open("https://www.coinbase.com/wallet/downloads", "_blank")}
+                        className="w-full text-red-700 border-red-300 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                        aria-label="Install Coinbase Wallet, opens in new tab"
+                      >
+                        Install Coinbase Wallet
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4" role="alert">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <AlertCircle className="h-4 w-4 text-blue-600" aria-hidden="true" />
+                        <span className="font-medium text-blue-800">Connect Your Wallet</span>
+                      </div>
+                      <p className="text-sm text-blue-700 mb-3">
+                        Please connect your Coinbase Smart Wallet to continue with the purchase.
+                      </p>
+                      <Button
+                        onClick={() => connectWallet("coinbaseSmart")}
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        aria-label="Connect Coinbase Smart Wallet"
+                      >
+                        Connect Coinbase Smart Wallet
+                      </Button>
+                    </div>
+                  )}
+                </>
               ) : (
                 <>
                   {/* Connected Wallet Display */}

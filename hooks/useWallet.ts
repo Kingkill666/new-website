@@ -220,6 +220,14 @@ export function useWallet() {
     return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   };
 
+  // Helper to detect if Coinbase Wallet app is installed (best effort)
+  const isCoinbaseWalletInstalled = () => {
+    // On iOS, we can try to open the app and fallback to the App Store
+    // On Android, we can try to open the app and fallback to Play Store
+    // On web, true detection is not possible, so we show the install link if connection fails
+    return false; // Always show install prompt if connection fails
+  };
+
   // Main connect function
   const connectWallet = useCallback(
     async (walletId: string) => {
@@ -232,6 +240,7 @@ export function useWallet() {
           await connector.createSession();
         }
         const uri = connector.uri;
+        let didConnect = false;
         // Listen for connection event
         connector.on("connect", async (error, payload) => {
           if (error) {
@@ -239,7 +248,7 @@ export function useWallet() {
             return;
           }
           const { accounts, chainId } = payload.params[0];
-          // Set WalletConnect provider as the dApp provider
+          didConnect = true;
           setWalletState({
             isConnected: true,
             address: accounts[0],
@@ -254,6 +263,15 @@ export function useWallet() {
         });
         // Open Coinbase Wallet app with WalletConnect URI
         window.location.href = `https://go.cb-w.com/walletlink?uri=${encodeURIComponent(uri)}`;
+        // After a short delay, if not connected, show install prompt
+        setTimeout(() => {
+          if (!didConnect) {
+            setWalletState((prev) => ({
+              ...prev,
+              error: "Coinbase Wallet app not detected. Please install it to continue.",
+            }));
+          }
+        }, 4000); // 4 seconds is a reasonable guess
         return;
       }
       // Only allow Coinbase Smart Wallet on mobile
