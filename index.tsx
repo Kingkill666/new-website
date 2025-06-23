@@ -903,23 +903,10 @@ const Index = () => {
                 <span className="font-bold text-red-500">VETERANS CRISIS LINE</span>
               </div>
               <p className="text-center text-gray-300 mb-1">
-                Call{" "}
-                <a
-                  href="tel:988"
-                  className="font-bold underline focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded"
-                >
-                  988
-                </a>{" "}
-                and Press <span className="font-bold">1</span>
+                Call <a href="tel:988" className="font-bold underline focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded hover:text-red-400">988</a> and Press <span className="font-bold">1</span>
               </p>
               <p className="text-center text-gray-300">
-                or Text{" "}
-                <a
-                  href="sms:838255"
-                  className="font-bold underline focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded"
-                >
-                  838255
-                </a>
+                or Text <a href="sms:838255" className="font-bold underline focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded hover:text-red-400">838255</a>
               </p>
             </div>
 
