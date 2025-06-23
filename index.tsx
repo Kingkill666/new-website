@@ -447,7 +447,7 @@ const Index = () => {
       <main id="main-content" className="pt-20">
         {/* Enhanced Hero Section - REVERTED TO ORIGINAL SIZES */}
         <section
-          className="relative py-16 sm:py-24 overflow-hidden bg-gradient-to-br from-blue-50 via-white to-red-50"
+          className="relative py-10 sm:py-20 overflow-hidden bg-gradient-to-br from-blue-50 via-white to-red-50"
           aria-labelledby="hero-heading"
         >
           <div className="absolute inset-0" aria-hidden="true">
@@ -464,27 +464,27 @@ const Index = () => {
           <div className="container mx-auto px-2 sm:px-4 lg:px-6">
             <div className="max-w-6xl mx-auto">
               <div className="grid lg:grid-cols-2 gap-6 lg:gap-12 items-center overflow-x-hidden">
-                {/* Left Column - Content - REVERTED TO ORIGINAL SIZES */}
+                {/* Left Column - Content - Responsive Sizing */}
                 <div className="text-center lg:text-left">
-                  <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-8 shadow-lg">
-                    <h1 id="hero-heading" className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+                  <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-4 sm:p-8 shadow-lg">
+                    <h1 id="hero-heading" className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 leading-tight break-words whitespace-normal">
                       <span className="text-red-600">Zero Fees.</span>
                       <br />
-                      <span className="text-blue-900 text-4xl sm:text-5xl lg:text-6xl">100% Donation</span>
+                      <span className="text-blue-900 text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl">100% Donation</span>
                       <br />
-                      <span className="text-blue-900 text-4xl sm:text-5xl lg:text-6xl">For Veterans.</span>
+                      <span className="text-blue-900 text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl">For Veterans.</span>
                     </h1>
 
-                    <p className="text-[20px] font-bold text-black mb-6 leading-snug max-w-2xl mx-auto lg:mx-0 text-center lg:text-left">
-                      <span className="block whitespace-nowrap">You buy. We match. You choose.</span>
-                      <span className="block whitespace-nowrap">Empowering change, one transaction at a time.</span>
-                      <span className="block whitespace-nowrap">With VMF, your purchase supports Veterans.</span>
+                    <p className="text-base xs:text-lg sm:text-xl md:text-2xl font-bold text-black mb-4 sm:mb-6 leading-snug max-w-2xl mx-auto lg:mx-0 text-center lg:text-left break-words whitespace-normal">
+                      <span className="block">You buy. We match. You choose.</span>
+                      <span className="block">Empowering change, one transaction at a time.</span>
+                      <span className="block">With VMF, your purchase supports Veterans.</span>
                     </p>
 
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8">
+                    <div className="flex flex-col xs:flex-row gap-3 sm:gap-4 justify-center lg:justify-start mb-6 sm:mb-8">
                       <Button
-                        size="lg"
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-semibold shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        size="sm"
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-8 py-2 sm:py-4 text-base sm:text-lg font-semibold shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                         onClick={() => setIsBuyModalOpen(true)}
                         aria-label="Buy VMF coins to support veterans"
                       >
@@ -493,17 +493,17 @@ const Index = () => {
                     </div>
 
                     {/* Trust Indicators */}
-                    <div className="flex flex-wrap justify-center lg:justify-start gap-6 text-sm text-slate-600">
+                    <div className="flex flex-wrap justify-center lg:justify-start gap-4 sm:gap-6 text-xs sm:text-sm text-slate-600">
                       <div className="flex items-center space-x-2">
-                        <CheckCircle className="h-5 w-5 text-green-600" aria-hidden="true" />
+                        <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" aria-hidden="true" />
                         <span>100% Transparent</span>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <Shield className="h-5 w-5 text-blue-600" aria-hidden="true" />
+                        <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" aria-hidden="true" />
                         <span>Veteran Verified</span>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <Heart className="h-5 w-5 text-red-600" aria-hidden="true" />
+                        <Heart className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" aria-hidden="true" />
                         <span>Zero Fees</span>
                       </div>
                     </div>
@@ -511,38 +511,38 @@ const Index = () => {
                 </div>
 
                 {/* Right Column - Visual */}
-                <div className="relative">
-                  <div className="!border-0 bg-white rounded-3xl p-8">
-                    <div className="text-center mb-6">
-                      <div className="w-24 h-24 mx-auto mb-4 rounded-2xl overflow-hidden shadow-lg">
+                <div className="relative mt-8 lg:mt-0">
+                  <div className="!border-0 bg-white rounded-3xl p-4 sm:p-8">
+                    <div className="text-center mb-4 sm:mb-6">
+                      <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-3 sm:mb-4 rounded-2xl overflow-hidden shadow-lg">
                         <img
                           src="/images/baldy-og.png"
                           alt="Baldy OG - VMF Mascot"
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <h2 className="text-2xl font-bold text-slate-800 mb-2">Global Crowdfund for Veterans</h2>
-                      <span className="block text-blue-800 bg-blue-100 rounded px-2 py-1 text-base font-medium w-fit mx-auto mb-4">
+                      <h2 className="text-lg sm:text-2xl font-bold text-slate-800 mb-1 sm:mb-2">Global Crowdfund for Veterans</h2>
+                      <span className="block text-blue-800 bg-blue-100 rounded px-2 py-1 text-xs sm:text-base font-medium w-fit mx-auto mb-2 sm:mb-4">
                         Instant donations. Direct impact.
                       </span>
                     </div>
 
-                    <div className="space-y-4" role="list" aria-label="Platform statistics">
-                      <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg" role="listitem">
-                        <span className="text-slate-700 font-medium">Donation Efficiency</span>
-                        <span className="text-2xl font-bold text-green-600" aria-label="100 percent efficiency">
+                    <div className="space-y-2 sm:space-y-4" role="list" aria-label="Platform statistics">
+                      <div className="flex justify-between items-center p-2 sm:p-3 bg-green-50 rounded-lg" role="listitem">
+                        <span className="text-slate-700 font-medium text-xs sm:text-base">Donation Efficiency</span>
+                        <span className="text-xl sm:text-2xl font-bold text-green-600" aria-label="100 percent efficiency">
                           100%
                         </span>
                       </div>
-                      <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg" role="listitem">
-                        <span className="text-slate-700 font-medium">Amount Given</span>
-                        <span className="text-2xl font-bold text-blue-600" aria-label="Amount given">
+                      <div className="flex justify-between items-center p-2 sm:p-3 bg-blue-50 rounded-lg" role="listitem">
+                        <span className="text-slate-700 font-medium text-xs sm:text-base">Amount Given</span>
+                        <span className="text-xl sm:text-2xl font-bold text-blue-600" aria-label="Amount given">
                           $1500+
                         </span>
                       </div>
-                      <div className="flex justify-between items-center p-3 bg-red-50 rounded-lg" role="listitem">
-                        <span className="text-slate-700 font-medium">Veterans Helped</span>
-                        <span className="text-2xl font-bold text-red-600" aria-label="5,700 plus veterans helped">
+                      <div className="flex justify-between items-center p-2 sm:p-3 bg-red-50 rounded-lg" role="listitem">
+                        <span className="text-slate-700 font-medium text-xs sm:text-base">Veterans Helped</span>
+                        <span className="text-xl sm:text-2xl font-bold text-red-600" aria-label="5,700 plus veterans helped">
                           5,700+
                         </span>
                       </div>
