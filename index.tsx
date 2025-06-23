@@ -187,7 +187,7 @@ const Index = () => {
     {
       icon: <Scale className="h-8 w-8 text-white" />,
       title: "Vote, Be Heard",
-      description: "VMF pays all fees for you. Your voice matters. We need your support and voice.",
+      description: "VMF pays all voting fees for you. Your voice matters. We need your support and voice.",
       color: "bg-purple-600",
     },
   ]
