@@ -153,7 +153,7 @@ const Index = () => {
       name: "Patriots Promise",
       description: "Permanent housing solutions and comprehensive veteran support services.",
       logo: "/images/charity-logos/patriots-promise-logo.png",
-      website: "https://patriotspromise.org",
+      website: "https://www.patriots-promise.com/",
       impact: "800+ Veterans Served",
     },
     {
@@ -521,9 +521,9 @@ const Index = () => {
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <h2 className="text-2xl font-bold text-slate-800 mb-2">Coin-Based Crowdfunding</h2>
+                      <h2 className="text-2xl font-bold text-slate-800 mb-2">Global Crowdfund for Veterans</h2>
                       <span className="block text-blue-800 bg-blue-100 rounded px-2 py-1 text-base font-medium w-fit mx-auto mb-4">
-                        Real donations. Direct impact.
+                        Instant donations. Direct impact.
                       </span>
                     </div>
 
@@ -629,22 +629,40 @@ const Index = () => {
                 <h3 className="text-3xl font-bold mb-6">Why VMF is Different</h3>
                 <div className="grid sm:grid-cols-3 gap-8" role="list" aria-label="VMF benefits">
                   <div role="listitem">
-                    <div className="text-4xl font-bold mb-2" aria-label="Zero percent platform fees">
+                    <div className="text-4xl font-bold mb-2" aria-label="Zero percent. No Donation Fees. No More Middle Man Taking A Cut.">
                       0%
                     </div>
-                    <div className="text-blue-100">Platform Fees</div>
+                    <div className="text-blue-100">
+                      No Donation Fees.
+                      <br />
+                      No More Middle Man
+                      <br />
+                      Taking A Cut.
+                    </div>
                   </div>
                   <div role="listitem">
-                    <div className="text-4xl font-bold mb-2" aria-label="One hundred percent your choice and impact">
+                    <div className="text-4xl font-bold mb-2" aria-label="One hundred percent. Your Donation Goes Directly To Our Partnered Charities.">
                       100%
                     </div>
-                    <div className="text-blue-100">Your Choice, 100% Impact</div>
+                    <div className="text-blue-100">
+                      Your Donation
+                      <br />
+                      Goes Directly To Our
+                      <br />
+                      Partnered Charities.
+                    </div>
                   </div>
                   <div role="listitem">
-                    <div className="text-4xl font-bold mb-2" aria-label="24/7 blockchain tracking">
+                    <div className="text-4xl font-bold mb-2" aria-label="24/7. All Transactions. All Donations. Traceable and Transparent.">
                       24/7
                     </div>
-                    <div className="text-blue-100">Blockchain Tracking</div>
+                    <div className="text-blue-100">
+                      All Transactions.
+                      <br />
+                      All Donations.
+                      <br />
+                      Traceable and Transparent.
+                    </div>
                   </div>
                 </div>
               </div>
@@ -661,7 +679,8 @@ const Index = () => {
                   Our Trusted Partners
                 </h2>
                 <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-                  Every VMF coin purchase supports these verified organizations making real impact for veterans.
+                  Every VMF coin purchase supports our verified organizations, putting $$$ into their hands, direct and
+                  instantly.
                 </p>
               </div>
 
@@ -731,9 +750,14 @@ const Index = () => {
           <div className="container mx-auto px-2 sm:px-4 lg:px-6">
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-16">
-                <Badge className="bg-yellow-500/20 text-yellow-400 px-6 py-2 text-sm font-semibold border border-yellow-400/30 mb-6">
-                  <Vote className="w-4 h-4 mr-2" aria-hidden="true" />
-                  DAO Governance
+                <Badge className="bg-yellow-500/20 text-yellow-400 px-6 py-3 text-sm font-semibold border border-yellow-400/30 mb-6">
+                  <div className="flex items-center">
+                    <Vote className="w-4 h-4 mr-3" aria-hidden="true" />
+                    <div className="text-center">
+                      <div>DAO Governance</div>
+                      <div className="text-xs font-normal -mt-1">Coming Soon</div>
+                    </div>
+                  </div>
                 </Badge>
                 <h2 id="governance-heading" className="text-4xl sm:text-5xl font-bold mb-6">
                   Community-Driven Decisions
@@ -748,10 +772,13 @@ const Index = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center bg-yellow-500 hover:bg-yellow-600 text-black px-8 py-4 text-lg font-bold shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 rounded-md transition-colors duration-200"
-                  aria-label="Join the DAO governance platform, opens in new tab"
+                  aria-label="Join VMF Voice, Your Voice Matters. Opens in new tab"
                 >
-                  Join the DAO
-                  <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />
+                  <div className="text-center">
+                    <div>Join VMF Voice</div>
+                    <div className="text-sm font-normal -mt-1">Your Voice Matters</div>
+                  </div>
+                  <ArrowRight className="ml-4 h-8 w-8" aria-hidden="true" />
                 </a>
               </div>
 
@@ -784,27 +811,27 @@ const Index = () => {
                 <div role="listitem">
                   <div
                     className="text-4xl sm:text-5xl font-bold text-yellow-400 mb-3"
-                    aria-label="47 community proposals"
+                    aria-label="Community proposals: data pending"
                   >
-                    47
+                    -
                   </div>
                   <p className="text-lg text-gray-300">Community Proposals</p>
                 </div>
                 <div role="listitem">
                   <div
                     className="text-4xl sm:text-5xl font-bold text-blue-400 mb-3"
-                    aria-label="2.8 million VMF coins voted"
+                    aria-label="VMF Coins Voted: data pending"
                   >
-                    2.8M
+                    -
                   </div>
                   <p className="text-lg text-gray-300">VMF Coins Voted</p>
                 </div>
                 <div role="listitem">
                   <div
                     className="text-4xl sm:text-5xl font-bold text-red-400 mb-3"
-                    aria-label="89 percent proposals passed"
+                    aria-label="Proposals Passed: data pending"
                   >
-                    89%
+                    -
                   </div>
                   <p className="text-lg text-gray-300">Proposals Passed</p>
                 </div>

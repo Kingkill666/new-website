@@ -363,20 +363,20 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
                       </div>
                       <h2 className="text-4xl font-bold text-slate-900 mb-6">The Vision Behind VMF</h2>
 
-                      <div className="max-w-3xl mx-auto text-center mb-16">
-                        <p className="text-lg mb-6">
+                      <div className="max-w-3xl mx-auto text-left mb-16">
+                        <p className="text-lg mb-6 text-left">
                           One evening, while watching a military documentary and studying crypto charts, I was struck by the idea of combining these two worlds to address a critical issue: traditional donation platforms taking fees from funds meant for Veterans.
                         </p>
                         <div className="flex justify-center my-10">
                           <blockquote
-                            className="bg-slate-50 border-l-4 border-blue-700 px-8 py-6 rounded-2xl shadow-lg font-serif text-xl text-slate-800 leading-tight tracking-tight max-w-2xl mx-auto relative"
+                            className="bg-slate-50 border-l-4 border-blue-700 px-8 py-6 rounded-2xl shadow-lg font-serif text-xl text-slate-800 leading-tight tracking-tight max-w-2xl mx-auto relative text-center"
                             style={{ fontFamily: 'Merriweather, serif', lineHeight: '1.25', letterSpacing: '-0.01em', marginTop: '1.5rem', marginBottom: '1.5rem' }}
                           >
                             <span>"It really upset me watching bureaucracy and fees reduce the impact of people's donations."</span>
                             <span className="block text-base text-slate-600 font-semibold mt-4" style={{ fontFamily: 'Merriweather, serif', fontWeight: 500, letterSpacing: '-0.01em' }}>— Michael reflects</span>
                           </blockquote>
                         </div>
-                        <p className="text-lg mb-6">
+                        <p className="text-lg mb-6 text-left">
                           This sparked the creation of VMF, leveraging blockchain technology to ensure 100% of donations reach veteran charities with complete transparency and zero fees. Our vision is to build a transparent, efficient platform that rewards generosity and invites non-tech-savvy individuals to confidently engage with cryptocurrency, making donations easy and approachable. VMF is dedicated to maximizing support for Veterans and their families, ensuring every dollar makes a meaningful impact.
                         </p>
                       </div>

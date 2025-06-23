@@ -22,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <Head>
-        <link rel="icon" href="/favicon.png" type="image/png" />
+        <link rel="icon" href="/images/vmf-logo-new-patriotic.png" type="image/png" />
       </Head>
       <body className={inter.className}>
         <WalletProvider>
