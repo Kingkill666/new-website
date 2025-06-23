@@ -475,16 +475,16 @@ const Index = () => {
                       <span className="text-blue-900 text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl">For Veterans.</span>
                     </h1>
 
-                    <p className="text-base xs:text-lg sm:text-xl md:text-2xl font-bold text-black mb-4 sm:mb-6 leading-snug max-w-2xl mx-auto lg:mx-0 text-center lg:text-left break-words whitespace-normal">
-                      <span className="block">You buy. We match. You choose.</span>
-                      <span className="block">Empowering change, one transaction at a time.</span>
-                      <span className="block">With VMF, your purchase supports Veterans.</span>
+                    <p className="text-[20px] font-bold text-black mb-6 leading-snug max-w-2xl mx-auto lg:mx-0 text-center lg:text-left">
+                      <span className="block whitespace-nowrap">You buy. We match. You choose.</span>
+                      <span className="block whitespace-nowrap">Empowering change, one transaction at a time.</span>
+                      <span className="block whitespace-nowrap">With VMF, your purchase supports Veterans.</span>
                     </p>
 
-                    <div className="flex flex-col xs:flex-row gap-3 sm:gap-4 justify-center lg:justify-start mb-6 sm:mb-8">
+                    <div className="flex justify-center mb-8">
                       <Button
                         size="sm"
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-8 py-2 sm:py-4 text-base sm:text-lg font-semibold shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 sm:px-10 sm:py-4 text-base sm:text-lg font-semibold shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                         onClick={() => setIsBuyModalOpen(true)}
                         aria-label="Buy VMF coins to support veterans"
                       >
