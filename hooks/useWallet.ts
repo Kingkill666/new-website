@@ -232,6 +232,26 @@ export function useWallet() {
           await connector.createSession();
         }
         const uri = connector.uri;
+        // Listen for connection event
+        connector.on("connect", async (error, payload) => {
+          if (error) {
+            setWalletState((prev) => ({ ...prev, error: error.message, isConnecting: false }));
+            return;
+          }
+          const { accounts, chainId } = payload.params[0];
+          // Set WalletConnect provider as the dApp provider
+          setWalletState({
+            isConnected: true,
+            address: accounts[0],
+            walletType: "Coinbase Smart Wallet",
+            balance: null, // You can fetch balance if needed
+            usdcBalance: null, // You can fetch USDC balance if needed
+            chainId: chainId,
+            isConnecting: false,
+            error: null,
+            provider: connector,
+          });
+        });
         // Open Coinbase Wallet app with WalletConnect URI
         window.location.href = `https://go.cb-w.com/walletlink?uri=${encodeURIComponent(uri)}`;
         return;
