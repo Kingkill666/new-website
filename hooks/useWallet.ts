@@ -3,6 +3,8 @@
 import { ethers } from "ethers"
 import { useState, useEffect, useCallback } from "react"
 import { detectWallets, getSpecificProvider, SUPPORTED_NETWORKS, connectCoinbaseSmartWallet } from "@/lib/wallet-config"
+import WalletConnect from "@walletconnect/client";
+import QRCodeModal from "@walletconnect/qrcode-modal";
 
 export interface WalletInfo {
   name: string
@@ -212,13 +214,37 @@ export function useWallet() {
     }
   }, [])
 
+  // Utility to detect mobile
+  const isMobile = () => {
+    if (typeof navigator === "undefined") return false;
+    return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  };
+
   // Main connect function
   const connectWallet = useCallback(
     async (walletId: string) => {
-      await connectEthereumWallet(walletId)
+      if (walletId === "coinbaseSmart" && isMobile()) {
+        // WalletConnect v1 for Coinbase Wallet deep link
+        const connector = new WalletConnect({
+          bridge: "https://bridge.walletconnect.org",
+        });
+        if (!connector.connected) {
+          await connector.createSession();
+        }
+        const uri = connector.uri;
+        // Open Coinbase Wallet app with WalletConnect URI
+        window.location.href = `https://go.cb-w.com/walletlink?uri=${encodeURIComponent(uri)}`;
+        return;
+      }
+      // Only allow Coinbase Smart Wallet on mobile
+      if (isMobile() && walletId !== "coinbaseSmart") {
+        alert("Only Coinbase Smart Wallet is supported on mobile.");
+        return;
+      }
+      await connectEthereumWallet(walletId);
     },
     [connectEthereumWallet],
-  )
+  );
 
   // Disconnect wallet
   const disconnectWallet = useCallback(async () => {
