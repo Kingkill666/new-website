@@ -228,6 +228,12 @@ export function useWallet() {
     return false; // Always show install prompt if connection fails
   };
 
+  // Helper to detect if Android
+  const isAndroid = () => {
+    if (typeof navigator === "undefined") return false;
+    return /Android/i.test(navigator.userAgent);
+  };
+
   // Main connect function
   const connectWallet = useCallback(
     async (walletId: string) => {
@@ -259,8 +265,19 @@ export function useWallet() {
             provider: connector,
           });
         });
-        // Open Coinbase Wallet app with WalletConnect URI
-        window.location.href = `https://go.cb-w.com/walletlink?uri=${encodeURIComponent(uri)}`;
+        // Android: try cbwallet:// deep link first, fallback to universal link
+        if (isAndroid()) {
+          const cbDeepLink = `cbwallet://wc?uri=${encodeURIComponent(uri)}`;
+          const fallbackLink = `https://go.cb-w.com/walletlink?uri=${encodeURIComponent(uri)}`;
+          // Try to open the app, fallback after 1s
+          window.location.href = cbDeepLink;
+          setTimeout(() => {
+            window.location.href = fallbackLink;
+          }, 1000);
+        } else {
+          // iOS or other: use universal link
+          window.location.href = `https://go.cb-w.com/walletlink?uri=${encodeURIComponent(uri)}`;
+        }
         return;
       }
       // Only allow Coinbase Smart Wallet on mobile
