@@ -238,14 +238,17 @@ export function useWallet() {
   const connectWallet = useCallback(
     async (walletId: string) => {
       if (walletId === "coinbaseSmart" && isMobile()) {
-        // WalletConnect v1 for Coinbase Wallet deep link
+        // Simple WalletConnect for Coinbase Wallet mobile app
         const connector = new WalletConnect({
           bridge: "https://bridge.walletconnect.org",
         });
+        
         if (!connector.connected) {
           await connector.createSession();
         }
+        
         const uri = connector.uri;
+        
         // Listen for connection event
         connector.on("connect", async (error, payload) => {
           if (error) {
@@ -265,26 +268,19 @@ export function useWallet() {
             provider: connector,
           });
         });
-        // Android: try cbwallet:// deep link first, fallback to universal link
-        if (isAndroid()) {
-          const cbDeepLink = `cbwallet://wc?uri=${encodeURIComponent(uri)}`;
-          const fallbackLink = `https://go.cb-w.com/walletlink?uri=${encodeURIComponent(uri)}`;
-          // Try to open the app, fallback after 1s
-          window.location.href = cbDeepLink;
-          setTimeout(() => {
-            window.location.href = fallbackLink;
-          }, 1000);
-        } else {
-          // iOS or other: use universal link
-          window.location.href = `https://go.cb-w.com/walletlink?uri=${encodeURIComponent(uri)}`;
-        }
+        
+        // Simple deep link - no fallbacks to app stores
+        const deepLink = `cbwallet://wc?uri=${encodeURIComponent(uri)}`;
+        window.location.href = deepLink;
         return;
       }
+      
       // Only allow Coinbase Smart Wallet on mobile
       if (isMobile() && walletId !== "coinbaseSmart") {
         alert("Only Coinbase Smart Wallet is supported on mobile.");
         return;
       }
+      
       // Desktop and fallback: use SDK/web flow
       await connectEthereumWallet(walletId);
     },
