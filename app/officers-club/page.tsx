@@ -76,8 +76,8 @@ const OfficersClubPage = () => {
             <Link href="/" aria-label="Go to home page">
               <div className="flex items-center space-x-3 cursor-pointer">
                 <div className="h-16 w-16">
-                  <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/New%20VMF%20Logo-HJjs5zLNzX1i3UA7BdYWX0EPUg7eWR.png" alt="VMF Logo - Patriotic star with red and white stripes" className="w-full h-full object-contain" />
-                </div>
+                <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/New%20VMF%20Logo-HJjs5zLNzX1i3UA7BdYWX0EPUg7eWR.png" alt="VMF Logo - Patriotic star with red and white stripes" className="w-full h-full object-contain" />
+              </div>
                 <div className="flex flex-col">
                   <span className="text-3xl font-black text-black tracking-tight leading-none">VMF</span>
                   <span className="text-xl font-bold text-red-600 tracking-wide uppercase leading-none">

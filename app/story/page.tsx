@@ -35,15 +35,15 @@ const StoryPage = () => {
 
   // Michael Gray - Founder & CEO
   const michaelGray = {
-    name: "Michael Gray",
-    role: "Founder & CEO",
+      name: "Michael Gray",
+      role: "Founder & CEO",
     bio: `I'm Michael Gray, a proud husband and father of two incredible kids. While I am not a Veteran myself, I come from a family of service members and hold the utmost respect for those who serve. My commitment to supporting Veterans drives my work with the VMF Coin Project 2025, where I aim to provide meaningful resources and support.
 
 By day, I'm a grip in Hollywood (Local 80), where integrity and honesty are non-negotiable. Working unsupervised on film sets has instilled in me a steadfast commitment to doing the right thing, a principle that guides every aspect of my life. Beyond the set, I'm passionate about technology, with a decade of experience in the crypto space, which inspired the creation of VMF Coin.
 
 When I'm not working, you'll find me camping with my family in our rooftop tent, exploring nature, or soaking in hot springs—having visited over 150 with my kids. I also help run the Ultimate Hot Springs Guide website. My family's love for adventure and my dedication to integrity fuel everything I do, from supporting Veterans to pursuing projects with purpose.`,
-    image: "/images/michael-gray.png",
-    linkedin: "https://x.com/VMFCoin",
+      image: "/images/michael-gray.png",
+      linkedin: "https://x.com/VMFCoin",
   }
 
   const milestones = [
@@ -156,19 +156,19 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
           <div className="flex items-center justify-between">
             <Link href="/" aria-label="Go to home page">
               <div className="flex items-center space-x-3 cursor-pointer">
-                <div className="h-16 w-16">
-                  <img
-                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/New%20VMF%20Logo-HJjs5zLNzX1i3UA7BdYWX0EPUg7eWR.png"
-                    alt="VMF Logo - Patriotic star with red and white stripes"
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-3xl font-black text-black tracking-tight leading-none">VMF</span>
-                  <span className="text-xl font-bold text-red-600 tracking-wide uppercase leading-none">
-                    VETERANS & MILITARY FAMILIES
-                  </span>
-                </div>
+              <div className="h-16 w-16">
+                <img
+                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/New%20VMF%20Logo-HJjs5zLNzX1i3UA7BdYWX0EPUg7eWR.png"
+                  alt="VMF Logo - Patriotic star with red and white stripes"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-3xl font-black text-black tracking-tight leading-none">VMF</span>
+                <span className="text-xl font-bold text-red-600 tracking-wide uppercase leading-none">
+                  VETERANS & MILITARY FAMILIES
+                </span>
+              </div>
               </div>
             </Link>
 
@@ -409,28 +409,28 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
 
                       <div className="prose prose-lg text-slate-700 max-w-none mx-auto mb-6 whitespace-pre-line">
                         {michaelGray.bio}
-                      </div>
+                        </div>
 
-                      <div className="flex justify-center space-x-4 pt-4">
+                        <div className="flex justify-center space-x-4 pt-4">
                         <a href="mailto:vmf@vmfcoin.com" aria-label="Email VMF">
                           <Button variant="outline" size="sm">
                             <Mail className="h-4 w-4 mr-2" aria-hidden="true" />
                             Contact
                           </Button>
                         </a>
-                        <a
+                          <a
                           href={michaelGray.linkedin}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label="Follow VMF on X, opens in new tab"
-                        >
-                          <Button variant="outline" size="sm">
-                            <svg className="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                            </svg>
-                            X
-                          </Button>
-                        </a>
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Follow VMF on X, opens in new tab"
+                          >
+                            <Button variant="outline" size="sm">
+                              <svg className="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                              </svg>
+                              X
+                            </Button>
+                          </a>
                       </div>
                     </div>
                   </div>
@@ -811,7 +811,7 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
                   </div>
                 </div>
 
-               {/* Legacy Values */}
+                {/* Legacy Values */}
                 <div className="text-center">
                   <h3 className="text-3xl sm:text-4xl font-bold text-white mb-12">Their Legacy Lives On</h3>
                   <div className="grid sm:grid-cols-3 gap-8 lg:gap-12" role="list">
