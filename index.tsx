@@ -537,7 +537,7 @@ const Index = () => {
                       <div className="flex justify-between items-center p-2 sm:p-3 bg-blue-50 rounded-lg" role="listitem">
                         <span className="text-slate-700 font-medium text-xs sm:text-base">Amount Given</span>
                         <span className="text-xl sm:text-2xl font-bold text-blue-600" aria-label="Amount given">
-                          $1,500+
+                          $2,200+
                         </span>
                       </div>
                       <div className="flex justify-between items-center p-2 sm:p-3 bg-red-50 rounded-lg" role="listitem">
