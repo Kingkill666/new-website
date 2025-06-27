@@ -4,7 +4,7 @@ const charities = [
   {
     name: "Holy Family Village",
     stat: "500+ Veterans Housed",
-    description: "Housing and support for veterans, low-income families, and homeless individuals.",
+    description: "Housing and support for veterans, low-income families, and the homeless.",
     logo: "/images/charity-logos/holy-family-village-logo.png",
     link: "#",
   },
@@ -48,41 +48,49 @@ const charities = [
     stat: "Coming Soon",
     description: "Supporting military children and families with care packages and programs.",
     logo: "/images/charity-logos/Little-Patriots-Embraced-logo.png",
-    link: "#",
+    link: "https://www.littlepatriotsembraced.org/",
   },
   {
     name: "Magicians On Mission",
     stat: "Coming Soon",
     description: "Bringing hope and entertainment to deployed troops through magic shows.",
     logo: "/images/charity-logos/Magicians-On-Mission.png",
-    link: "#",
+    link: "https://magiciansonmission.org/",
   },
   {
     name: "April Forces",
     stat: "Coming Soon",
-    description: "Підтримка ветеранів та їхніх сімей через громадські ініціативи.",
+    description: "Підтримка ветеранів та їхніх сімей через громадські ініціативи. 🇺🇦",
     logo: "/images/charity-logos/April-Forces-logo.png",
-    link: "#",
+    link: "https://aprilforces.com/en/about_us",
     green: true,
   },
 ];
 
 export default function CharityGrid() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-stretch">
       {charities.map((charity) => (
-        <div key={charity.name} className="bg-white rounded-xl shadow p-6 flex flex-col items-start">
-          <div className="flex items-center mb-3">
-            <img src={charity.logo} alt={charity.name} className="w-12 h-12 rounded mr-3 object-contain" />
+        <div
+          key={charity.name}
+          className="bg-white rounded-xl shadow flex flex-col items-start w-full max-w-[320px] h-[190px] mx-auto p-5"
+        >
+          <div className="flex items-center mb-2">
+            <img
+              src={charity.logo}
+              alt={charity.name}
+              className="w-10 h-10 rounded mr-3 object-contain"
+            />
             <div>
-              <div className="font-bold text-lg">{charity.name}</div>
+              <div className="font-bold text-lg leading-tight mb-0.5">{charity.name}</div>
               <div className={`font-semibold text-sm ${charity.green ? 'text-green-700' : 'text-green-600'}`}>{charity.stat}</div>
             </div>
           </div>
-          <div className="text-gray-700 mb-4">{charity.description}</div>
+          <div className="text-gray-700 text-sm mb-2 line-clamp-3">{charity.description}</div>
           <a
             href={charity.link}
-            className="mt-auto inline-block border border-blue-500 text-blue-600 px-4 py-2 rounded hover:bg-blue-50 font-medium transition"
+            className="mt-auto flex justify-center w-full border-2 border-blue-600 text-blue-600 px-2 py-1 rounded hover:bg-blue-50 font-bold transition text-center text-base border-2"
+            style={{ minHeight: '36px' }}
           >
             Learn More
           </a>
