@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { X, ChevronDown, ChevronUp, CheckCircle, Copy, Check, Minus, Plus, AlertCircle } from "lucide-react"
 import { useWallet } from "@/hooks/useWallet"
+import { DialogFooter } from "@/components/ui/dialog"
+import axios from "axios"
 
 interface BuyVMFModalProps {
   isOpen: boolean
@@ -74,8 +76,47 @@ const charities: Charity[] = [
 
 const CONTRACT_ADDRESS = "0x46855ec900764Dc6c05155Af0eCe45DB004E814A"
 
+// Add the 3 extra charities for the DONATE modal
+const allCharities = [
+  ...charities,
+  {
+    id: "little-patriots-embraced",
+    name: "Little Patriots Embraced",
+    shortName: "Little Patriots Embraced",
+    address: "",
+    logo: "/images/charity-logos/Little-Patriots-Embraced-logo.png",
+  },
+  {
+    id: "magicians-on-mission",
+    name: "Magicians On Mission",
+    shortName: "Magicians On Mission",
+    address: "",
+    logo: "/images/charity-logos/Magicians-On-Mission.png",
+  },
+  {
+    id: "april-forces",
+    name: "April Forces",
+    shortName: "April Forces",
+    address: "",
+    logo: "/images/charity-logos/April-Forces-logo.png",
+  },
+]
+
+// Fix charityDescriptions keys to match allCharities IDs
+const charityDescriptions: Record<string, string> = {
+  "holy-family": "Provides Housing and Medical.",
+  "patriots-promise": "Free Housing For Veterans.",
+  "victory-veterans": "Mental Health For Veterans.",
+  "veterans-need": "Emergency Assistance Provider.",
+  "honor-her": "Homeless Women Support.",
+  "camp-cowboy": "Equine Therapy For Veterans.",
+  "little-patriots-embraced": "Supporting Military Children",
+  "magicians-on-mission": "Bringing Hope And Entertainment.",
+  "april-forces": "Supporting Ukrainian Veterans."
+}
+
 export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
-  const [currentStep, setCurrentStep] = useState<"buy" | "verify" | "success">("buy")
+  const [currentStep, setCurrentStep] = useState<"buy" | "donate" | "verify" | "success">("buy")
   const [amount, setAmount] = useState("")
   const [selectedCharities, setSelectedCharities] = useState<string[]>([])
   const [charityDistributions, setCharityDistributions] = useState<CharityDistribution[]>([])
@@ -84,7 +125,8 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
   const { walletState, connectWallet, formatAddress, switchNetwork} = useWallet()
   const [transactionHash, setTransactionHash] = useState("")
   const [vmfAmount, setVmfAmount] = useState("")
-  const [fees] = useState("20.0")
+  const [fees, setFees] = useState<string | null>(null)
+  const [isEstimatingGas, setIsEstimatingGas] = useState(false)
   const [charityPool, setCharityPool] = useState("0.00")
   const [copied, setCopied] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
@@ -140,7 +182,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
 
   useEffect(() => {
     if (amount) {
-      const vmf = (Number.parseFloat(amount) * 1000).toFixed(4)
+      const vmf = Number.parseFloat(amount).toFixed(4)
       setVmfAmount(vmf)
       setCharityPool(amount)
     }
@@ -167,6 +209,60 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
       setCharityDistributions([])
     }
   }, [selectedCharities])
+
+  // Estimate gas fees dynamically
+  useEffect(() => {
+    async function estimateGas() {
+      setIsEstimatingGas(true)
+      try {
+        if (!walletState.isConnected || !amount || Number(amount) <= 0) {
+          setFees(null)
+          setIsEstimatingGas(false)
+          return
+        }
+        const provider = new ethers.BrowserProvider(walletState.provider)
+        const signer = await provider.getSigner()
+        const contract = new ethers.Contract(
+          CONTRACT_ADDRESS,
+          [
+            {
+              type: "function",
+              name: "handleUSDC",
+              inputs: [
+                { name: "amountUSDC", type: "uint256", internalType: "uint256" },
+                { name: "to", type: "address", internalType: "address" },
+              ],
+              outputs: [],
+              stateMutability: "nonpayable",
+            },
+          ],
+          signer
+        )
+        // Use the first selected charity for estimation
+        const selectedCharity = allCharities.find((c) => c.id === selectedCharities[0])
+        if (!selectedCharity) {
+          setFees(null)
+          setIsEstimatingGas(false)
+          return
+        }
+        const usdcAmount = ethers.parseUnits(Number(amount).toFixed(2), 6)
+        const gasEstimate = await contract.estimateGas["handleUSDC"](usdcAmount, selectedCharity.address)
+        const gasPrice = await provider.getFeeData()
+        const ethGasFee = gasEstimate * (gasPrice.gasPrice ?? BigInt(0))
+        // Get ETH/USD price
+        const { data } = await axios.get("https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd")
+        const ethUsd = data?.ethereum?.usd ?? 3500
+        const feeInEth = Number(ethers.formatEther(ethGasFee.toString()))
+        const feeUsd = (feeInEth * ethUsd).toFixed(2)
+        setFees(feeUsd)
+      } catch (e) {
+        setFees("20.0") // fallback
+      } finally {
+        setIsEstimatingGas(false)
+      }
+    }
+    estimateGas()
+  }, [walletState.isConnected, amount, selectedCharities, walletState.provider])
 
   const handleCharitySelect = (charityId: string) => {
     if (selectedCharities.includes(charityId)) {
@@ -254,7 +350,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
       // For each charity, send their share
       let lastTxHash = ""
       for (const dist of charityDistributions) {
-        const charity = charities.find((c) => c.id === dist.charityId)
+        const charity = allCharities.find((c) => c.id === dist.charityId)
         if (!charity) continue
         // Calculate USDC amount (assuming 6 decimals for USDC)
         const usdcAmount = ethers.parseUnits(
@@ -498,145 +594,111 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
             </div>
 
               {/* Description */}
-              <div className="bg-blue-50 p-4 rounded-lg">
+              <div className="bg-blue-50 p-4 rounded-lg mb-4">
                 <p className="text-sm text-blue-800 leading-relaxed">
                   When you buy VMF, you get to donate an equal amount of USDC to our partnered charities{" "}
                   <span className="font-bold">for FREE!</span>
                 </p>
               </div>
 
-            {/* Charity Selection */}
-              <fieldset>
-                <legend className="text-lg font-semibold mb-3 text-center">
-                  Pick Up To 3 Trusted And
-                  <br />
-                  Verified Partnered Charities
-                </legend>
-                <div className="grid grid-cols-2 gap-2" role="group" aria-labelledby="charity-selection">
-                {charities.map((charity) => (
-                  <Button
-                      key={charity.id}
-                      variant={selectedCharities.includes(charity.id) ? "default" : "outline"}
-                    size="sm"
-                      onClick={() => handleCharitySelect(charity.id)}
-                      onKeyDown={(e) => handleKeyDown(e, () => handleCharitySelect(charity.id))}
-                    className={`text-xs p-2 h-auto whitespace-normal focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                        selectedCharities.includes(charity.id)
-                        ? "bg-blue-600 text-white"
-                        : "border-gray-300 text-gray-700 hover:bg-gray-50"
-                    }`}
-                      disabled={!selectedCharities.includes(charity.id) && selectedCharities.length >= 3}
-                      aria-pressed={selectedCharities.includes(charity.id)}
-                      aria-label={`${selectedCharities.includes(charity.id) ? "Deselect" : "Select"} ${charity.shortName}`}
-                    >
-                      {charity.shortName}
-                    </Button>
-                  ))}
-                </div>
-                <p className="text-xs text-gray-500 mt-2" aria-live="polite">
-                  Selected: {selectedCharities.length}/3
-                </p>
-              </fieldset>
-
-              {/* Charity Distribution */}
-              {selectedCharities.length > 0 && (
-                <div>
-                  <h3 className="text-lg font-semibold mb-3">Distribute Your Donation</h3>
-                  <div className="space-y-3" role="list" aria-label="Charity distribution settings">
-                    {charityDistributions.map((distribution) => {
-                      const charity = charities.find((c) => c.id === distribution.charityId)
-                      return (
-                        <div key={distribution.charityId} className="bg-gray-50 p-3 rounded-lg" role="listitem">
-                          <div className="flex items-center justify-between mb-2">
-                            <div className="flex items-center space-x-2">
-                              <img
-                                src={charity?.logo || "/placeholder.svg"}
-                                alt=""
-                                className="w-6 h-6 rounded object-contain"
-                                aria-hidden="true"
-                              />
-                              <span className="text-sm font-medium">{charity?.shortName}</span>
-                            </div>
-                            <span
-                              className="text-sm font-bold text-green-600"
-                              aria-label={`${charity?.shortName} will receive $${getCharityAmount(distribution.percentage)}`}
-                            >
-                              ${getCharityAmount(distribution.percentage)}
-                            </span>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              className="h-6 w-6 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                              onClick={() =>
-                                updateCharityPercentage(
-                                  distribution.charityId,
-                                  Math.max(0, distribution.percentage - 5),
-                                )
-                              }
-                              aria-label={`Decrease ${charity?.shortName} percentage by 5%`}
-                            >
-                              <Minus className="h-3 w-3" />
-                            </Button>
-                            <div
-                              className="flex-1 bg-white rounded px-2 py-1 text-center text-sm font-medium"
-                              aria-label={`${charity?.shortName} receives ${distribution.percentage} percent`}
-                            >
-                              {distribution.percentage}%
-                            </div>
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              className="h-6 w-6 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                              onClick={() =>
-                                updateCharityPercentage(
-                                  distribution.charityId,
-                                  Math.min(100, distribution.percentage + 5),
-                                )
-                              }
-                              aria-label={`Increase ${charity?.shortName} percentage by 5%`}
-                            >
-                              <Plus className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                  <div className="mt-3 p-2 bg-blue-50 rounded-lg" role="status" aria-live="polite">
-                    <div className="flex justify-between text-sm">
-                      <span>Total Distribution:</span>
-                      <span className={`font-bold ${getTotalPercentage() === 100 ? "text-green-600" : "text-red-600"}`}>
-                        {getTotalPercentage()}%
-                      </span>
-                    </div>
-                    {getTotalPercentage() !== 100 && (
-                      <p className="text-xs text-red-600 mt-1" role="alert">
-                        Distribution must equal 100% to continue
-                      </p>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Next Button */}
+              {/* Continue Button to go to DONATE modal */}
               <Button
-                onClick={handleBuyNext}
-                disabled={
-                  !amount ||
-                  selectedCharities.length === 0 ||
-                  !walletState.isConnected ||
-                  getTotalPercentage() !== 100 ||
-                  walletState.walletType === "Phantom" ||
-                  needsNetworkSwitch
-                }
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg font-semibold disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                aria-label="Continue to verification step"
+                onClick={() => setCurrentStep("donate")}
+                disabled={!walletState.isConnected || !amount || Number(amount) <= 0}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg font-semibold disabled:opacity-50"
               >
                 Continue
               </Button>
+
             </CardContent>
+          </Card>
+        )}
+
+        {/* Donate Step */}
+        {currentStep === "donate" && (
+          <Card className="border-0 shadow-none flex flex-col h-[80vh]">
+            <CardHeader className="relative pb-4">
+              <div className="flex items-center justify-between">
+                <CardTitle id="modal-title" className="text-2xl font-bold text-center flex-1">
+                  DONATE
+                </CardTitle>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute top-4 right-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                onClick={handleClose}
+                aria-label="Close modal"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </CardHeader>
+            <div className="flex-1 overflow-y-auto px-6">
+              <div className="mb-4 text-center">
+                <h2 className="text-xl font-bold mb-2">Pick Up To 3 Trusted And Verified Partnered Charities</h2>
+              </div>
+              <div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                  {allCharities.map((charity) => {
+                    const selected = selectedCharities.includes(charity.id);
+                    return (
+                      <button
+                        key={charity.id}
+                        onClick={() => handleCharitySelect(charity.id)}
+                        disabled={!selected && selectedCharities.length >= 3}
+                        className={`flex flex-col items-center border rounded-lg p-3 transition-colors w-full text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${selected ? "border-blue-600 bg-blue-50" : "border-gray-200 bg-white hover:bg-gray-50"}`}
+                        aria-pressed={selected}
+                        aria-label={`${selected ? "Deselect" : "Select"} ${charity.shortName}`}
+                      >
+                        <img src={charity.logo} alt="" className="w-10 h-10 rounded object-contain mb-2" />
+                        <div className="text-xs text-gray-500 text-center mb-1 min-h-[2.2em]">{charityDescriptions[charity.id]}</div>
+                        <div className="font-semibold text-base text-center">{charity.shortName}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+                {/* Visual Breakdown of Distribution */}
+                {selectedCharities.length > 0 && (
+                  <div className="bg-gray-50 rounded-lg p-4 mb-2">
+                    <h3 className="text-base font-semibold mb-2 text-center">Your Donation Breakdown</h3>
+                    <div className="space-y-2">
+                      {selectedCharities.map((charityId) => {
+                        const charity = allCharities.find((c) => c.id === charityId);
+                        const percent = Math.floor(100 / selectedCharities.length) + (selectedCharities[0] === charityId ? 100 % selectedCharities.length : 0);
+                        const amountPer = amount ? ((Number(amount) * percent) / 100).toFixed(2) : null;
+                        return (
+                          <div key={charityId} className="flex items-center justify-between bg-white rounded p-2 shadow-sm">
+                            <div className="flex items-center gap-2">
+                              <img src={charity?.logo} alt={charity?.shortName} className="w-7 h-7 rounded object-contain" />
+                              <span className="font-medium text-sm">{charity?.shortName}</span>
+                            </div>
+                            <div className="text-right">
+                              <span className="font-bold text-blue-700 text-sm">{percent}%</span>
+                              {amount && (
+                                <span className="block text-xs text-gray-600">${amountPer}</span>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            {/* Sticky Footer for selection count and continue button */}
+            <div className="sticky bottom-0 left-0 right-0 bg-white pt-2 pb-4 px-6 z-10">
+              <div className="flex flex-col gap-2">
+                <div className="text-xs text-gray-500 mb-1">Selected: {selectedCharities.length}/3</div>
+                <Button
+                  onClick={() => setCurrentStep("verify")}
+                  disabled={selectedCharities.length === 0}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg font-semibold disabled:opacity-50"
+                >
+                  Continue
+                </Button>
+              </div>
+            </div>
           </Card>
         )}
 
@@ -682,6 +744,10 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
 
                 <div className="flex justify-between items-center py-2 border-b border-gray-200" role="listitem">
                   <span className="font-medium text-gray-700">Network:</span>
+                  <span className="flex items-center gap-2 font-semibold">
+                    <img src="/images/base-logo-in-blue.png" alt="Base Logo" width={24} height={24} className="object-cover" />
+                    Base
+                  </span>
                 </div>
 
                 <div className="flex justify-between items-center py-2 border-b border-gray-200" role="listitem">
@@ -698,11 +764,6 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                       <Copy className="h-3 w-3" />
                   </Button>
                   </div>
-                </div>
-
-                <div className="flex justify-between items-center py-2 border-b border-gray-200" role="listitem">
-                  <span className="font-medium text-gray-700">Gas Fees (Est.):</span>
-                  <span className="font-semibold">${fees}</span>
                 </div>
 
                 <div className="flex justify-between items-center py-2 border-b border-gray-200" role="listitem">
@@ -728,7 +789,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                   <div id="charity-distribution-details" className="p-3 border-t border-gray-200 bg-gray-50">
                     <div className="space-y-2" role="list" aria-label="Charity distribution breakdown">
                       {charityDistributions.map((distribution) => {
-                        const charity = charities.find((c) => c.id === distribution.charityId)
+                        const charity = allCharities.find((c) => c.id === distribution.charityId)
                         return (
                           <div
                             key={distribution.charityId}
@@ -788,6 +849,10 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                         <span>Chain ID:</span>
                         <span className="font-mono">{walletState.chainId}</span>
                       </div>
+                      <div className="flex justify-between" role="listitem">
+                        <span>Gas Fees (Est.):</span>
+                        <span className="font-mono">{isEstimatingGas ? "Estimating..." : fees ? `$${fees}` : "-"}</span>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -818,7 +883,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
         )}
 
         {/* Success Step */}
-      {currentStep === "success" && (
+        {currentStep === "success" && (
           <Card className="border-0 shadow-none">
             <CardHeader className="relative pb-4">
               <CardTitle id="modal-title" className="text-2xl font-bold text-center text-green-600">
@@ -883,7 +948,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                   <div id="success-charity-distribution" className="p-3 border-t border-gray-200 bg-gray-50">
                     <div className="space-y-2" role="list" aria-label="Successful charity distributions">
                       {charityDistributions.map((distribution) => {
-                        const charity = charities.find((c) => c.id === distribution.charityId)
+                        const charity = allCharities.find((c) => c.id === distribution.charityId)
                         return (
                           <div
                             key={distribution.charityId}
