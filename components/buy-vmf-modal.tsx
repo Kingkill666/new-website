@@ -483,15 +483,15 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                       <p className="text-sm text-blue-700 mb-3">
                         Please connect your Coinbase Smart Wallet to continue with the purchase.
                       </p>
-                      <Button
-                        onClick={() => connectWallet("coinbaseSmart")}
+            <Button
+              onClick={() => connectWallet("coinbaseSmart")}
                         className="w-full bg-blue-600 hover:bg-blue-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                         aria-label="Connect Coinbase Smart Wallet"
-                      >
-                        Connect Coinbase Smart Wallet
-                      </Button>
-                    </div>
-                  )}
+            >
+              Connect Coinbase Smart Wallet
+            </Button>
+          </div>
+        )}
                 </>
               ) : (
                 <>
@@ -590,7 +590,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                 />
                 <div id="amount-description" className="sr-only">
                   Enter the dollar amount you want to spend on VMF coins
-                </div>
+              </div>
             </div>
 
               {/* Description */}
@@ -711,7 +711,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                 <br />
                 VMF Purchase
               </CardTitle>
-              <Button
+                  <Button
                 variant="ghost"
                 size="icon"
                 className="absolute top-4 right-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
@@ -883,7 +883,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
         )}
 
         {/* Success Step */}
-        {currentStep === "success" && (
+      {currentStep === "success" && (
           <Card className="border-0 shadow-none">
             <CardHeader className="relative pb-4">
               <CardTitle id="modal-title" className="text-2xl font-bold text-center text-green-600">
