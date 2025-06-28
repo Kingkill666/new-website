@@ -596,8 +596,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
               {/* Description */}
               <div className="bg-blue-50 p-4 rounded-lg mb-4">
                 <p className="text-sm text-blue-800 leading-relaxed">
-                  When you buy VMF, you get to donate an equal amount of USDC to our partnered charities{" "}
-                  <span className="font-bold">for FREE!</span>
+                  When you buy VMF, you get to donate an equal amount of USDC to our partnered charities!
                 </p>
               </div>
 
