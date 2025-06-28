@@ -556,8 +556,8 @@ const Index = () => {
                       </div>
                       <div className="flex justify-between items-center p-2 sm:p-3 bg-red-50 rounded-lg" role="listitem">
                         <span className="text-slate-700 font-medium text-xs sm:text-base">Veterans Helped</span>
-                        <span className="text-xl sm:text-2xl font-bold text-red-600" aria-label="5,700 plus veterans helped">
-                          5,700+
+                        <span className="text-xl sm:text-2xl font-bold text-red-600" aria-label="5,900 plus veterans helped">
+                          5,900+
                         </span>
                       </div>
                     </div>
