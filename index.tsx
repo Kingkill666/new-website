@@ -648,11 +648,9 @@ const Index = () => {
                       0%
                     </div>
                     <div className="text-blue-100">
-                      No Donation Fees.
-                      <br />
-                      No More Middle Man
-                      <br />
-                      Taking A Cut.
+                      No Donation Fees.<br />
+                      No More Middle Man.<br />
+                      No Bureaucracy.
                     </div>
                   </div>
                   <div role="listitem">
