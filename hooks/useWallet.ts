@@ -248,7 +248,33 @@ export function useWallet() {
   // Main connect function
   const connectWallet = useCallback(
     async (walletId: string) => {
-      // Always try to connect the selected wallet, regardless of device
+      const isMobileDevice = isMobile();
+      // Mobile deep link logic
+      if (isMobileDevice) {
+        let deepLink = null;
+        switch (walletId) {
+          case "coinbaseSmart":
+            deepLink = "cbwallet://dapp/vmfcoin.com";
+            break;
+          case "metamask":
+            deepLink = "metamask://dapp/vmfcoin.com";
+            break;
+          case "rainbow":
+            deepLink = "rainbow://dapp/vmfcoin.com";
+            break;
+          case "farcaster":
+            deepLink = "farcaster://dapp/vmfcoin.com";
+            break;
+        }
+        if (deepLink) {
+          window.location.href = deepLink;
+          setTimeout(() => {
+            alert("If your wallet app did not open, please make sure it is installed and try again, or open this site in your wallet app's browser.");
+          }, 2000);
+          return;
+        }
+      }
+      // Desktop and fallback: use SDK/web flow
       await connectEthereumWallet(walletId);
     },
     [connectEthereumWallet],
