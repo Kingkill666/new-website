@@ -217,7 +217,7 @@ const OfficersClubPage = () => {
                     role="menuitem"
                     aria-label="Visit our Socials page"
                     onClick={() => setIsMenuOpen(false)}
-                  >
+                >
                     Socials
                   </span>
                 </Link>

@@ -684,7 +684,7 @@ const Index = () => {
         </section>
 
         {/* Enhanced Partner Charities Section */}
-        <section id="charities" className="py-16 sm:py-20 bg-gray-50" aria-labelledby="charities-heading">
+        <section id="charities" className="pt-4 pb-16 sm:pt-6 sm:pb-20 bg-gray-50" aria-labelledby="charities-heading">
           <div className="container mx-auto px-2 sm:px-4 lg:px-6">
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-16">
