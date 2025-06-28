@@ -486,8 +486,7 @@ const Index = () => {
                     <h1 id="hero-heading" className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 leading-tight break-words max-w-full">
                       <span className="text-red-600 whitespace-nowrap">Direct Dollars.</span>
                       <span className="text-blue-900 text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl block">100% Donation</span>
-                      <br />
-                      <span className="text-blue-900 text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl">For Veterans.</span>
+                      <span className="text-blue-900 text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl block">For Veterans.</span>
                     </h1>
 
                     <p className="text-[20px] font-bold text-black mb-6 leading-snug max-w-full mx-auto lg:mx-0 text-center lg:text-left break-words">
