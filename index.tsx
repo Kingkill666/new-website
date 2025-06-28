@@ -30,6 +30,7 @@ import {
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { BuyVMFModal } from "@/components/buy-vmf-modal"
+import CharityGrid from "@/components/charity-grid"
 
 const Index = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -284,21 +285,20 @@ const Index = () => {
               {/* Compact Action Buttons */}
               <div className="flex items-center space-x-1 min-w-0">
                 <Link href="/story">
-                  <Button
-                    size="sm"
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  <span
+                    className="font-extrabold text-xl whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3 py-2 transition-all duration-200 text-slate-900 hover:text-blue-600 hover:bg-blue-50 cursor-pointer"
                     aria-label="Read our story"
                   >
                     Our Story
-                  </Button>
+                  </span>
                 </Link>
                 <Button
                   size="sm"
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3 text-base shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   onClick={() => setIsBuyModalOpen(true)}
                   aria-label="Buy VMF coins"
                 >
-                  Buy VMF
+                  BUY VMF
                 </Button>
 
                 {/* Compact Officers Club Button */}
@@ -401,13 +401,12 @@ const Index = () => {
                 {/* Mobile Action Buttons */}
                 <div className="flex flex-col space-y-2 pt-3 border-t border-gray-200">
                   <Link href="/story">
-                    <Button
-                      className="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                      onClick={() => setIsMenuOpen(false)}
+                    <span
+                      className="font-extrabold text-xl whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3 py-2 transition-all duration-200 text-slate-900 hover:text-blue-600 hover:bg-blue-50 cursor-pointer"
                       aria-label="Read our story"
                     >
                       Our Story
-                    </Button>
+                    </span>
                   </Link>
                   <Button
                     className="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
@@ -468,7 +467,7 @@ const Index = () => {
                 <div className="text-center lg:text-left">
                   <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-4 sm:p-8 shadow-lg">
                     <h1 id="hero-heading" className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 leading-tight break-words whitespace-normal">
-                      <span className="text-red-600">Zero Fees.</span>
+                      <span className="text-red-600 whitespace-nowrap">Direct Dollars.</span>
                       <br />
                       <span className="text-blue-900 text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl">100% Donation</span>
                       <br />
@@ -484,7 +483,7 @@ const Index = () => {
                     <div className="flex justify-center mb-8">
                       <Button
                         size="sm"
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 sm:px-10 sm:py-4 text-base sm:text-lg font-semibold shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-14 py-2 sm:px-16 sm:py-4 text-base sm:text-lg font-semibold shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                         onClick={() => setIsBuyModalOpen(true)}
                         aria-label="Buy VMF coins to support veterans"
                       >
@@ -685,50 +684,7 @@ const Index = () => {
                 </p>
               </div>
 
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6" role="list" aria-label="Partner charities">
-                {charities.map((charity, index) => (
-                  <Card
-                    key={index}
-                    className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 group overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 flex flex-col h-full"
-                    role="listitem"
-                  >
-                    <CardContent className="p-0 flex flex-col h-full">
-                      <div className="p-6 pb-4 flex-grow">
-                        <div className="flex items-center space-x-4 mb-4">
-                          <div className="w-16 h-16 rounded-xl overflow-hidden bg-white shadow-md flex-shrink-0">
-                            <img
-                              src={charity.logo || "/placeholder.svg"}
-                              alt={`${charity.name} logo`}
-                              className="w-full h-full object-contain p-2"
-                            />
-                          </div>
-                          <div>
-                            <h3 className="text-lg font-bold text-slate-800 leading-tight">{charity.name}</h3>
-                            <div
-                              className="text-sm text-green-600 font-semibold"
-                              aria-label={`Impact: ${charity.impact}`}
-                            >
-                              {charity.impact}
-                            </div>
-                          </div>
-                        </div>
-                        <p className="text-slate-600 text-sm leading-relaxed">{charity.description}</p>
-                      </div>
-                      <div className="px-6 pb-6 mt-auto">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="w-full border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                          onClick={() => window.open(charity.website, "_blank")}
-                          aria-label={`Learn more about ${charity.name}, opens in new tab`}
-                        >
-                          Learn More
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+              <CharityGrid />
             </div>
           </div>
         </section>
