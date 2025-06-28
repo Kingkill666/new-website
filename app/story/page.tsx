@@ -76,11 +76,33 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
       description:
         "VMF placed 2nd in the prestigious Base batch Build competition, validating our innovative approach to veteran support through blockchain technology.",
       link: "https://x.com/VMFCoin/status/1930890256888590525",
+      images: [
+        "/images/base-batch-runner-up.jpeg"
+      ]
     },
     {
       year: "June 15th 2025",
       title: "VMF Launches on Base",
       description: "VMF went live on Base and the system works. Charities receive 100% of their donations and donors receive VMF.",
+    },
+    {
+      year: "June 25th 2025",
+      title: "First In-Person Charity Event",
+      description: "VMF had our first in person charity event with our partnered charity Patriots Promise.",
+      link: "https://x.com/VMFCoin/status/1938125706678178012",
+      images: [
+        "/images/vmf-event-1.jpeg",
+        "/images/vmf-event-2.jpeg"
+      ]
+    },
+    {
+      year: "June 27th 2025",
+      title: "Base Batch Incubator Completion",
+      description: "VMF finishes Base Batch Incubator Program and was rewarded for our vision of bringing donations to our Veterans.",
+      images: [
+        "/images/base-batch-winner.png"
+      ],
+      link: "https://x.com/VMFCoin/status/1937842959132815849"
     },
   ]
 
@@ -632,12 +654,28 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
                             </Badge>
                             <h3 className="text-2xl font-bold text-slate-900 mb-3">{milestone.title}</h3>
                             <p className="text-slate-600 mb-4">{milestone.description}</p>
+                            {milestone.images && (
+                              <div className="flex flex-col sm:flex-row gap-4 mt-4">
+                                {milestone.images.map((img, idx) => (
+                                  <img
+                                    key={idx}
+                                    src={img}
+                                    alt={milestone.title === 'Base Batch Incubator Completion' ? 'Base Batch Incubator Winner' : milestone.title === 'Base Batch Build Success' ? 'Base Batch North America Runner-Up Award' : `VMF Event Photo ${idx + 1}`}
+                                    className={
+                                      milestone.title === 'Base Batch Build Success'
+                                        ? 'rounded-xl shadow-md max-w-[280px] max-h-72 object-cover object-center border border-gray-200'
+                                        : 'rounded-xl shadow-md max-w-[180px] max-h-56 object-cover object-center border border-gray-200'
+                                    }
+                                  />
+                                ))}
+                              </div>
+                            )}
                             {milestone.link && (
                               <a
                                 href={milestone.link}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium"
+                                className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium mt-2"
                               >
                                 View Announcement
                                 <ArrowRight className="ml-1 h-4 w-4" />
