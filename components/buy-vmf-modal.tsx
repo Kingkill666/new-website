@@ -247,16 +247,19 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
         }
         const usdcAmount = ethers.parseUnits(Number(amount).toFixed(2), 6)
         const gasEstimate = await (contract as any).estimateGas.handleUSDC(usdcAmount, selectedCharity.address)
-        const gasPrice = await provider.getFeeData()
-        const ethGasFee = gasEstimate * (gasPrice.gasPrice ?? BigInt(0))
+        // Fetch Base gas price from official API
+        const { data: gasData } = await axios.get("https://gas.api.base.org")
+        const baseGasPriceWei = gasData.recommended.maxFeePerGas // in wei
         // Get ETH/USD price
         const { data } = await axios.get("https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd")
         const ethUsd = data?.ethereum?.usd ?? 3500
+        // Calculate gas fee in ETH and USD
+        const ethGasFee = BigInt(gasEstimate) * BigInt(baseGasPriceWei)
         const feeInEth = Number(ethers.formatEther(ethGasFee.toString()))
         const feeUsd = (feeInEth * ethUsd).toFixed(2)
         setFees(feeUsd)
       } catch (e) {
-        setFees("20.0") // fallback
+        setFees(null)
       } finally {
         setIsEstimatingGas(false)
       }
