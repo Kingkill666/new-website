@@ -12,8 +12,8 @@ export const detectWallets = () => {
     coinbase: ethereum?.isCoinbaseWallet || ethereum?.selectedProvider?.isCoinbaseWallet,
     coinbaseSmart: true, // Coinbase Smart Web Wallet is always available
     rainbow: ethereum?.isRainbow,
-    phantom: solana?.isPhantom,
-    // Check for multiple providers
+    farcaster: ethereum?.isFarcaster,
+    // Rabby removed
     multipleProviders: ethereum?.providers?.length > 1,
     providers: ethereum?.providers || [],
   }
@@ -36,6 +36,8 @@ export const getSpecificProvider = (walletType: string) => {
         return ethereum.providers.find((p: any) => p.isCoinbaseWallet)
       case "rainbow":
         return ethereum.providers.find((p: any) => p.isRainbow)
+      case "farcaster":
+        return ethereum.providers.find((p: any) => p.isFarcaster)
       default:
         return ethereum
     }

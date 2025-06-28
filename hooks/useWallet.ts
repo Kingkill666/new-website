@@ -30,6 +30,7 @@ export const WALLET_OPTIONS: WalletInfo[] = [
   { name: "Coinbase Extension", logo: "/images/coinbase-logo.png", id: "coinbase" },
   { name: "Coinbase Smart Wallet", logo: "/images/coinbase-logo.png", id: "coinbaseSmart" },
   { name: "Rainbow", logo: "🌈", id: "rainbow" },
+  { name: "Farcaster", logo: "n", id: "farcaster" },
 ]
 
 export function useWallet() {
@@ -75,6 +76,16 @@ export function useWallet() {
           break
         case "coinbaseSmart":
           // Coinbase Smart Wallet is always available, no installation check needed
+          break
+        case "rainbow":
+          if (!detectedWallets.rainbow) {
+            throw new Error("Rainbow Wallet not installed. Please install Rainbow Wallet extension.")
+          }
+          break
+        case "farcaster":
+          if (!detectedWallets.farcaster) {
+            throw new Error("Farcaster Wallet not installed. Please install Farcaster Wallet extension.")
+          }
           break
       }
 
@@ -237,51 +248,7 @@ export function useWallet() {
   // Main connect function
   const connectWallet = useCallback(
     async (walletId: string) => {
-      if (walletId === "coinbaseSmart" && isMobile()) {
-        // Simple WalletConnect for Coinbase Wallet mobile app
-        const connector = new WalletConnect({
-          bridge: "https://bridge.walletconnect.org",
-        });
-        
-        if (!connector.connected) {
-          await connector.createSession();
-        }
-        
-        const uri = connector.uri;
-        
-        // Listen for connection event
-        connector.on("connect", async (error, payload) => {
-          if (error) {
-            setWalletState((prev) => ({ ...prev, error: error.message, isConnecting: false }));
-            return;
-          }
-          const { accounts, chainId } = payload.params[0];
-          setWalletState({
-            isConnected: true,
-            address: accounts[0],
-            walletType: "Coinbase Smart Wallet",
-            balance: null, // You can fetch balance if needed
-            usdcBalance: null, // You can fetch USDC balance if needed
-            chainId: chainId,
-            isConnecting: false,
-            error: null,
-            provider: connector,
-          });
-        });
-        
-        // Simple deep link - no fallbacks to app stores
-        const deepLink = `cbwallet://wc?uri=${encodeURIComponent(uri)}`;
-        window.location.href = deepLink;
-        return;
-      }
-      
-      // Only allow Coinbase Smart Wallet on mobile
-      if (isMobile() && walletId !== "coinbaseSmart") {
-        alert("Only Coinbase Smart Wallet is supported on mobile.");
-        return;
-      }
-      
-      // Desktop and fallback: use SDK/web flow
+      // Always try to connect the selected wallet, regardless of device
       await connectEthereumWallet(walletId);
     },
     [connectEthereumWallet],
@@ -435,16 +402,16 @@ export function useWallet() {
     return WALLET_OPTIONS.map((wallet) => ({
       ...wallet,
       installed:
-        wallet.id === "phantom"
-          ? detected.phantom
-          : wallet.id === "metamask"
-            ? detected.metamask
-            : wallet.id === "coinbase"
-              ? detected.coinbase
-              : wallet.id === "coinbaseSmart"
-                ? detected.coinbaseSmart || true // Coinbase Smart Wallet might not be detectable
-                : wallet.id === "rainbow"
-                  ? detected.rainbow || true // Rainbow might not be detectable
+        wallet.id === "metamask"
+          ? detected.metamask
+          : wallet.id === "coinbase"
+            ? detected.coinbase
+            : wallet.id === "coinbaseSmart"
+              ? detected.coinbaseSmart || true // Coinbase Smart Wallet might not be detectable
+              : wallet.id === "rainbow"
+                ? detected.rainbow || true // Rainbow might not be detectable
+                : wallet.id === "farcaster"
+                  ? detected.farcaster || true
                   : false,
     }))
   }, [])

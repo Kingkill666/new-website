@@ -122,7 +122,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
   const [charityDistributions, setCharityDistributions] = useState<CharityDistribution[]>([])
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false)
   const [isCharityDropdownOpen, setIsCharityDropdownOpen] = useState(false)
-  const { walletState, connectWallet, formatAddress, switchNetwork} = useWallet()
+  const { walletState, connectWallet, formatAddress, switchNetwork, disconnectWallet } = useWallet()
   const [transactionHash, setTransactionHash] = useState("")
   const [vmfAmount, setVmfAmount] = useState("")
   const [fees, setFees] = useState<string | null>(null)
@@ -246,7 +246,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
           return
         }
         const usdcAmount = ethers.parseUnits(Number(amount).toFixed(2), 6)
-        const gasEstimate = await contract.estimateGas["handleUSDC"](usdcAmount, selectedCharity.address)
+        const gasEstimate = await (contract as any).estimateGas.handleUSDC(usdcAmount, selectedCharity.address)
         const gasPrice = await provider.getFeeData()
         const ethGasFee = gasEstimate * (gasPrice.gasPrice ?? BigInt(0))
         // Get ETH/USD price
@@ -456,59 +456,71 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
 
               {!walletState.isConnected ? (
                 <>
-                  {walletState.error && walletState.error.includes("Coinbase Wallet app not detected") ? (
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4" role="alert">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <AlertCircle className="h-4 w-4 text-red-600" aria-hidden="true" />
-                        <span className="font-medium text-red-800">Coinbase Wallet Not Detected</span>
-                      </div>
-                      <p className="text-sm text-red-700 mb-3">
-                        To buy VMF, you need the Coinbase Wallet app installed on your device.
-                      </p>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4" role="alert">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <AlertCircle className="h-4 w-4 text-blue-600" aria-hidden="true" />
+                      <span className="font-medium text-blue-800">Connect Your Wallet</span>
+                    </div>
+                    <p className="text-sm text-blue-700 mb-3">
+                      Please select a wallet to connect and continue with the purchase.
+                    </p>
+                    <div className="grid grid-cols-1 gap-3">
                       <Button
-                        variant="outline"
-                        onClick={() => window.open("https://www.coinbase.com/wallet/downloads", "_blank")}
-                        className="w-full text-red-700 border-red-300 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                        aria-label="Install Coinbase Wallet, opens in new tab"
+                        onClick={() => connectWallet("coinbaseSmart")}
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2"
+                        aria-label="Connect Coinbase Smart Wallet"
                       >
-                        Install Coinbase Wallet
+                        <img src="/images/coinbase-logo.png" alt="Coinbase" className="h-6 w-6" />
+                        Coinbase Smart Wallet
+                      </Button>
+                      <Button
+                        onClick={() => connectWallet("metamask")}
+                        className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2"
+                        aria-label="Connect MetaMask"
+                      >
+                        <span className="text-2xl">🦊</span>
+                        MetaMask
+                      </Button>
+                      <Button
+                        onClick={() => connectWallet("rainbow")}
+                        className="w-full bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 hover:from-pink-500 hover:to-blue-500 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2"
+                        aria-label="Connect Rainbow Wallet"
+                      >
+                        <span className="text-2xl">🌈</span>
+                        Rainbow Wallet
+                      </Button>
+                      <Button
+                        onClick={() => connectWallet("farcaster")}
+                        className="w-full bg-[#8C6DFD] hover:bg-[#7a5be6] text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2"
+                        aria-label="Connect Farcaster Wallet"
+                      >
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" rx="6" fill="#8C6DFD"/><path d="M7 18V10.5C7 8.01472 9.01472 6 11.5 6H12.5C14.9853 6 17 8.01472 17 10.5V18H15V12C15 10.8954 14.1046 10 13 10H11C9.89543 10 9 10.8954 9 12V18H7Z" fill="white"/></svg>
+                        Farcaster Wallet
                       </Button>
                     </div>
-                  ) : (
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4" role="alert">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <AlertCircle className="h-4 w-4 text-blue-600" aria-hidden="true" />
-                        <span className="font-medium text-blue-800">Connect Your Wallet</span>
-                      </div>
-                      <p className="text-sm text-blue-700 mb-3">
-                        Please connect your Coinbase Smart Wallet to continue with the purchase.
-                      </p>
-            <Button
-              onClick={() => connectWallet("coinbaseSmart")}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                        aria-label="Connect Coinbase Smart Wallet"
-            >
-              Connect Coinbase Smart Wallet
-            </Button>
-          </div>
-        )}
+                  </div>
                 </>
               ) : (
                 <>
                   {/* Connected Wallet Display */}
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-4" role="status" aria-live="polite">
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4 relative" role="status" aria-live="polite">
+                    {/* Disconnect X button (for all wallets) */}
+                    <button
+                      onClick={disconnectWallet}
+                      className="absolute top-3 right-3 rounded-full p-1 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-400"
+                      aria-label="Disconnect wallet"
+                    >
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="10" cy="10" r="9" stroke="#16a34a" strokeWidth="2" fill="white" />
+                        <path d="M7 7l6 6M13 7l-6 6" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" />
+                      </svg>
+                    </button>
                     <div className="flex items-center space-x-2">
                       <CheckCircle className="h-4 w-4 text-green-600" aria-hidden="true" />
                       <span className="font-medium text-green-800">
                         {walletState.walletType}: {formatAddress(walletState.address!)}
                       </span>
                     </div>
-                    {walletState.balance && (
-                      
-                      <p className="text-sm text-green-700 mt-1">
-                        Balance: {walletState.balance} ETH
-                      </p>
-                    )}
                     {walletState.usdcBalance && (
                       <p className="text-sm text-green-700 mt-1">
                         ${walletState.usdcBalance}
@@ -535,40 +547,26 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                           Buy USDC on Coinbase
                         </Button>
                       </div>
-              </div>
-            )}
+                </div>
+              )}
 
-                  {/* Network Warning for Ethereum wallets */}
-                  {walletState.walletType !== "Phantom" && needsNetworkSwitch && (
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4" role="alert">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <AlertCircle className="h-4 w-4 text-yellow-600" aria-hidden="true" />
-                        <span className="font-medium text-yellow-800">Wrong Network</span>
-                      </div>
-                      <p className="text-sm text-yellow-700 mb-3">Please switch to the correct network to continue.</p>
-                      <Button
-                        onClick={handleNetworkSwitch}
-                        className="w-full bg-yellow-600 hover:bg-yellow-700 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
-                        aria-label="Switch to new network"
-                      >
-                        Switch Network
-                      </Button>
-              </div>
-                  )}
-
-                  {/* Phantom Wallet Warning */}
-                  {walletState.walletType === "Phantom" && (
-                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-4" role="alert">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <AlertCircle className="h-4 w-4 text-orange-600" aria-hidden="true" />
-                        <span className="font-medium text-orange-800">Solana Wallet Detected</span>
-                      </div>
-                      <p className="text-sm text-orange-700">
-                        Smart contract execution requires an Ethereum wallet. Please connect MetaMask, Coinbase, or
-                        Rainbow wallet.
-                      </p>
-                    </div>
-                  )}
+              {/* Network Warning for Ethereum wallets */}
+              {needsNetworkSwitch && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4" role="alert">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <AlertCircle className="h-4 w-4 text-yellow-600" aria-hidden="true" />
+                    <span className="font-medium text-yellow-800">Wrong Network</span>
+                  </div>
+                  <p className="text-sm text-yellow-700 mb-3">Please switch to the correct network to continue.</p>
+                  <Button
+                    onClick={handleNetworkSwitch}
+                    className="w-full bg-yellow-600 hover:bg-yellow-700 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
+                    aria-label="Switch to new network"
+                  >
+                    Switch Network
+                  </Button>
+                </div>
+              )}
                 </>
             )}
 
