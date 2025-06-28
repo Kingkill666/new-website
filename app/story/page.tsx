@@ -30,6 +30,7 @@ const StoryPage = () => {
   const [activeTab, setActiveTab] = useState("vision")
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isBuyModalOpen, setIsBuyModalOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
 
   const router = useRouter()
 
@@ -136,6 +137,25 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
     checkWalletConnection()
   }, [])
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50)
+    }
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  useEffect(() => {
+    if (isBuyModalOpen) {
+      document.body.style.overflow = "hidden"
+    } else {
+      document.body.style.overflow = "unset"
+    }
+    return () => {
+      document.body.style.overflow = "unset"
+    }
+  }, [isBuyModalOpen])
+
   return (
     <div className="min-h-screen bg-white">
       {/* Skip to main content link for screen readers */}
@@ -146,14 +166,18 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
         Skip to main content
       </a>
 
-      {/* Modern Navigation */}
+      {/* Header Navigation (copied from index.tsx, Our Story link removed, Socials link added) */}
       <nav
-        className="border-b border-border/20 bg-white/95 backdrop-blur-sm sticky top-0 z-50 shadow-sm"
+        className={`border-b backdrop-blur-md fixed top-0 left-0 right-0 z-50 shadow-lg transition-all duration-300 ${
+          scrolled ? "bg-white/98 border-gray-200 shadow-md" : "bg-white/95 border-border/20"
+        }`}
         role="navigation"
         aria-label="Main navigation"
+        style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50 }}
       >
-        <div className="container mx-auto px-4 sm:px-6 py-3">
-          <div className="flex items-center justify-between">
+        <div className="container mx-auto px-2 sm:px-4 py-2 overflow-x-hidden">
+          <div className="flex items-center justify-between min-w-0">
+            {/* Logo Section */}
             <Link href="/" aria-label="Go to home page">
               <div className="flex items-center space-x-3 cursor-pointer">
               <div className="h-16 w-16">
@@ -171,81 +195,151 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
               </div>
               </div>
             </Link>
-
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-4">
+            <div className="hidden lg:flex items-center space-x-1 min-w-0">
+              <div className="flex items-center space-x-1 min-w-0">
+                <a
+                  href="/#how-it-works"
+                  className="font-extrabold text-xl whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3 py-2 transition-all duration-200 text-slate-900 hover:text-blue-600 hover:bg-blue-50 cursor-pointer"
+                  aria-label="Navigate to How It Works section"
+                >
+                  How It Works
+                </a>
+                <a
+                  href="/#charities"
+                  className="font-extrabold text-xl whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3 py-2 transition-all duration-200 text-slate-900 hover:text-blue-600 hover:bg-blue-50 cursor-pointer"
+                  aria-label="Navigate to Our Partners section"
+                >
+                  Our Partners
+                </a>
+                <a
+                  href="/#governance"
+                  className="font-extrabold text-xl whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3 py-2 transition-all duration-200 text-slate-900 hover:text-blue-600 hover:bg-blue-50 cursor-pointer"
+                  aria-label="Navigate to Community section"
+                >
+                  Community
+                </a>
+                <Link href="/socials">
+                  <span
+                    className="font-extrabold text-xl whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3 py-2 transition-all duration-200 text-slate-900 hover:text-blue-600 hover:bg-blue-50 cursor-pointer"
+                    aria-label="Visit our Socials page"
+                  >
+                    Socials
+                  </span>
+                </Link>
+              </div>
+              <div className="flex items-center space-x-1 min-w-0">
               <Button
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6"
+                  size="sm"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3 text-base shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 onClick={() => setIsBuyModalOpen(true)}
+                  aria-label="Buy VMF coins"
               >
-                Buy VMF
+                  BUY VMF
               </Button>
-
-              {/* Officers Club Button */}
               <Link href="/officers-club">
                 <Button
-                  className="relative overflow-hidden text-white font-bold px-6 py-2 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                    className="relative overflow-hidden text-white font-bold px-2 py-1.5 text-xs shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
                   style={{
                     background:
                       "linear-gradient(45deg, #3B82F6 0%, #EF4444 25%, #3B82F6 50%, #EF4444 75%, #3B82F6 100%)",
                     backgroundSize: "200% 200%",
                     animation: "gradient-shift 3s ease infinite",
                   }}
+                    size="sm"
+                    aria-label="Access Officers Club"
                 >
-                  <Crown className="h-4 w-4 mr-2" />
+                    <Crown className="h-3 w-3 mr-1" aria-hidden="true" />
                   <span className="relative z-10 font-extrabold tracking-wide">OFFICERS CLUB</span>
                 </Button>
               </Link>
-
-              <Button
-                variant="outline"
-                className="flex items-center space-x-2"
-                aria-label="Go back to home page"
-                onClick={handleBackToHome}
-              >
-                <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-                <span>Back to Home</span>
-              </Button>
             </div>
-
+            </div>
             {/* Mobile menu button */}
-            <div className="md:hidden">
+            <div className="lg:hidden">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 aria-expanded={isMenuOpen}
-                aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+                aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+                aria-controls="mobile-menu"
+                className="focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-slate-800 hover:bg-gray-100"
               >
-                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </Button>
             </div>
           </div>
-
           {/* Mobile Menu */}
           {isMenuOpen && (
-            <div className="md:hidden mt-4 pb-4 border-t border-gray-100">
-              <div className="flex flex-col space-y-3 pt-4">
-                <div className="flex flex-col space-y-2">
+            <div
+              id="mobile-menu"
+              className="lg:hidden mt-4 pb-4 border-t border-gray-200"
+              role="menu"
+              aria-label="Mobile navigation menu"
+            >
+              <div className="flex flex-col space-y-2 pt-4">
+                <a
+                  href="/#how-it-works"
+                  className="text-slate-800 hover:text-blue-600 hover:bg-blue-50 font-semibold py-2 text-left text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3"
+                  role="menuitem"
+                  aria-label="Navigate to How It Works section"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  How It Works
+                </a>
+                <a
+                  href="/#charities"
+                  className="text-slate-800 hover:text-blue-600 hover:bg-blue-50 font-semibold py-2 text-left text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3"
+                  role="menuitem"
+                  aria-label="Navigate to Our Partners section"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Our Partners
+                </a>
+                <a
+                  href="/#governance"
+                  className="text-slate-800 hover:text-blue-600 hover:bg-blue-50 font-semibold py-2 text-left text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3"
+                  role="menuitem"
+                  aria-label="Navigate to Community section"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Community
+                </a>
+                <Link href="/socials">
+                  <span
+                    className="text-slate-800 hover:text-blue-600 hover:bg-blue-50 font-semibold py-2 text-left text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3 cursor-pointer"
+                    role="menuitem"
+                    aria-label="Visit our Socials page"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Socials
+                  </span>
+                </Link>
+                <div className="flex flex-col space-y-2 pt-3 border-t border-gray-200">
                   <Button
                     className="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                    onClick={() => setIsBuyModalOpen(true)}
+                    onClick={() => {
+                      setIsBuyModalOpen(true)
+                      setIsMenuOpen(false)
+                    }}
+                    aria-label="Buy VMF coins"
                   >
                     Buy VMF
                   </Button>
-
-                  {/* Mobile Officers Club Button */}
                   <Link href="/officers-club">
                     <Button
-                      className="w-full relative overflow-hidden text-white font-bold px-6 py-3 shadow-lg"
+                      className="w-full relative overflow-hidden text-white font-bold px-6 py-3 shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
                       style={{
                         background:
                           "linear-gradient(45deg, #3B82F6 0%, #EF4444 25%, #3B82F6 50%, #EF4444 75%, #3B82F6 100%)",
                         backgroundSize: "200% 200%",
                         animation: "gradient-shift 3s ease infinite",
                       }}
+                      onClick={() => setIsMenuOpen(false)}
+                      aria-label="Access Officers Club"
                     >
-                      <Crown className="h-4 w-4 mr-2" />
+                      <Crown className="h-4 w-4 mr-2" aria-hidden="true" />
                       <span className="relative z-10 font-extrabold tracking-wide">OFFICERS CLUB</span>
                     </Button>
                   </Link>
@@ -255,9 +349,8 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
           )}
         </div>
       </nav>
-
-      {/* Main Content */}
-      <main id="main-content">
+      <BuyVMFModal isOpen={isBuyModalOpen} onClose={() => setIsBuyModalOpen(false)} />
+      <main className="pt-24">
         {/* Hero Section with Parallax Effect */}
         <section className="relative py-20 sm:py-28 overflow-hidden">
           {/* American Flag Image Background */}
@@ -888,21 +981,12 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button
                   size="lg"
-                  className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 text-lg font-semibold"
+                  className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 text-lg font-semibold mx-auto"
                   onClick={() => setIsBuyModalOpen(true)}
                   aria-label="Purchase VMF Coins"
                 >
                   Buy VMF Coins
                   <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-3 text-lg font-semibold"
-                  aria-label="Learn more about VMF"
-                  onClick={handleBackToHome}
-                >
-                  Back to Home
                 </Button>
               </div>
             </div>
@@ -1030,9 +1114,6 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
           }
         }
       `}</style>
-      {/* Click outside to close wallet options */}
-      {/* Buy VMF Modal */}
-      <BuyVMFModal isOpen={isBuyModalOpen} onClose={() => setIsBuyModalOpen(false)} />
     </div>
   )
 }

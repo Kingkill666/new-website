@@ -21,22 +21,36 @@ import {
   X,
 } from "lucide-react"
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { WalletConnector } from "@/components/wallet-connector"
 import { BuyVMFModal } from "@/components/buy-vmf-modal"
+import Footer from "@/components/footer"
 
 const OfficersClubPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const router = useRouter()
   const [isBuyModalOpen, setIsBuyModalOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
 
-  const handleBackToHome = () => {
-    router.push("/")
-    setTimeout(() => {
-      window.scrollTo({ top: 0, behavior: "smooth" })
-    }, 100)
-  }
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50)
+    }
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  useEffect(() => {
+    if (isBuyModalOpen) {
+      document.body.style.overflow = "hidden"
+    } else {
+      document.body.style.overflow = "unset"
+    }
+    return () => {
+      document.body.style.overflow = "unset"
+    }
+  }, [isBuyModalOpen])
 
   const clubFeatures = [
     {
@@ -67,100 +81,175 @@ const OfficersClubPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-red-50 relative">
-      {/* Starry Background */}
-
-      {/* Navigation */}
-      <nav className="border-b border-border/20 bg-slate-800/95 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
-        <div className="container mx-auto px-4 sm:px-6 py-3">
-          <div className="flex items-center justify-between">
+      {/* Header Navigation (copied from index.tsx, Back to Home button removed, Socials link added, white bg) */}
+      <nav
+        className={`border-b backdrop-blur-md fixed top-0 left-0 right-0 z-50 shadow-lg transition-all duration-300 bg-white`}
+        role="navigation"
+        aria-label="Main navigation"
+        style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50 }}
+      >
+        <div className="container mx-auto px-2 sm:px-4 py-2 overflow-x-hidden">
+          <div className="flex items-center justify-between min-w-0">
+            {/* Logo Section */}
             <Link href="/" aria-label="Go to home page">
               <div className="flex items-center space-x-3 cursor-pointer">
                 <div className="h-16 w-16">
-                <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/New%20VMF%20Logo-HJjs5zLNzX1i3UA7BdYWX0EPUg7eWR.png" alt="VMF Logo - Patriotic star with red and white stripes" className="w-full h-full object-contain" />
-              </div>
+                  <img
+                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/New%20VMF%20Logo-HJjs5zLNzX1i3UA7BdYWX0EPUg7eWR.png"
+                    alt="VMF Logo - Patriotic star with red and white stripes"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
                 <div className="flex flex-col">
                   <span className="text-3xl font-black text-black tracking-tight leading-none">VMF</span>
                   <span className="text-xl font-bold text-red-600 tracking-wide uppercase leading-none">
                     VETERANS & MILITARY FAMILIES
                   </span>
-                </div>
+              </div>
               </div>
             </Link>
-
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-4">
-              <Link href="/story">
-                <Button
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6"
+            <div className="hidden lg:flex items-center space-x-1 min-w-0">
+              <div className="flex items-center space-x-1 min-w-0">
+                <a
+                  href="/#how-it-works"
+                  className="font-extrabold text-xl whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3 py-2 transition-all duration-200 text-slate-900 hover:text-blue-600 hover:bg-blue-50 cursor-pointer"
+                  aria-label="Navigate to How It Works section"
                 >
-                  Our Story
-                </Button>
-              </Link>
+                  How It Works
+                </a>
+                <a
+                  href="/#charities"
+                  className="font-extrabold text-xl whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3 py-2 transition-all duration-200 text-slate-900 hover:text-blue-600 hover:bg-blue-50 cursor-pointer"
+                  aria-label="Navigate to Our Partners section"
+                >
+                  Our Partners
+                </a>
+                <a
+                  href="/#governance"
+                  className="font-extrabold text-xl whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3 py-2 transition-all duration-200 text-slate-900 hover:text-blue-600 hover:bg-blue-50 cursor-pointer"
+                  aria-label="Navigate to Community section"
+                >
+                  Community
+                </a>
+                <Link href="/socials">
+                  <span
+                    className="font-extrabold text-xl whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3 py-2 transition-all duration-200 text-slate-900 hover:text-blue-600 hover:bg-blue-50 cursor-pointer"
+                    aria-label="Visit our Socials page"
+                  >
+                    Socials
+                  </span>
+                </Link>
+                <Link href="/story">
+                  <span
+                    className="font-extrabold text-xl whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3 py-2 transition-all duration-200 text-slate-900 hover:text-blue-600 hover:bg-blue-50 cursor-pointer"
+                    aria-label="Visit our Story page"
+                  >
+                    Our Story
+                  </span>
+                </Link>
+              </div>
+              <div className="flex items-center space-x-1 min-w-0">
               <Button
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6"
+                  size="sm"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3 text-base shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 onClick={() => setIsBuyModalOpen(true)}
+                  aria-label="Buy VMF coins"
               >
-                Buy VMF
+                  BUY VMF
               </Button>
-              <Button
-                variant="outline"
-                className="flex items-center space-x-2 border-white/20 text-black bg-white/80 hover:bg-white"
-                onClick={handleBackToHome}
-              >
-                <ArrowLeft className="h-4 w-4" />
-                <span>Back to Home</span>
-              </Button>
+              </div>
             </div>
-
-            {/* Mobile Navigation */}
-            <div className="md:hidden">
+            {/* Mobile menu button */}
+            <div className="lg:hidden">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="text-white hover:bg-white/10"
+                aria-expanded={isMenuOpen}
+                aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+                aria-controls="mobile-menu"
+                className="focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-slate-800 hover:bg-gray-100"
               >
-                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </Button>
             </div>
           </div>
-
           {/* Mobile Menu */}
           {isMenuOpen && (
-            <div className="md:hidden mt-4 pb-4 border-t border-gray-700">
-              <div className="flex flex-col space-y-3 pt-4">
+            <div
+              id="mobile-menu"
+              className="lg:hidden mt-4 pb-4 border-t border-gray-200"
+              role="menu"
+              aria-label="Mobile navigation menu"
+            >
+              <div className="flex flex-col space-y-2 pt-4">
+                <a
+                  href="/#how-it-works"
+                  className="text-slate-800 hover:text-blue-600 hover:bg-blue-50 font-semibold py-2 text-left text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3"
+                  role="menuitem"
+                  aria-label="Navigate to How It Works section"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  How It Works
+                </a>
+                <a
+                  href="/#charities"
+                  className="text-slate-800 hover:text-blue-600 hover:bg-blue-50 font-semibold py-2 text-left text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3"
+                  role="menuitem"
+                  aria-label="Navigate to Our Partners section"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Our Partners
+                </a>
+                <a
+                  href="/#governance"
+                  className="text-slate-800 hover:text-blue-600 hover:bg-blue-50 font-semibold py-2 text-left text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3"
+                  role="menuitem"
+                  aria-label="Navigate to Community section"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Community
+                </a>
+                <Link href="/socials">
+                  <span
+                    className="text-slate-800 hover:text-blue-600 hover:bg-blue-50 font-semibold py-2 text-left text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3 cursor-pointer"
+                    role="menuitem"
+                    aria-label="Visit our Socials page"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Socials
+                  </span>
+                </Link>
                 <Link href="/story">
-                  <Button
-                    className="bg-blue-600 hover:bg-blue-700 text-white w-full"
+                  <span
+                    className="text-slate-800 hover:text-blue-600 hover:bg-blue-50 font-semibold py-2 text-left text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3 cursor-pointer"
+                    role="menuitem"
+                    aria-label="Visit our Story page"
+                    onClick={() => setIsMenuOpen(false)}
                   >
                     Our Story
-                  </Button>
+                  </span>
                 </Link>
+                <div className="flex flex-col space-y-2 pt-3 border-t border-gray-200">
                 <Button
-                  className="bg-blue-600 hover:bg-blue-700 text-white w-full"
-                  onClick={() => setIsBuyModalOpen(true)}
-                >
-                  Buy VMF
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full border-white/20 text-black bg-white/80 hover:bg-white"
+                    className="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   onClick={() => {
-                    handleBackToHome()
+                      setIsBuyModalOpen(true)
                     setIsMenuOpen(false)
                   }}
+                    aria-label="Buy VMF coins"
                 >
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back to Home
+                    Buy VMF
                 </Button>
+                </div>
               </div>
             </div>
           )}
         </div>
       </nav>
-
-      {/* Main Content */}
-      <main>
+      <BuyVMFModal isOpen={isBuyModalOpen} onClose={() => setIsBuyModalOpen(false)} />
+      <main className="pt-24">
         {/* Hero Section */}
         <section className="relative py-20 sm:py-28 overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800">
           {/* Twinkling Stars Background */}
@@ -328,119 +417,13 @@ const OfficersClubPage = () => {
                   </CardContent>
                 </Card>
               </div>
-
-              <div className="text-center">
-                <Button
-                  size="lg"
-                  className="bg-gradient-to-r from-blue-600 to-red-600 hover:from-blue-700 hover:to-red-700 text-white px-8 py-4 text-lg font-bold shadow-lg"
-                  onClick={handleBackToHome}
-                >
-                  Back to Main Site
-                </Button>
-              </div>
             </div>
           </div>
         </section>
       </main>
 
       {/* Footer */}
-      <footer className="py-12 bg-slate-900 text-white border-t border-white/10">
-        <div className="container mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-            <div className="flex flex-col items-center md:items-start">
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="w-12 h-12 rounded-xl overflow-hidden">
-                  <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/New%20VMF%20Logo-HJjs5zLNzX1i3UA7BdYWX0EPUg7eWR.png" alt="VMF Logo - Patriotic star with red and white stripes" className="w-full h-full object-contain" />
-                </div>
-                <div>
-                  <span className="text-xl font-bold">Officers Club</span>
-                  <p className="text-xs text-yellow-400">VMF Community Hub</p>
-                </div>
-              </div>
-              <p className="text-gray-400 text-center md:text-left">Where Veterans Connect & Play</p>
-            </div>
-            <div className="flex flex-col items-center">
-              <div className="flex items-center space-x-2 mb-3">
-                <Phone className="h-5 w-5 text-red-500" />
-                <span className="font-bold text-red-500">VETERANS CRISIS LINE</span>
-              </div>
-              <p className="text-center text-gray-300 mb-1">
-                Call <a href="tel:988" className="font-bold underline focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded hover:text-red-400">988</a> and Press <span className="font-bold">1</span>
-              </p>
-              <p className="text-center text-gray-300">
-                or Text <a href="sms:838255" className="font-bold underline focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded hover:text-red-400">838255</a>
-              </p>
-            </div>
-            <div className="flex flex-col items-center md:items-end">
-              <h4 className="text-lg font-semibold mb-4">Connect With VMF</h4>
-              <div className="flex space-x-3">
-                <a
-                  href="https://www.facebook.com/profile.php?id=61574041978891&mibextid=wwXIfr&mibextid=wwXIfr"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-slate-800 hover:bg-slate-700 p-3 rounded-xl transition-colors"
-                >
-                  <Facebook className="h-5 w-5" />
-                </a>
-                <a
-                  href="https://x.com/VMFCoin"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-slate-800 hover:bg-slate-700 p-3 rounded-xl transition-colors"
-                >
-                  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                  </svg>
-                </a>
-                <a
-                  href="https://www.instagram.com/vmfcoin?igsh=MTJtcjl3Ym1jbm9qMA%3D%3D&utm_source=qr"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-slate-800 hover:bg-slate-700 p-3 rounded-xl transition-colors"
-                >
-                  <Instagram className="h-5 w-5" />
-                </a>
-                <a
-                  href="https://www.linkedin.com/company/vmfcoin/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-slate-800 hover:bg-slate-700 p-3 rounded-xl transition-colors"
-                >
-                  <Linkedin className="h-5 w-5" />
-                </a>
-                <a
-                  href="https://farcaster.xyz/vmfcoin"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-slate-800 hover:bg-slate-700 p-3 rounded-xl transition-colors"
-                >
-                  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M4 4h16v2H4V4zm2 4h12v2H6V8zm1 4h10v2H7v-2zm2 4h6v2H9v-2zm3 4h2v2h-2v-2z" />
-                    <path d="M5 6v12h2V8h10v10h2V6H5z" />
-                    <rect x="7" y="10" width="10" height="6" fill="none" stroke="currentColor" strokeWidth="1" />
-                    <path d="M8 12h8M8 14h8" stroke="currentColor" strokeWidth="0.5" />
-                  </svg>
-                </a>
-                <a
-                  href="https://bsky.app/profile/vmfcoin.bsky.social"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-slate-800 hover:bg-slate-700 p-3 rounded-xl transition-colors"
-                >
-                  <svg className="h-5 w-5" viewBox="0 0 600 530" fill="currentColor">
-                    <path d="m135.72 44.03c66.496 49.921 138.02 151.14 164.28 205.46 26.262-54.316 97.782-155.54 164.28-205.46 47.98-36.021 125.72-63.892 125.72 24.795 0 17.712-10.155 148.79-16.111 170.07-20.703 73.984-96.144 92.854-163.25 81.433 117.3 19.964 147.14 86.092 82.697 152.22-122.39 125.59-175.91-31.511-189.63-71.766-2.514-7.3797-3.6904-10.832-3.7077-7.8964-0.0174-2.9357-1.1937 0.51669-3.7077 7.8964-13.714 40.255-67.233 197.36-189.63 71.766-64.444-66.128-34.605-132.26 82.697-152.22-67.108 11.421-142.55-7.4491-163.25-81.433-5.9562-21.282-16.111-152.36-16.111-170.07 0-88.687 77.742-60.816 125.72-24.795z" />
-                  </svg>
-                </a>
-              </div>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 pt-6 text-center">
-            <p className="text-gray-400">
-              &copy; {new Date().getFullYear()} Veterans & Military Families. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
 
       {/* CSS for animations */}
       <style jsx>{`
@@ -449,10 +432,6 @@ const OfficersClubPage = () => {
           100% { opacity: 0.8; }
         }
       `}</style>
-
-      {/* Click outside to close wallet options */}
-      {/* Buy VMF Modal */}
-      <BuyVMFModal isOpen={isBuyModalOpen} onClose={() => setIsBuyModalOpen(false)} />
     </div>
   )
 }

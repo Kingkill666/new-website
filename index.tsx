@@ -31,6 +31,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { BuyVMFModal } from "@/components/buy-vmf-modal"
 import CharityGrid from "@/components/charity-grid"
+import Footer from "@/components/footer"
 
 const Index = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -292,6 +293,14 @@ const Index = () => {
                     Our Story
                   </span>
                 </Link>
+                <Link href="/socials">
+                  <span
+                    className="font-extrabold text-xl whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3 py-2 transition-all duration-200 text-slate-900 hover:text-blue-600 hover:bg-blue-50 cursor-pointer"
+                    aria-label="Visit our Socials page"
+                  >
+                    Socials
+                  </span>
+                </Link>
                 <Button
                   size="sm"
                   className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3 text-base shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
@@ -408,6 +417,14 @@ const Index = () => {
                       Our Story
                     </span>
                   </Link>
+                  <Link href="/socials">
+                    <span
+                      className="font-extrabold text-xl whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3 py-2 transition-all duration-200 text-slate-900 hover:text-blue-600 hover:bg-blue-50 cursor-pointer"
+                      aria-label="Visit our Socials page"
+                    >
+                      Socials
+                    </span>
+                  </Link>
                   <Button
                     className="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                     onClick={() => {
@@ -466,18 +483,15 @@ const Index = () => {
                 {/* Left Column - Content - Responsive Sizing */}
                 <div className="text-center lg:text-left">
                   <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-4 sm:p-8 shadow-lg">
-                    <h1 id="hero-heading" className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 leading-tight break-words whitespace-normal">
+                    <h1 id="hero-heading" className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 leading-tight break-words max-w-full">
                       <span className="text-red-600 whitespace-nowrap">Direct Dollars.</span>
-                      <br />
-                      <span className="text-blue-900 text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl">100% Donation</span>
+                      <span className="text-blue-900 text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl block">100% Donation</span>
                       <br />
                       <span className="text-blue-900 text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl">For Veterans.</span>
                     </h1>
 
-                    <p className="text-[20px] font-bold text-black mb-6 leading-snug max-w-2xl mx-auto lg:mx-0 text-center lg:text-left">
-                      <span className="block whitespace-nowrap">You buy. We match. You choose.</span>
-                      <span className="block whitespace-nowrap">Empowering change, one transaction at a time.</span>
-                      <span className="block whitespace-nowrap">With VMF, your purchase supports Veterans.</span>
+                    <p className="text-[20px] font-bold text-black mb-6 leading-snug max-w-full mx-auto lg:mx-0 text-center lg:text-left break-words">
+                      You buy. We match. You choose. Empowering change, one transaction at a time. With VMF, your purchase supports Veterans.
                     </p>
 
                     <div className="flex justify-center mb-8">
@@ -733,7 +747,7 @@ const Index = () => {
                 >
                   <div className="text-center">
                     <div>Join VMF Voice</div>
-                    <div className="text-sm font-normal -mt-1">Your Voice Matters</div>
+                    <div className="text-sm font-normal -mt-1">Make Proposals And Vote.</div>
                   </div>
                   <ArrowRight className="ml-4 h-8 w-8" aria-hidden="true" />
                 </a>
@@ -838,61 +852,7 @@ const Index = () => {
       </main>
 
       {/* Enhanced Footer */}
-      <footer className="py-12 bg-slate-900 text-white" role="contentinfo">
-        <div className="container mx-auto px-2 sm:px-4 lg:px-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-            <div className="flex flex-col items-center md:items-start">
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="w-12 h-12 rounded-xl overflow-hidden bg-white p-1">
-                  <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/New%20VMF%20Logo-HJjs5zLNzX1i3UA7BdYWX0EPUg7eWR.png" alt="VMF Logo - Patriotic star with red and white stripes" className="w-full h-full object-contain" />
-                </div>
-                <div>
-                  <span className="text-xl font-bold">Veterans & Military Families</span>
-                </div>
-              </div>
-              <p className="text-gray-400 text-center md:text-left">Supporting Those Who Served</p>
-            </div>
-
-            <div className="flex flex-col items-center">
-              <div className="flex items-center space-x-2 mb-3">
-                <Phone className="h-5 w-5 text-red-500" aria-hidden="true" />
-                <span className="font-bold text-red-500">VETERANS CRISIS LINE</span>
-              </div>
-              <p className="text-center text-gray-300 mb-1">
-                Call <a href="tel:988" className="font-bold underline focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded hover:text-red-400">988</a> and Press <span className="font-bold">1</span>
-              </p>
-              <p className="text-center text-gray-300">
-                or Text <a href="sms:838255" className="font-bold underline focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded hover:text-red-400">838255</a>
-              </p>
-            </div>
-
-            <div className="flex flex-col items-center md:items-end">
-              <h3 className="text-lg font-semibold mb-4">Connect With Us</h3>
-              <div className="flex space-x-3" role="list" aria-label="Social media links">
-                {socialLinks.map((social, index) => (
-                  <a
-                    key={index}
-                    href={social.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-slate-800 hover:bg-slate-700 p-3 rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                    aria-label={`Visit our ${social.name} page, opens in new tab`}
-                    role="listitem"
-                  >
-                    {social.icon}
-                  </a>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-800 pt-6 text-center">
-            <p className="text-gray-400">
-              &copy; {new Date().getFullYear()} Veterans & Military Families. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
 
       {/* Enhanced Buy VMF Modal */}
       <BuyVMFModal isOpen={isBuyModalOpen} onClose={() => setIsBuyModalOpen(false)} />
