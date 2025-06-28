@@ -416,8 +416,8 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault()
       action()
-    }
-  }
+          }
+        }
 
   if (!isOpen) return null
 
@@ -954,7 +954,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                             key={distribution.charityId}
                             className="flex justify-between items-center"
                             role="listitem"
-                          >
+            >
                             <div className="flex items-center space-x-2">
                               <CheckCircle className="h-4 w-4 text-green-600" aria-label="Successfully donated" />
                               <img

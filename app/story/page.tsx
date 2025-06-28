@@ -91,14 +91,14 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
       description: "VMF had our first in person charity event with our partnered charity Patriots Promise.",
       link: "https://x.com/VMFCoin/status/1938125706678178012",
       images: [
-        "/images/vmf-event-1.jpeg",
-        "/images/vmf-event-2.jpeg"
+        "/images/vmf-event-2.jpeg",
+        "/images/vmf-event-1.jpeg"
       ]
     },
     {
       year: "June 27th 2025",
-      title: "Base Batch Incubator Completion",
-      description: "VMF finishes Base Batch Incubator Program and was rewarded for our vision of bringing donations to our Veterans.",
+      title: "Base Batch Incubator Winner",
+      description: "VMF finishes Base Batch Incubator Program and was rewarded as a Winner for our vision of bringing donations to our Veterans.",
       images: [
         "/images/base-batch-winner.png"
       ],
@@ -636,11 +636,11 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
                   {/* Timeline line */}
                   <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-blue-100"></div>
 
-                  <div className="space-y-24">
+                  <div>
                     {milestones.map((milestone, index) => (
                       <div
                         key={index}
-                        className={`relative flex items-center ${index % 2 === 0 ? "justify-start" : "justify-end"}`}
+                        className={`relative flex items-center ${index % 2 === 0 ? "justify-start" : "justify-end"} ${(index === 7) ? "-mt-32" : (index === 6) ? "-mt-20" : (index === 5) ? "-mt-32" : (index !== 0 && index % 2 === 0) ? "-mt-32" : (index !== 0 ? "-mt-24" : "")}`}
                       >
                         {/* Timeline dot */}
                         <div className="absolute left-1/2 transform -translate-x-1/2 w-6 h-6 rounded-full bg-blue-600 border-4 border-white shadow-lg"></div>
