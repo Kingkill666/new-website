@@ -429,13 +429,13 @@ export function useWallet() {
       ...wallet,
       installed:
         wallet.id === "metamask"
-          ? detected.metamask
-          : wallet.id === "coinbase"
-            ? detected.coinbase
-            : wallet.id === "coinbaseSmart"
-              ? detected.coinbaseSmart || true // Coinbase Smart Wallet might not be detectable
-              : wallet.id === "rainbow"
-                ? detected.rainbow || true // Rainbow might not be detectable
+            ? detected.metamask
+            : wallet.id === "coinbase"
+              ? detected.coinbase
+              : wallet.id === "coinbaseSmart"
+                ? detected.coinbaseSmart || true // Coinbase Smart Wallet might not be detectable
+                : wallet.id === "rainbow"
+                  ? detected.rainbow || true // Rainbow might not be detectable
                 : wallet.id === "farcaster"
                   ? detected.farcaster || true
                   : false,
