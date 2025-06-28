@@ -229,12 +229,12 @@ const OfficersClubPage = () => {
               </div>
               <div className="relative group">
                 <div className="relative bg-slate-700/50 backdrop-blur-sm rounded-3xl p-4 border border-white/10 shadow-2xl">
-                  <div className="overflow-hidden rounded-2xl shadow-lg" style={{ maxHeight: "500px" }}>
+                  <div className="overflow-hidden rounded-2xl shadow-lg w-full h-[700px]">
                     <img
                       src="/images/secret-officers-club.jpeg"
                       alt="Secret Officers Club interior"
-                      className="w-full object-cover object-[center_top]"
-                      style={{ objectPosition: 'center top' }}
+                      className="w-full h-full object-cover"
+                      style={{ objectPosition: 'center 70%' }}
                     />
                   </div>
                 </div>
