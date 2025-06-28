@@ -490,7 +490,9 @@ const Index = () => {
                     </h1>
 
                     <p className="text-[20px] font-bold text-black mb-6 leading-snug max-w-full mx-auto lg:mx-0 text-center lg:text-left break-words">
-                      You buy. We match. You choose. Empowering change, one transaction at a time. With VMF, your purchase supports Veterans.
+                      You buy. We match. You choose.<br />
+                      Empowering change, one transaction at a time.<br />
+                      With VMF, your purchase supports Veterans.
                     </p>
 
                     <div className="flex justify-center mb-8">
