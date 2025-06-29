@@ -116,7 +116,7 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
       color: "bg-red-600",
     },
     {
-      title: "Transparency",
+      title: "Honesty",
       description:
         "Every transaction is recorded on the blockchain, providing complete visibility into how donations are distributed and used.",
       icon: <Shield className="h-6 w-6 text-white" />,
