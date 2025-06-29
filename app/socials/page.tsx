@@ -315,7 +315,7 @@ export default function SocialsPage() {
               <div className="mt-2 w-48 h-2 rounded-full bg-gradient-to-r from-red-500 via-white to-blue-600 animate-pulse" style={{ boxShadow: '0 2px 8px 0 rgba(30,58,138,0.15)' }}></div>
             </div>
             <div className="grid md:grid-cols-3 gap-8">
-              {YOUTUBE_VIDEOS.map((video, i) => (
+              {YOUTUBE_VIDEOS.slice(0, 3).map((video, i) => (
                 <div key={video.url} className="bg-blue-50 rounded-xl shadow-lg border-2 border-blue-200 hover:scale-105 transition-transform flex flex-col items-center p-4">
                   <div className="w-full aspect-video rounded-lg overflow-hidden mb-3 border-4 border-white shadow">
                     <iframe
@@ -335,6 +335,29 @@ export default function SocialsPage() {
                 </div>
               ))}
             </div>
+            {YOUTUBE_VIDEOS.length === 5 && (
+              <div className="flex justify-center gap-8 mt-8">
+                {YOUTUBE_VIDEOS.slice(3).map((video) => (
+                  <div key={video.url} className="bg-blue-50 rounded-xl shadow-lg border-2 border-blue-200 hover:scale-105 transition-transform flex flex-col items-center p-4 w-full max-w-md">
+                    <div className="w-full aspect-video rounded-lg overflow-hidden mb-3 border-4 border-white shadow">
+                      <iframe
+                        width="100%"
+                        height="100%"
+                        src={video.embed}
+                        title={video.title}
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        className="w-full h-full"
+                      ></iframe>
+                    </div>
+                    <a href={video.url} target="_blank" rel="noopener noreferrer" className="font-bold text-blue-900 text-lg hover:underline text-center">
+                      {video.title}
+                    </a>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 

@@ -158,11 +158,11 @@ const OfficersClubPage = () => {
                       "linear-gradient(45deg, #3B82F6 0%, #EF4444 25%, #3B82F6 50%, #EF4444 75%, #3B82F6 100%)",
                     backgroundSize: "200% 200%",
                   }}
-                  onClick={() => setIsBuyModalOpen(true)}
+                onClick={() => setIsBuyModalOpen(true)}
                   aria-label="Buy VMF coins"
-                >
+              >
                   BUY VMF
-                </Button>
+              </Button>
               </div>
             </div>
             {/* Mobile menu button */}
