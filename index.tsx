@@ -518,7 +518,7 @@ const Index = () => {
                       </div>
                       <div className="flex items-center space-x-2">
                         <Heart className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" aria-hidden="true" />
-                        <span>Zero Fees</span>
+                        <span>Instant Support</span>
                       </div>
                     </div>
                   </div>
