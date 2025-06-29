@@ -531,7 +531,7 @@ const Index = () => {
                       </div>
                       <h2 className="text-lg sm:text-2xl font-bold text-slate-800 mb-1 sm:mb-2">Global Crowdfund for Veterans</h2>
                       <span className="block text-blue-800 bg-blue-100 rounded px-2 py-1 text-xs sm:text-base font-medium w-fit mx-auto mb-2 sm:mb-4">
-                        Instant donations. Direct impact.
+                        Instant Donations. Instant Money.
                       </span>
                     </div>
 

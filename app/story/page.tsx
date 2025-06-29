@@ -58,7 +58,7 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
       year: "Feb 2025",
       title: "Foundation Built",
       description:
-        "VMF was officially founded with the core principle of 100% donation transparency and zero fees for veteran charities.",
+        "VMF was officially founded with the core principle of 100% donations given and real, tangible help for veteran charities.",
       link: "https://m.facebook.com/story.php?story_fbid=pfbid0dPkCpMUSDeaL7gBiDNrudFX1NaAiYQ1asVcGe3ZYrrYJABdFhSH79Bv9xB32KS3Rl&id=100000958545409&mibextid=wwXIfr",
     },
     {
@@ -487,7 +487,7 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
                           </blockquote>
                         </div>
                         <p className="text-lg mb-6 text-left">
-                          This sparked the creation of VMF, leveraging blockchain technology to ensure 100% of donations reach veteran charities with complete transparency and zero fees. Our vision is to build a transparent, efficient platform that rewards generosity and invites non-tech-savvy individuals to confidently engage with cryptocurrency, making donations easy and approachable. VMF is dedicated to maximizing support for Veterans and their families, ensuring every dollar makes a meaningful impact.
+                          This sparked the creation of VMF, leveraging blockchain technology to ensure 100% of donations reach veteran charities with complete transparency and not a penny taken. Our vision is to build a transparent, efficient platform that rewards generosity and invites non-tech-savvy individuals to confidently engage with cryptocurrency, making donations easy and approachable. VMF is dedicated to maximizing support for Veterans and their families, ensuring every dollar makes a meaningful impact.
                         </p>
                       </div>
                     </div>
@@ -588,9 +588,7 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
                     <div className="mb-6 md:mb-0 md:mr-10">
                       <h3 className="text-3xl font-bold mb-4">Our Commitment</h3>
                       <p className="text-white/90 text-lg leading-relaxed max-w-xl">
-                        We're committed to revolutionizing how charitable giving works for veterans. Through blockchain
-                        technology, we ensure complete transparency, zero fees, and direct impact for those who served
-                        our country.
+                        We're committed to revolutionizing how charitable giving works for veterans. Through blockchain technology, we ensure complete honesty, charities receive 100%, and instant dollars for those who served our country.
                       </p>
                     </div>
                     <div className="flex-shrink-0">
