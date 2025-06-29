@@ -78,28 +78,7 @@ const CONTRACT_ADDRESS = "0x46855ec900764Dc6c05155Af0eCe45DB004E814A"
 
 // Add the 3 extra charities for the DONATE modal
 const allCharities = [
-  ...charities,
-  {
-    id: "little-patriots-embraced",
-    name: "Little Patriots Embraced",
-    shortName: "Little Patriots Embraced",
-    address: "",
-    logo: "/images/charity-logos/Little-Patriots-Embraced-logo.png",
-  },
-  {
-    id: "magicians-on-mission",
-    name: "Magicians On Mission",
-    shortName: "Magicians On Mission",
-    address: "",
-    logo: "/images/charity-logos/Magicians-On-Mission.png",
-  },
-  {
-    id: "april-forces",
-    name: "April Forces",
-    shortName: "April Forces",
-    address: "",
-    logo: "/images/charity-logos/April-Forces-logo.png",
-  },
+  ...charities
 ]
 
 // Fix charityDescriptions keys to match allCharities IDs
@@ -109,10 +88,7 @@ const charityDescriptions: Record<string, string> = {
   "victory-veterans": "Mental Health For Veterans.",
   "veterans-need": "Emergency Assistance Provider.",
   "honor-her": "Homeless Women Support.",
-  "camp-cowboy": "Equine Therapy For Veterans.",
-  "little-patriots-embraced": "Supporting Military Children",
-  "magicians-on-mission": "Bringing Hope And Entertainment.",
-  "april-forces": "Supporting Ukrainian Veterans."
+  "camp-cowboy": "Equine Therapy For Veterans."
 }
 
 export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
