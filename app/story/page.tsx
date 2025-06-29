@@ -59,6 +59,7 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
       title: "Foundation Built",
       description:
         "VMF was officially founded with the core principle of 100% donation transparency and zero fees for veteran charities.",
+      link: "https://m.facebook.com/story.php?story_fbid=pfbid0dPkCpMUSDeaL7gBiDNrudFX1NaAiYQ1asVcGe3ZYrrYJABdFhSH79Bv9xB32KS3Rl&id=100000958545409&mibextid=wwXIfr",
     },
     {
       year: "April 2025",
@@ -676,6 +677,7 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium mt-2"
+                                aria-label={`View Announcement for ${milestone.title}`}
                               >
                                 View Announcement
                                 <ArrowRight className="ml-1 h-4 w-4" />
