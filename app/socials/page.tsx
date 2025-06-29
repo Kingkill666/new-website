@@ -12,27 +12,27 @@ const YOUTUBE_VIDEOS = [
   {
     url: "https://youtu.be/VZLpz_o2Vow",
     embed: "https://www.youtube.com/embed/VZLpz_o2Vow",
-    title: "VMF Coin Project: Welcome Video"
+    title: "Coinbase VMF Pitch Video"
   },
   {
     url: "https://youtu.be/Al6im1fEI_I",
     embed: "https://www.youtube.com/embed/Al6im1fEI_I",
-    title: "What is VMF Coin?"
+    title: "Holy Family Village Believing In VMF"
   },
   {
     url: "https://youtube.com/shorts/0Fq2of3iTd8?feature=share",
     embed: "https://www.youtube.com/embed/0Fq2of3iTd8",
-    title: "Short: VMF Coin Quick Intro"
+    title: "Veterans In Need Project: A Thank You"
   },
   {
     url: "https://youtube.com/shorts/K-NpY2siFkQ?feature=share",
     embed: "https://www.youtube.com/embed/K-NpY2siFkQ",
-    title: "Short: Why VMF?"
+    title: "Victory For Veterans Speak Truth"
   },
   {
     url: "https://youtube.com/shorts/McPEUO9vu7g?feature=share",
     embed: "https://www.youtube.com/embed/McPEUO9vu7g",
-    title: "Short: Support Veterans!"
+    title: "A Testimonial From Holy Family Village"
   },
 ]
 
@@ -160,7 +160,12 @@ export default function SocialsPage() {
                 </Link>
                 <Button
                   size="sm"
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3 text-base shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  className="relative overflow-hidden text-white font-bold px-8 py-3 text-base shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 animate-gradient-shift"
+                  style={{
+                    background:
+                      "linear-gradient(45deg, #3B82F6 0%, #EF4444 25%, #3B82F6 50%, #EF4444 75%, #3B82F6 100%)",
+                    backgroundSize: "200% 200%",
+                  }}
                   onClick={() => setIsBuyModalOpen(true)}
                   aria-label="Buy VMF coins"
                 >
@@ -168,13 +173,7 @@ export default function SocialsPage() {
                 </Button>
                 <Link href="/officers-club">
                   <Button
-                    className="relative overflow-hidden text-white font-bold px-2 py-1.5 text-xs shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
-                    style={{
-                      background:
-                        "linear-gradient(45deg, #3B82F6 0%, #EF4444 25%, #3B82F6 50%, #EF4444 75%, #3B82F6 100%)",
-                      backgroundSize: "200% 200%",
-                      animation: "gradient-shift 3s ease infinite",
-                    }}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-2 py-1.5 text-xs shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                     size="sm"
                     aria-label="Access Officers Club"
                   >
@@ -256,14 +255,8 @@ export default function SocialsPage() {
                   </Button>
                   <Link href="/officers-club">
                     <Button
-                      className="w-full relative overflow-hidden text-white font-bold px-6 py-3 shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
-                      style={{
-                        background:
-                          "linear-gradient(45deg, #3B82F6 0%, #EF4444 25%, #3B82F6 50%, #EF4444 75%, #3B82F6 100%)",
-                        backgroundSize: "200% 200%",
-                        animation: "gradient-shift 3s ease infinite",
-                      }}
-                      onClick={() => setIsMenuOpen(false)}
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                      size="sm"
                       aria-label="Access Officers Club"
                     >
                       <Crown className="h-4 w-4 mr-2" aria-hidden="true" />
@@ -385,11 +378,24 @@ export default function SocialsPage() {
                       href={tweet.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block bg-white/70 backdrop-blur-xl rounded-2xl border-2 border-blue-200 shadow-2xl hover:scale-105 hover:shadow-blue-400/40 transition-all duration-300 p-6 group ring-2 ring-transparent hover:ring-blue-400/60 focus:ring-blue-500/80 focus:z-20"
+                      className="block bg-white/90 backdrop-blur-xl rounded-2xl border-2 border-blue-200 shadow-2xl hover:scale-105 hover:shadow-blue-400/40 transition-all duration-300 p-6 group ring-2 ring-transparent hover:ring-blue-400/60 focus:ring-blue-500/80 focus:z-20"
                       style={{ boxShadow: '0 8px 32px 0 rgba(30,58,138,0.10), 0 1.5px 12px 0 rgba(255,0,0,0.08)' }}
                     >
-                      <div className="text-slate-800 text-base mb-4 group-hover:text-blue-900 transition-colors duration-200" dangerouslySetInnerHTML={{ __html: tweet.description || tweet.title }} />
-                      <div className="text-xs text-slate-500 group-hover:text-blue-700 transition-colors duration-200">{tweet.pubDate ? new Date(tweet.pubDate).toLocaleString() : ""}</div>
+                      <div
+                        className="text-base mb-4 group-hover:text-blue-900 transition-colors duration-200 font-medium fun-tweet-text"
+                        style={{
+                          fontFamily: 'Quicksand, Nunito, Fredoka, Arial, sans-serif',
+                          fontSize: '1rem',
+                          color: '#334155',
+                          textShadow: '0 1.5px 6px #e0e7ef',
+                          lineHeight: 1.5,
+                          letterSpacing: '0.01em',
+                          borderRadius: '0.5rem',
+                          padding: '0.1em 0',
+                        }}
+                        dangerouslySetInnerHTML={{ __html: tweet.description || tweet.title }}
+                      />
+                      <div className="text-xs text-blue-500 font-bold group-hover:text-blue-700 transition-colors duration-200 mt-2" style={{ fontFamily: 'Montserrat, Poppins, Arial, sans-serif', letterSpacing: '0.03em' }}>{tweet.pubDate ? new Date(tweet.pubDate).toLocaleString() : ""}</div>
                     </a>
                   ))}
                 </div>

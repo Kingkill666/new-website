@@ -152,12 +152,17 @@ const OfficersClubPage = () => {
               <div className="flex items-center space-x-1 min-w-0">
               <Button
                   size="sm"
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3 text-base shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                onClick={() => setIsBuyModalOpen(true)}
+                  className="relative overflow-hidden text-white font-bold px-8 py-3 text-base shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 animate-gradient-shift"
+                  style={{
+                    background:
+                      "linear-gradient(45deg, #3B82F6 0%, #EF4444 25%, #3B82F6 50%, #EF4444 75%, #3B82F6 100%)",
+                    backgroundSize: "200% 200%",
+                  }}
+                  onClick={() => setIsBuyModalOpen(true)}
                   aria-label="Buy VMF coins"
-              >
+                >
                   BUY VMF
-              </Button>
+                </Button>
               </div>
             </div>
             {/* Mobile menu button */}
@@ -431,6 +436,8 @@ const OfficersClubPage = () => {
           0% { opacity: 0.4; }
           100% { opacity: 0.8; }
         }
+        @keyframes gradient-shift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .animate-gradient-shift { animation: gradient-shift 3s ease infinite; }
       `}</style>
     </div>
   )

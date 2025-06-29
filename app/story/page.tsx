@@ -254,7 +254,13 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
               <div className="flex items-center space-x-1 min-w-0">
               <Button
                   size="sm"
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3 text-base shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  className="relative overflow-hidden text-white font-bold px-8 py-3 text-base shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  style={{
+                    background:
+                      "linear-gradient(45deg, #3B82F6 0%, #EF4444 25%, #3B82F6 50%, #EF4444 75%, #3B82F6 100%)",
+                    backgroundSize: "200% 200%",
+                    animation: "gradient-shift 3s ease infinite",
+                  }}
                 onClick={() => setIsBuyModalOpen(true)}
                   aria-label="Buy VMF coins"
               >
@@ -262,13 +268,7 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
               </Button>
               <Link href="/officers-club">
                 <Button
-                    className="relative overflow-hidden text-white font-bold px-2 py-1.5 text-xs shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
-                  style={{
-                    background:
-                      "linear-gradient(45deg, #3B82F6 0%, #EF4444 25%, #3B82F6 50%, #EF4444 75%, #3B82F6 100%)",
-                    backgroundSize: "200% 200%",
-                    animation: "gradient-shift 3s ease infinite",
-                  }}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-2 py-1.5 text-xs shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                     size="sm"
                     aria-label="Access Officers Club"
                 >
@@ -352,14 +352,8 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
                   </Button>
                   <Link href="/officers-club">
                     <Button
-                      className="w-full relative overflow-hidden text-white font-bold px-6 py-3 shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
-                      style={{
-                        background:
-                          "linear-gradient(45deg, #3B82F6 0%, #EF4444 25%, #3B82F6 50%, #EF4444 75%, #3B82F6 100%)",
-                        backgroundSize: "200% 200%",
-                        animation: "gradient-shift 3s ease infinite",
-                      }}
-                      onClick={() => setIsMenuOpen(false)}
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                      size="sm"
                       aria-label="Access Officers Club"
                     >
                       <Crown className="h-4 w-4 mr-2" aria-hidden="true" />
