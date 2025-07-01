@@ -252,7 +252,7 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
                 </Link>
               </div>
               <div className="flex items-center space-x-1 min-w-0">
-              <Button
+                <Button
                   size="sm"
                   className="relative overflow-hidden text-white font-bold px-8 py-3 text-base shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   style={{
@@ -263,18 +263,18 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
                   }}
                 onClick={() => setIsBuyModalOpen(true)}
                   aria-label="Buy VMF coins"
-              >
+                >
                   BUY VMF
-              </Button>
+                </Button>
               <Link href="/officers-club">
-                <Button
+              <Button
                     className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-2 py-1.5 text-xs shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                     size="sm"
                     aria-label="Access Officers Club"
-                >
+              >
                     <Crown className="h-3 w-3 mr-1" aria-hidden="true" />
                   <span className="relative z-10 font-extrabold tracking-wide">OFFICERS CLUB</span>
-                </Button>
+              </Button>
               </Link>
             </div>
             </div>

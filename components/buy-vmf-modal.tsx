@@ -78,7 +78,14 @@ const CONTRACT_ADDRESS = "0x46855ec900764Dc6c05155Af0eCe45DB004E814A"
 
 // Add the 3 extra charities for the DONATE modal
 const allCharities = [
-  ...charities
+  ...charities,
+  {
+    id: "magicians-on-mission",
+    name: "Magicians On Mission",
+    shortName: "Magicians On Mission",
+    address: "0x0730d4dc43cf10A3Cd986FEE17f30cB0E75410e0",
+    logo: "/images/charity-logos/Magicians-On-Mission.png",
+  },
 ]
 
 // Fix charityDescriptions keys to match allCharities IDs
@@ -88,7 +95,8 @@ const charityDescriptions: Record<string, string> = {
   "victory-veterans": "Mental Health For Veterans.",
   "veterans-need": "Emergency Assistance Provider.",
   "honor-her": "Homeless Women Support.",
-  "camp-cowboy": "Equine Therapy For Veterans."
+  "camp-cowboy": "Equine Therapy For Veterans.",
+  "magicians-on-mission": "Entertainment Thru Magic",
 }
 
 export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {

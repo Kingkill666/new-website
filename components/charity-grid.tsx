@@ -52,7 +52,7 @@ const charities = [
   },
   {
     name: "Magicians On Mission",
-    stat: "Coming Soon",
+    stat: "",
     description: "Bringing hope and entertainment to deployed troops through magic shows.",
     logo: "/images/charity-logos/Magicians-On-Mission.png",
     link: "https://magiciansonmission.org/",
