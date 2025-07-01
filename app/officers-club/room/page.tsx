@@ -14,6 +14,20 @@ export default function OfficersClubRoom() {
         backgroundRepeat: "no-repeat",
       }}
     >
+      {/* VMF Logo in top-left corner */}
+      <a
+        href="/"
+        className="absolute top-4 left-4 z-50"
+        aria-label="Go to VMF homepage"
+        style={{ display: 'inline-block' }}
+      >
+        <img
+          src="/images/vmf-logo-new.png"
+          alt="VMF Logo"
+          className="w-14 h-14 md:w-20 md:h-20 drop-shadow-lg hover:scale-105 transition-transform rounded-full bg-white/80 p-1"
+        />
+      </a>
+
       {/* Overlay for darkening the image, only if overlays are visible */}
       {!showOnlyBar && <div className="absolute inset-0 bg-black/60" />}
 
@@ -56,13 +70,6 @@ export default function OfficersClubRoom() {
             style={{ left: '54%', top: '3%', width: '23%', height: '22%', transform: 'rotate(-6deg)' }}
           >
             <div className="w-full h-full transition-all duration-200 group-hover:border-8 group-hover:border-white group-hover:shadow-[0_0_32px_8px_rgba(255,255,255,0.7)] rounded-[48px]" style={{ border: '4px solid transparent' }} />
-          </div>
-          {/* Bartender */}
-          <div
-            className="absolute z-20 group"
-            style={{ left: '38%', bottom: '23%', width: '13%', height: '32%' }}
-          >
-            <div className="w-full h-full transition-all duration-200 group-hover:border-4 group-hover:border-white rounded-full" />
           </div>
         </>
       )}
