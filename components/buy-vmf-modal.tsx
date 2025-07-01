@@ -86,6 +86,13 @@ const allCharities = [
     address: "0x0730d4dc43cf10A3Cd986FEE17f30cB0E75410e0",
     logo: "/images/charity-logos/Magicians-On-Mission.png",
   },
+  {
+    id: "april-forces",
+    name: "April Forces",
+    shortName: "April Forces",
+    address: "0x043820c97771c570d830bb0e189778fdef5e6eeb",
+    logo: "/images/charity-logos/April-Forces-logo.png",
+  },
 ]
 
 // Fix charityDescriptions keys to match allCharities IDs
@@ -97,6 +104,7 @@ const charityDescriptions: Record<string, string> = {
   "honor-her": "Homeless Women Support.",
   "camp-cowboy": "Equine Therapy For Veterans.",
   "magicians-on-mission": "Entertainment Thru Magic",
+  "april-forces": "Support For Veterans And Their Families.",
 }
 
 export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
