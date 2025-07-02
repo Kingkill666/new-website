@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {ERC20} from "lib/solady/src/tokens/ERC20.sol";
-import {SafeTransferLib} from "lib/solady/src/utils/SafeTransferLib.sol";
-import {EnumerableSetLib} from "lib/solady/src/utils/EnumerableSetLib.sol";
-import { FixedPointMathLib } from "lib/solady/src/utils/FixedPointMathLib.sol";
+import {ERC20} from "solady/tokens/ERC20.sol";
+import {SafeTransferLib} from "solady/utils/SafeTransferLib.sol";
+import {EnumerableSetLib} from "solady/utils/EnumerableSetLib.sol";
+import {FixedPointMathLib} from "solady/utils/FixedPointMathLib.sol";
 
 
 contract VmfCoin is ERC20 {
