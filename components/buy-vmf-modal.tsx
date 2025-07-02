@@ -208,7 +208,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     async function estimateGas() {
       setIsEstimatingGas(true)
       try {
-        if (!walletState.isConnected || !amount || Number(amount) <= 0) {
+        if (!walletState.isConnected || !amount || Number(amount) <= 0 || charityDistributions.length === 0) {
           setFees(null)
           setIsEstimatingGas(false)
           return
@@ -220,10 +220,10 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
           [
             {
               type: "function",
-              name: "handleUSDC",
+              name: "handleUSDCBatch",
               inputs: [
-                { name: "amountUSDC", type: "uint256", internalType: "uint256" },
-                { name: "to", type: "address", internalType: "address" },
+                { name: "amounts", type: "uint256[]", internalType: "uint256[]" },
+                { name: "recipients", type: "address[]", internalType: "address[]" },
               ],
               outputs: [],
               stateMutability: "nonpayable",
@@ -231,15 +231,20 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
           ],
           signer
         )
-        // Use the first selected charity for estimation
-        const selectedCharity = allCharities.find((c) => c.id === selectedCharities[0])
-        if (!selectedCharity) {
+        // Prepare batch arrays
+        const amounts = charityDistributions.map(dist =>
+          ethers.parseUnits(((Number(amount) * dist.percentage) / 100).toFixed(2), 6)
+        )
+        const recipients = charityDistributions.map(dist => {
+          const charity = allCharities.find(c => c.id === dist.charityId)
+          return charity?.address
+        })
+        if (recipients.some(addr => !addr)) {
           setFees(null)
           setIsEstimatingGas(false)
           return
         }
-        const usdcAmount = ethers.parseUnits(Number(amount).toFixed(2), 6)
-        const gasEstimate = await (contract as any).estimateGas.handleUSDC(usdcAmount, selectedCharity.address)
+        const gasEstimate = await (contract as any).estimateGas.handleUSDCBatch(amounts, recipients)
         // Fetch Base gas price from official API
         const { data: gasData } = await axios.get("https://gas.api.base.org")
         const baseGasPriceWei = gasData.recommended.maxFeePerGas // in wei
@@ -258,7 +263,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
       }
     }
     estimateGas()
-  }, [walletState.isConnected, amount, selectedCharities, walletState.provider])
+  }, [walletState.isConnected, amount, charityDistributions, walletState.provider])
 
   const handleCharitySelect = (charityId: string) => {
     if (selectedCharities.includes(charityId)) {
@@ -321,20 +326,17 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
 
     try {
       setIsProcessing(true)
-      
-      // Get the provider from the wallet state
       const provider = new ethers.BrowserProvider(walletState.provider)
       const signer = await provider.getSigner()
-      
       const contract = new ethers.Contract(
         CONTRACT_ADDRESS,
         [
           {
             type: "function",
-            name: "handleUSDC",
+            name: "handleUSDCBatch",
             inputs: [
-              { name: "amountUSDC", type: "uint256", internalType: "uint256" },
-              { name: "to", type: "address", internalType: "address" },
+              { name: "amounts", type: "uint256[]", internalType: "uint256[]" },
+              { name: "recipients", type: "address[]", internalType: "address[]" },
             ],
             outputs: [],
             stateMutability: "nonpayable",
@@ -342,31 +344,33 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
         ],
         signer
       )
-      
-      // For each charity, send their share
-      let lastTxHash = ""
-      for (const dist of charityDistributions) {
-        const charity = allCharities.find((c) => c.id === dist.charityId)
-        if (!charity) continue
-        // Calculate USDC amount (assuming 6 decimals for USDC)
-        const usdcAmount = ethers.parseUnits(
-          ((Number(amount) * dist.percentage) / 100).toFixed(2),
-          6
-        )
-        const usdcContractAddress = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
-        const erc20Abi = [
-          "function balanceOf(address owner) view returns (uint256)",
-          "function approve(address spender, uint256 amount) external returns (bool)"
-        ];
-        const usdcContract = new ethers.Contract(usdcContractAddress, erc20Abi, signer);
-        const approveTx = await usdcContract.approve(CONTRACT_ADDRESS, usdcAmount);
-        await approveTx.wait();
-
-        const tx = await contract.handleUSDC(usdcAmount, charity.address)
-        lastTxHash = tx.hash
-        await tx.wait()
+      // Prepare batch arrays
+      const amounts = charityDistributions.map(dist =>
+        ethers.parseUnits(((Number(amount) * dist.percentage) / 100).toFixed(2), 6)
+      )
+      const recipients = charityDistributions.map(dist => {
+        const charity = allCharities.find(c => c.id === dist.charityId)
+        return charity?.address
+      })
+      if (recipients.some(addr => !addr)) {
+        alert("One or more selected charities are invalid.")
+        setIsProcessing(false)
+        return false
       }
-      setTransactionHash(lastTxHash)
+      // Approve total USDC for the contract
+      const totalUSDC = amounts.reduce((a, b) => a + b, BigInt(0))
+      const usdcContractAddress = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
+      const erc20Abi = [
+        "function balanceOf(address owner) view returns (uint256)",
+        "function approve(address spender, uint256 amount) external returns (bool)"
+      ];
+      const usdcContract = new ethers.Contract(usdcContractAddress, erc20Abi, signer);
+      const approveTx = await usdcContract.approve(CONTRACT_ADDRESS, totalUSDC);
+      await approveTx.wait();
+      // Call batch donation
+      const tx = await contract.handleUSDCBatch(amounts, recipients)
+      setTransactionHash(tx.hash)
+      await tx.wait()
       await new Promise((resolve) => setTimeout(resolve, 2000))
       return true
     } catch (error: any) {
@@ -832,7 +836,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                       </div>
                       <div className="flex justify-between" role="listitem">
                         <span>Function:</span>
-                        <span className="font-mono">handleUSDC</span>
+                        <span className="font-mono">handleUSDCBatch</span>
                       </div>
                       <div className="flex justify-between" role="listitem">
                         <span>Connected Wallet:</span>

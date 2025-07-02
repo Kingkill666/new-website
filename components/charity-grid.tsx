@@ -59,7 +59,7 @@ const charities = [
   },
   {
     name: "April Forces",
-    stat: "Coming Soon",
+    stat: "Ukrainian Veteran Support",
     description: "Support For Veterans And Their Families Through Community Initiatives. 🇺🇦",
     logo: "/images/charity-logos/April-Forces-logo.png",
     link: "https://aprilforces.com/en/about_us",

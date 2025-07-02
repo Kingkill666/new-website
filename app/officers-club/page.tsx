@@ -292,13 +292,13 @@ const OfficersClubPage = () => {
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
                 <Link href="/officers-club/room">
-                  <Button
-                    size="lg"
-                    className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black px-8 py-4 text-lg font-bold shadow-lg"
-                  >
-                    <Dice6 className="mr-2 h-5 w-5" />
-                    Enter the Club
-                  </Button>
+                <Button
+                  size="lg"
+                  className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black px-8 py-4 text-lg font-bold shadow-lg"
+                >
+                  <Dice6 className="mr-2 h-5 w-5" />
+                  Enter the Club
+                </Button>
                 </Link>
                 <Button
                   size="lg"
