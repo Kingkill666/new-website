@@ -16,12 +16,11 @@ contract VmfCoin is ERC20, UUPSUpgradeable, Ownable {
 
     address public minter; // Address allowed to mint
     address public usdc;   // Address of the USDC contract
-    // TODO: have these managed by the owner (dao)
     EnumerableSetLib.AddressSet private _allowedReceivers; // this is the list of charities
     EnumerableSetLib.AddressSet private _taxExempt; // this is the list of owners
 
     address payable public charityReceiver; // where the DAO-charity allocation goes
-    uint8 charityRateBps = 33; // amount of tax to be taken from each transaction, in basis points (bps)
+    uint8 charityRateBps = 33; // amount of tax to
 
     address payable public teamReceiver; // where the team allocation goes
     uint8 teamRateBps = 10; // amount of tax to be taken from each transaction, in basis points (bps)
@@ -244,4 +243,48 @@ contract VmfCoin is ERC20, UUPSUpgradeable, Ownable {
         // Transfer USDC to the specified address
         address(usdc).safeTransfer(to, amountUSDC);
     }
+
+    /**
+     * @dev Batch function to handle multiple USDC donations in a single transaction.
+     * @param amounts Array of USDC amounts to donate.
+     * @param recipients Array of addresses to receive the USDC donations.
+     */
+    function handleUSDCBatch(uint256[] calldata amounts, address[] calldata recipients) external {
+        require(amounts.length == recipients.length, "VMF: arrays length mismatch");
+        require(amounts.length > 0, "VMF: empty arrays");
+        
+        uint256 totalUSDC = 0;
+        uint256 totalVMFMatching = 0;
+        
+        // Validate all recipients and calculate totals
+        for (uint256 i = 0; i < recipients.length; i++) {
+            require(_allowedReceivers.contains(recipients[i]), "VMF: recipient not allowed");
+            require(amounts[i] > 0, "VMF: amount must be greater than zero");
+            
+            totalUSDC += amounts[i];
+            
+            uint256 normalizedAmount = amounts[i] * (10**12);
+            uint256 vmfMatching = normalizedAmount * donationMultipleBps / 10000;
+            totalVMFMatching += vmfMatching;
+        }
+        
+        // Check total VMF matching against donation pool
+        require(totalVMFMatching <= donationPool, "VMF: total donations exceed pool limit");
+        
+        // Transfer total USDC from sender to this contract
+        address(usdc).safeTransferFrom(msg.sender, address(this), totalUSDC);
+        
+        // Update donation pool and mint total VMF tokens
+        donationPool -= totalVMFMatching;
+        _mint(msg.sender, totalVMFMatching);
+        
+        // Transfer USDC to each recipient
+        for (uint256 i = 0; i < recipients.length; i++) {
+            address(usdc).safeTransfer(recipients[i], amounts[i]);
+            emit BatchDonation(msg.sender, recipients[i], amounts[i]);
+        }
+    }
+
+    /// @dev Emitted when a batch donation is made
+    event BatchDonation(address indexed donor, address indexed recipient, uint256 amount);
 }
