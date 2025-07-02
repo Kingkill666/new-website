@@ -74,7 +74,8 @@ const charities: Charity[] = [
   },
 ]
 
-const CONTRACT_ADDRESS = "0x2213414893259b0C48066Acd1763e7fbA97859E5"
+const CONTRACT_ADDRESS = "0xe65019C78C5b4d96b5931cc233B5d4dC2B196594"
+
 
 // Add the 3 extra charities for the DONATE modal
 const allCharities = [

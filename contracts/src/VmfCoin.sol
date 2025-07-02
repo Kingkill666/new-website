@@ -93,7 +93,7 @@ contract VmfCoin is ERC20, UUPSUpgradeable, Ownable {
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
     function name() public view virtual override returns (string memory) {
-        return "VMFCoin";
+        return "VMF";
     }
     function symbol() public view virtual override returns (string memory) {
         return "VMF";

@@ -64,3 +64,8 @@ $ forge --help
 $ anvil --help
 $ cast --help
 ```
+
+
+
+CAN ADD NNEW CHARITIES IN add_chirty.sh
+addresses and everything
