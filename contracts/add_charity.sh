@@ -24,3 +24,9 @@ cast send $contract_address "addAllowedReceivers(address)" $charity_address \
 charity_address="0x10F01632DC709F7fA413A140739D8843b06235A1"
 cast send $contract_address "addAllowedReceivers(address)" $charity_address \
     --rpc-url $rpc_url --private-key "$PRIVATE_KEY"
+charity_address="0x0730d4dc43cf10A3Cd986FEE17f30cB0E75410e0"
+cast send $contract_address "addAllowedReceivers(address)" $charity_address \
+    --rpc-url $rpc_url --private-key "$PRIVATE_KEY"
+charity_address="0x043820c97771c570d830bb0e189778fdef5e6eeb"
+cast send $contract_address "addAllowedReceivers(address)" $charity_address \
+    --rpc-url $rpc_url --private-key "$PRIVATE_KEY"
