@@ -219,6 +219,9 @@ export function useWallet() {
         alert("Connection rejected by user")
       } else if (error.code === -32002) {
         alert("Connection request already pending. Please check your wallet.")
+      } else if (error.code === 'NETWORK_ERROR' || (error.message && error.message.includes('NETWORK_ERROR'))) {
+        // Suppress alert for generic network errors, just log
+        console.warn("Suppressed NETWORK_ERROR alert:", error)
       } else {
         alert(error.message || `Failed to connect ${walletId}`)
       }

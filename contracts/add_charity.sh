@@ -2,7 +2,7 @@
 set -ex
 
 # Contract configuration
-contract_address="0x5dA3a9Ca8db3ACdE5A64077AA1D7A2408c5DE24C"
+contract_address="0x2213414893259b0C48066Acd1763e7fbA97859E5"
 
 # Load environment variables
 source .env
