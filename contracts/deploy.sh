@@ -33,6 +33,4 @@ forge script script/SmartDeploy.s.sol:SmartDeployScript \
 echo ""
 echo "=== Available Scripts ==="
 echo "• ./deploy.sh              - Smart deployment (recommended)"
-echo "• ./deploy-proxy.sh        - Deploy new proxy only"
-echo "• ./deploy-implementation.sh - Deploy implementation only"
 echo "• ./upgrade.sh             - Upgrade existing proxy"

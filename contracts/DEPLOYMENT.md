@@ -18,26 +18,7 @@ The VMF Coin contract is now upgradeable using Solady's UUPS (Universal Upgradea
 - Deploys new implementation if needed
 - Provides clear feedback on what was deployed
 
-### 2. Deploy Proxy Only
-```bash
-./deploy-proxy.sh
-```
-**What it does:**
-- Always deploys a new proxy
-- Reuses existing implementation if `IMPLEMENTATION_ADDRESS` is set
-- Deploys new implementation if no existing one is provided
-- Use this when you specifically want a new proxy instance
-
-### 3. Deploy Implementation Only
-```bash
-./deploy-implementation.sh
-```
-**What it does:**
-- Deploys only the implementation contract
-- Use this when preparing for an upgrade
-- Outputs the implementation address for use in upgrades
-
-### 4. Upgrade Existing Proxy
+### 2. Upgrade Existing Proxy
 ```bash
 ./upgrade.sh
 ```

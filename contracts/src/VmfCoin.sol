@@ -37,7 +37,9 @@ contract VmfCoin is ERC20, UUPSUpgradeable, Ownable {
     ) external {
         // Ensure this can only be called once
         require(minter == address(0), "VMF: already initialized");
-        
+        require(initialOwner != address(0), "VMF: must have an initial owner");
+        require(_usdc != address(0), "VMF: must have a valid USDC address");
+
         minter = initialOwner;
         usdc = _usdc;
         charityReceiver = initCharityReceiver;

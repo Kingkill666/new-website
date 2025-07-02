@@ -73,13 +73,6 @@ contract SmartDeployScript is Script {
             }
         } catch {}
         
-        // Deploy implementation if not provided or invalid
-        if (implementationAddress == address(0)) {
-            VmfCoin implementation = new VmfCoin();
-            implementationAddress = address(implementation);
-            console2.log("New implementation deployed at:", implementationAddress);
-        }
-        
         // Prepare the initialization data
         bytes memory initData = abi.encodeWithSelector(
             VmfCoin.initialize.selector,
@@ -89,16 +82,24 @@ contract SmartDeployScript is Script {
             deployer // initial owner
         );
         
+        // Deploy implementation if not provided or invalid
+        if (implementationAddress == address(0)) {
+            VmfCoin implementation = new VmfCoin();
+            implementationAddress = address(implementation);
+            console2.log("New implementation deployed at:", implementationAddress);
+        }
+        
         // Deploy the ERC1967 proxy pointing to the implementation
         address localProxy = LibClone.deployERC1967(implementationAddress, initData);
         console2.log("Proxy deployed at:", localProxy);
         
         // Verify the proxy is working
-        VmfCoin localVmfProxy = VmfCoin(localProxy);
-        console2.log("Token name:", localVmfProxy.name());
-        console2.log("Token symbol:", localVmfProxy.symbol());
-        console2.log("Owner:", localVmfProxy.owner());
-        console2.log("Minter:", localVmfProxy.minter());
+        VmfCoin localVmf = VmfCoin(localProxy);
+        console2.log("Token name:", localVmf.name());
+        console2.log("Token symbol:", localVmf.symbol());
+        console2.log("USDC:", localVmf.usdc());
+        console2.log("Owner:", localVmf.owner());
+        console2.log("Minter:", localVmf.minter());
 
         vm.stopBroadcast();
         
