@@ -5,9 +5,11 @@ import {ERC20} from "solady/tokens/ERC20.sol";
 import {SafeTransferLib} from "solady/utils/SafeTransferLib.sol";
 import {EnumerableSetLib} from "solady/utils/EnumerableSetLib.sol";
 import {FixedPointMathLib} from "solady/utils/FixedPointMathLib.sol";
+import {UUPSUpgradeable} from "solady/utils/UUPSUpgradeable.sol";
+import {Ownable} from "solady/auth/Ownable.sol";
 
 
-contract VmfCoin is ERC20 {
+contract VmfCoin is ERC20, UUPSUpgradeable, Ownable {
     using FixedPointMathLib for uint256;
     using SafeTransferLib for address;
     using EnumerableSetLib for EnumerableSetLib.AddressSet;
@@ -27,13 +29,23 @@ contract VmfCoin is ERC20 {
     uint256 public donationPool = 1_000_000e18; // running total amount of wei-tokens to be allocated to charity
     uint256 donationMultipleBps = 10000; // multiple of USDC amount to mint VMF tokens
 
-    constructor(address _usdc,
+    /// @dev Initializes the contract. Can only be called once.
+    function initialize(
+        address _usdc,
         address payable initCharityReceiver,
-        address payable initTeamReceiver) ERC20() {
-        minter = msg.sender;
+        address payable initTeamReceiver,
+        address initialOwner
+    ) external {
+        // Ensure this can only be called once
+        require(minter == address(0), "VMF: already initialized");
+        
+        minter = initialOwner;
         usdc = _usdc;
         charityReceiver = initCharityReceiver;
         teamReceiver = initTeamReceiver;
+        
+        // Initialize Ownable
+        _initializeOwner(initialOwner);
     }
 
     /**
@@ -69,11 +81,15 @@ contract VmfCoin is ERC20 {
      */
     modifier onlyMinter() {
         require(
-            msg.sender == minter,
-            "VMF: caller is not the minter"
+            msg.sender == minter || msg.sender == owner(),
+            "VMF: caller is not the minter or owner"
         );
         _;
     }
+
+    /// @dev Authorizes an upgrade to a new implementation.
+    /// Only the owner can authorize upgrades.
+    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
     function name() public view virtual override returns (string memory) {
         return "VMFCoin";
@@ -113,7 +129,7 @@ contract VmfCoin is ERC20 {
      * @dev Sets a new minter.
      * @param newMinter The address of the new minter.
      */
-    function setMinter(address newMinter) external onlyMinter {
+    function setMinter(address newMinter) external onlyOwner {
         require(
             newMinter != address(0),
             "VMF: new minter is the zero address"
@@ -124,7 +140,7 @@ contract VmfCoin is ERC20 {
     
     event MinterChanged(address newMinter);
 
-    function setTeamAddress(address payable newTeam) external onlyMinter {
+    function setTeamAddress(address payable newTeam) external onlyOwner {
         require(
             newTeam != address(0),
             "VMF: new team is the zero address"
@@ -135,7 +151,7 @@ contract VmfCoin is ERC20 {
 
     event TeamChanged(address newTeam);
     
-    function setCharityPoolAddress(address payable newPool) external onlyMinter {
+    function setCharityPoolAddress(address payable newPool) external onlyOwner {
         require(
             newPool!= address(0),
             "VMF: new pool is the zero address"
@@ -146,21 +162,21 @@ contract VmfCoin is ERC20 {
 
     event CharityPoolChanged(address newPool);
     
-    function setCharityBps(uint8 newCharityBps)external onlyMinter {
+    function setCharityBps(uint8 newCharityBps)external onlyOwner {
         charityRateBps = newCharityBps;
         emit CharityRateChanged(newCharityBps);
     }
 
     event CharityRateChanged(uint8 newCharityBps);
 
-    function setTeamBps(uint8 newTeamBps)external onlyMinter {
+    function setTeamBps(uint8 newTeamBps)external onlyOwner {
         teamRateBps = newTeamBps;
         emit TeamRateChanged(newTeamBps);
     }
 
     event TeamRateChanged(uint8 newTeamBps);
     
-    function addAllowedReceivers(address payable newCharity) external onlyMinter {
+    function addAllowedReceivers(address payable newCharity) external onlyOwner {
         require(
             newCharity != address(0),
             "VMF: new receiver is the zero address"
@@ -169,7 +185,7 @@ contract VmfCoin is ERC20 {
         emit ReceiverAdded(newCharity);
     }
 
-    function removeAllowedReceivers(address payable oldCharity) external onlyMinter {
+    function removeAllowedReceivers(address payable oldCharity) external onlyOwner {
         _allowedReceivers.remove(oldCharity);
         emit ReceiverRemoved(oldCharity);
     }
@@ -177,7 +193,7 @@ contract VmfCoin is ERC20 {
     event ReceiverRemoved(address newPool);
     event ReceiverAdded(address newPool);
 
-    function addAllowedTaxExempt(address payable newTaxExempt) external onlyMinter {
+    function addAllowedTaxExempt(address payable newTaxExempt) external onlyOwner {
         require(
             newTaxExempt != address(0),
             "VMF: new tax exempt is the zero address"
@@ -186,7 +202,7 @@ contract VmfCoin is ERC20 {
         emit TaxExemptAdded(newTaxExempt);
     }
 
-    function removeAllowedTaxExempt(address payable oldTaxExempt) external onlyMinter {
+    function removeAllowedTaxExempt(address payable oldTaxExempt) external onlyOwner {
         _taxExempt.remove(oldTaxExempt);
         emit TaxExemptRemoved(oldTaxExempt);
     }
@@ -194,11 +210,11 @@ contract VmfCoin is ERC20 {
     event TaxExemptRemoved(address newPool);
     event TaxExemptAdded(address newPool);
 
-    function updateDonationPool(uint256 setDonationPool) external onlyMinter {
+    function updateDonationPool(uint256 setDonationPool) external onlyOwner {
         donationPool = setDonationPool;
         emit DonationPoolChanged(setDonationPool);
     }
-    function updateDonationMultipleBps(uint256 newDonationMultipleBps) external onlyMinter {
+    function updateDonationMultipleBps(uint256 newDonationMultipleBps) external onlyOwner {
         donationMultipleBps = newDonationMultipleBps;
         emit DonationPoolChanged(donationMultipleBps);
     }
