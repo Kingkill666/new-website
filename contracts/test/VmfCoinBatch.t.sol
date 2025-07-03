@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {Test, console} from "forge-std/Test.sol";
-import {VmfCoin} from "../src/VmfCoin.sol";
+import {VMF} from "../src/VMF.sol";
 import {ERC20} from "solady/tokens/ERC20.sol";
 import {LibClone} from "solady/utils/LibClone.sol";
 
@@ -26,7 +26,7 @@ contract MockUSDC is ERC20 {
 }
 
 contract VmfCoinBatchTest is Test {
-    VmfCoin public vmfCoin;
+    VMF public vmfCoin;
     MockUSDC public usdc;
     
     address public owner;
@@ -58,11 +58,11 @@ contract VmfCoinBatchTest is Test {
         usdc = new MockUSDC();
         
         // Deploy VMF implementation (just like in deploy script)
-        VmfCoin implementation = new VmfCoin();
+        VMF implementation = new VMF();
         
         // Prepare the initialization data (just like in deploy script)
         bytes memory initData = abi.encodeWithSelector(
-            VmfCoin.initialize.selector,
+            VMF.initialize.selector,
             address(usdc),
             payable(charityReceiver),
             payable(teamReceiver),
@@ -71,7 +71,7 @@ contract VmfCoinBatchTest is Test {
         
         // Deploy the ERC1967 proxy pointing to the implementation (just like in deploy script)
         address proxyAddress = LibClone.deployERC1967(address(implementation), initData);
-        vmfCoin = VmfCoin(proxyAddress);
+        vmfCoin = VMF(proxyAddress);
         
         // Explicitly call initialize to ensure proper setup (in case proxy init didn't work)
         try vmfCoin.initialize(

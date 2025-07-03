@@ -2,7 +2,7 @@
 set -ex
 
 # Contract configuration
-contract_address="0xe65019C78C5b4d96b5931cc233B5d4dC2B196594"
+contract_address="0x2213414893259b0C48066Acd1763e7fbA97859E5"
 
 # Load environment variables
 source .env
@@ -18,6 +18,7 @@ charity_addresses=(
     "0x10F01632DC709F7fA413A140739D8843b06235A1" # Honor HER Foundation
     "0x0730d4dc43cf10A3Cd986FEE17f30cB0E75410e0" # Magicians On Mission
     "0x043820c97771c570d830bb0e189778fdef5e6eeb" # April Forces
+    "0x097701F99CC7b0Ff816C2355faC104ADdC6e27B9" # Little Patriots Embraced
 )
 
 # Function to add a charity address as an allowed receiver

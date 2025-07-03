@@ -74,10 +74,10 @@ const charities: Charity[] = [
   },
 ]
 
-const CONTRACT_ADDRESS = "0xe65019C78C5b4d96b5931cc233B5d4dC2B196594"
+const CONTRACT_ADDRESS = "0x2213414893259b0C48066Acd1763e7fbA97859E5"
 
 
-// Add the 3 extra charities for the DONATE modal
+// Add the 4 extra charities for the DONATE modal
 const allCharities = [
   ...charities,
   {
@@ -94,6 +94,13 @@ const allCharities = [
     address: "0x043820c97771c570d830bb0e189778fdef5e6eeb",
     logo: "/images/charity-logos/April-Forces-logo.png",
   },
+  {
+    id: "little-patriots-embraced",
+    name: "Little Patriots Embraced",
+    shortName: "Little Patriots Embraced",
+    address: "0x097701F99CC7b0Ff816C2355faC104ADdC6e27B9",
+    logo: "/images/charity-logos/Little-Patriots-Embraced-logo.png",
+  },
 ]
 
 // Fix charityDescriptions keys to match allCharities IDs
@@ -106,6 +113,7 @@ const charityDescriptions: Record<string, string> = {
   "camp-cowboy": "Equine Therapy For Veterans.",
   "magicians-on-mission": "Entertainment Thru Magic",
   "april-forces": "Support For Veterans And Their Families.",
+  "little-patriots-embraced": "Supporting Military Children.",
 }
 
 export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {

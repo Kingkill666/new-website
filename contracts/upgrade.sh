@@ -3,7 +3,7 @@ set -ex
 
 # Set the proxy address that you want to upgrade
 # You'll need to set this after initial deployment
-export PROXY_ADDRESS="YOUR_PROXY_ADDRESS_HERE"
+export PROXY_ADDRESS="0x2213414893259b0C48066Acd1763e7fbA97859E5"
 
 source .env
 

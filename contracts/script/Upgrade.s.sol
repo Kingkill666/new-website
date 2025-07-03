@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import {Script} from "forge-std/Script.sol";
 import {console2} from "forge-std/console2.sol";
-import {VmfCoin} from "../src/VmfCoin.sol";
+import {VMF} from "../src/VMF.sol";
 
 contract UpgradeScript is Script {
     function run() external {
@@ -15,11 +15,11 @@ contract UpgradeScript is Script {
         console2.log("Upgrading proxy at:", proxyAddress);
         
         // Deploy new implementation
-        VmfCoin newImplementation = new VmfCoin();
+        VMF newImplementation = new VMF();
         console2.log("New implementation deployed at:", address(newImplementation));
         
         // Get the proxy instance
-        VmfCoin proxy = VmfCoin(proxyAddress);
+        VMF proxy = VMF(proxyAddress);
         
         // Upgrade to new implementation
         proxy.upgradeToAndCall(address(newImplementation), "");

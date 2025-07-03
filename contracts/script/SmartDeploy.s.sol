@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import {Script} from "forge-std/Script.sol";
 import {console2} from "forge-std/console2.sol";
-import {VmfCoin} from "../src/VmfCoin.sol";
+import {VMF} from "../src/VMF.sol";
 import {LibClone} from "solady/utils/LibClone.sol";
 
 contract SmartDeployScript is Script {
@@ -28,7 +28,7 @@ contract SmartDeployScript is Script {
             assembly { codeSize := extcodesize(proxy) }
             
             if (codeSize > 0) {
-                try VmfCoin(proxy).name() returns (string memory) {
+                try VMF(proxy).name() returns (string memory) {
                     proxyExists = true;
                     console2.log("Existing proxy found at:", proxy);
                 } catch {
@@ -44,7 +44,7 @@ contract SmartDeployScript is Script {
         if (proxyExists) {
             console2.log("==== Existing Deployment Found ====");
             console2.log("Proxy address:", existingProxy);
-            VmfCoin vmfProxy = VmfCoin(existingProxy);
+            VMF vmfProxy = VMF(existingProxy);
             console2.log("Token name:", vmfProxy.name());
             console2.log("Token symbol:", vmfProxy.symbol());
             console2.log("Owner:", vmfProxy.owner());
@@ -75,7 +75,7 @@ contract SmartDeployScript is Script {
         
         // Prepare the initialization data
         bytes memory initData = abi.encodeWithSelector(
-            VmfCoin.initialize.selector,
+            VMF.initialize.selector,
             usdcAddress,
             payable(charityReceiver),
             payable(teamReceiver),
@@ -84,7 +84,7 @@ contract SmartDeployScript is Script {
         
         // Deploy implementation if not provided or invalid
         if (implementationAddress == address(0)) {
-            VmfCoin implementation = new VmfCoin();
+            VMF implementation = new VMF();
             implementationAddress = address(implementation);
             console2.log("New implementation deployed at:", implementationAddress);
         }
@@ -94,7 +94,7 @@ contract SmartDeployScript is Script {
         console2.log("Proxy deployed at:", localProxy);
         
         // Verify the proxy is working
-        VmfCoin localVmf = VmfCoin(localProxy);
+        VMF localVmf = VMF(localProxy);
         console2.log("Token name:", localVmf.name());
         console2.log("Token symbol:", localVmf.symbol());
         console2.log("USDC:", localVmf.usdc());

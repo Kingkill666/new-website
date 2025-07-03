@@ -9,7 +9,7 @@ import {UUPSUpgradeable} from "solady/utils/UUPSUpgradeable.sol";
 import {Ownable} from "solady/auth/Ownable.sol";
 
 
-contract VmfCoin is ERC20, UUPSUpgradeable, Ownable {
+contract VMF is ERC20, UUPSUpgradeable, Ownable {
     using FixedPointMathLib for uint256;
     using SafeTransferLib for address;
     using EnumerableSetLib for EnumerableSetLib.AddressSet;
