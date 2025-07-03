@@ -57,21 +57,40 @@ contract VmfCoinBatchTest is Test {
         // Deploy mock USDC
         usdc = new MockUSDC();
         
-        // Deploy VMF implementation
+        // Deploy VMF implementation (just like in deploy script)
         VmfCoin implementation = new VmfCoin();
         
-        // Prepare initialization data
+        // Prepare the initialization data (just like in deploy script)
         bytes memory initData = abi.encodeWithSelector(
             VmfCoin.initialize.selector,
             address(usdc),
             payable(charityReceiver),
             payable(teamReceiver),
-            owner
+            owner // initial owner
         );
         
-        // Deploy proxy
+        // Deploy the ERC1967 proxy pointing to the implementation (just like in deploy script)
         address proxyAddress = LibClone.deployERC1967(address(implementation), initData);
         vmfCoin = VmfCoin(proxyAddress);
+        
+        // Explicitly call initialize to ensure proper setup (in case proxy init didn't work)
+        try vmfCoin.initialize(
+            address(usdc),
+            payable(charityReceiver),
+            payable(teamReceiver),
+            owner
+        ) {
+            // Initialize succeeded
+        } catch {
+            // Initialize failed, which means it was already called during proxy deployment
+            // This is expected behavior
+        }
+        
+        // Verify the proxy is working (just like in deploy script)
+        require(bytes(vmfCoin.name()).length > 0, "VMF: proxy not initialized correctly");
+        require(vmfCoin.owner() == owner, "VMF: owner not set correctly");
+        require(vmfCoin.minter() == owner, "VMF: minter not set correctly");
+        require(vmfCoin.usdc() == address(usdc), "VMF: USDC address not set correctly");
         
         // Set up authorized charities
         vm.startPrank(owner);

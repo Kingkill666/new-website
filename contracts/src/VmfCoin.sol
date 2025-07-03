@@ -26,7 +26,7 @@ contract VmfCoin is ERC20, UUPSUpgradeable, Ownable {
     uint8 teamRateBps = 10; // amount of tax to be taken from each transaction, in basis points (bps)
 
     uint256 public donationPool = 1_000_000e18; // running total amount of wei-tokens to be allocated to charity
-    uint256 donationMultipleBps = 10000; // multiple of USDC amount to mint VMF tokens
+    uint256 donationMultipleBps = 10_000; // multiple of USDC amount to mint VMF tokens
 
     /// @dev Initializes the contract. Can only be called once.
     function initialize(
@@ -44,9 +44,19 @@ contract VmfCoin is ERC20, UUPSUpgradeable, Ownable {
         usdc = _usdc;
         charityReceiver = initCharityReceiver;
         teamReceiver = initTeamReceiver;
+
+        // when working with a proxy, we want to set the storage locations again
+        _setDefaults();
         
         // Initialize Ownable
         _initializeOwner(initialOwner);
+    }
+    
+    function _setDefaults() internal {
+        charityRateBps = 33;
+        teamRateBps = 10;
+        donationMultipleBps = 10_000;
+        donationPool = 1_000_000e18;
     }
 
     /**
@@ -236,7 +246,7 @@ contract VmfCoin is ERC20, UUPSUpgradeable, Ownable {
 
         uint256 normalizedUsdcAmount = amountUSDC * (10**12);
 
-        uint256 vmfMatching = normalizedUsdcAmount * donationMultipleBps / 10000;
+        uint256 vmfMatching = normalizedUsdcAmount * (donationMultipleBps / 10000);
         require(vmfMatching <= donationPool, "VMF: donation exceeds pool limit");
         
         donationPool -= vmfMatching;
@@ -245,6 +255,9 @@ contract VmfCoin is ERC20, UUPSUpgradeable, Ownable {
         // Transfer USDC to the specified address
         address(usdc).safeTransfer(to, amountUSDC);
     }
+
+    /// @dev Emitted when a batch donation is made
+    event Donation(address indexed donor, address indexed recipient, uint256 amount);
 
     /**
      * @dev Batch function to handle multiple USDC donations in a single transaction.
@@ -266,9 +279,12 @@ contract VmfCoin is ERC20, UUPSUpgradeable, Ownable {
             totalUSDC += amounts[i];
             
             uint256 normalizedAmount = amounts[i] * (10**12);
-            uint256 vmfMatching = normalizedAmount * donationMultipleBps / 10000;
+            uint256 donationMultiple = FixedPointMathLib.divUp(donationMultipleBps, 10_000);
+            uint256 vmfMatching = normalizedAmount * donationMultiple;
             totalVMFMatching += vmfMatching;
         }
+
+        require(totalVMFMatching > 0, "VMF: no VMF tokens to mint");
         
         // Check total VMF matching against donation pool
         require(totalVMFMatching <= donationPool, "VMF: total donations exceed pool limit");
