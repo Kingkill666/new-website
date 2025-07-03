@@ -45,7 +45,7 @@ const charities = [
   },
   {
     name: "Little Patriots Embraced",
-    stat: "Coming Soon",
+    stat: "Over 100 Million Kids Served",
     description: "Supporting military children and families with care packages and programs.",
     logo: "/images/charity-logos/Little-Patriots-Embraced-logo.png",
     link: "https://www.littlepatriotsembraced.org/",

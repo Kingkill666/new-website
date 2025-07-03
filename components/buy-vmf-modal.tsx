@@ -1023,7 +1023,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                 <Button
                   variant="outline"
                   className="bg-yellow-100 border-yellow-300 text-yellow-800 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
-                  onClick={() => window.open("#", "_blank")}
+                  onClick={() => window.open("https://opensea.io/collection/original-vmfc-baldy-mascot", "_blank")}
                   aria-label="View Baldy NFT, opens in new tab"
                 >
                   <div
