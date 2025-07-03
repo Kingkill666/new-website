@@ -84,7 +84,7 @@ contract VmfCoin is ERC20, UUPSUpgradeable, Ownable {
         super._transfer(sender, recipient, amountAfterTeam);
 
         super._transfer(sender, charityReceiver, charityAmount);
-        super._transfer(sender, teamReceiver, charityAmount);
+        super._transfer(sender, teamReceiver, teamAmount);
     }
 
     /**
