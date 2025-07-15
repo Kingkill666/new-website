@@ -3,7 +3,7 @@ import React from "react";
 const charities = [
   {
     name: "Holy Family Village",
-    stat: "500+ Veterans Housed",
+    stat: "Uplifting Homeless Veterans",
     description: "Housing and support for veterans, low-income families, and the homeless.",
     logo: "/images/charity-logos/holy-family-village-logo.png",
     link: "#",
