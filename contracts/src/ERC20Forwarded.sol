@@ -1,3 +1,11 @@
+interface IUniswapV4Pool {
+    function swap(
+        address recipient,
+        int256 amountSpecified,
+        uint160 sqrtPriceLimitX96,
+        bytes calldata data
+    ) external returns (int256 amount0, int256 amount1);
+}
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
@@ -20,6 +28,24 @@ interface IUniswapV4Singleton {
 }
 
 contract ERC20Forwarded {
+    // Swap VMF for USDC in a Uniswap v4 pool
+    function sellVMF(
+        address pool,
+        address vmfToken,
+        uint256 amountVMF,
+        address recipient
+    ) external {
+        // Approve pool to spend VMF
+        IERC20(vmfToken).approve(pool, amountVMF);
+        // Uniswap v4 swap: amountSpecified is negative for sell (exact input)
+        // sqrtPriceLimitX96: set to 0 for no limit
+        // data: empty for simple swap
+        int256 amountSpecified = -int256(amountVMF); // negative for sell
+        uint160 sqrtPriceLimitX96 = 0;
+        bytes memory data = "";
+        IUniswapV4Pool(pool).swap(recipient, amountSpecified, sqrtPriceLimitX96, data);
+        emit TokensForwarded(vmfToken, amountVMF);
+    }
     using SafeTransferLib for address;
 
     address public destination;

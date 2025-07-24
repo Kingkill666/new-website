@@ -9,11 +9,7 @@ source .env
 # Build contracts and extract USDCForwardingHook bytecode
 forge build
 
-# Uniswap v4 PoolManager address for Base mainnet
-SINGLETON="0x498581ff718922c3f8e6a244956af099b2652b2b"
 TOKEN_A="0x2213414893259b0C48066Acd1763e7fbA97859E5" # VMF coin address
-TOKEN_B="0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"   # USDC address on Base mainnet
-FEE=10000           # Initial fee (in basis points)
 
 # List of charity addresses
 charity_addresses=(
@@ -29,30 +25,30 @@ charity_addresses=(
 )
 
 
+
+
+AMOUNT_VMF="1000000000000000000000"   # 1000 VMF in wei (assuming 18 decimals)
+POOL="0xfde8880eb05554a44f9a51e657b637ba733953082b28ea38fd95f0a6ed483414"
+
+DEPLOYED_FORWARDERS_FILE="deployed_forwarders.txt"
+echo -n "" > "$DEPLOYED_FORWARDERS_FILE" # Clear file before writing
+
 for CHARITY in "${charity_addresses[@]}"; do
-    # Deploy the hook contract for this charity using forge create
-    HOOK_DEPLOY_OUTPUT=$(forge create --broadcast --rpc-url "$BASE_RPC_URL" --private-key "$PRIVATE_KEY" src/USDCForwardingHook.sol:USDCForwardingHook --constructor-args "$CHARITY" "$TOKEN_B")
-    HOOK=$(echo "$HOOK_DEPLOY_OUTPUT" | grep -oE 'Deployed to: (0x[a-fA-F0-9]{40})' | awk '{print $3}')
-    echo "USDCForwardingHook deployed for $CHARITY at: $HOOK"
+    # Deploy ERC20Forwarded contract for this charity
+    FORWARDER_DEPLOY_OUTPUT=$(forge create --broadcast --rpc-url "$BASE_RPC_URL" --private-key "$PRIVATE_KEY" src/ERC20Forwarded.sol:ERC20Forwarded --constructor-args "$CHARITY")
+    FORWARDER=$(echo "$FORWARDER_DEPLOY_OUTPUT" | grep -oE 'Deployed to: (0x[a-fA-F0-9]{40})' | awk '{print $3}')
+    echo "ERC20Forwarded deployed for $CHARITY at: $FORWARDER"
 
-    # Create the Uniswap v4 pool with the hook
-    POOL_OUTPUT=$(cast send $SINGLETON "createPool(address,address,uint24,address)" $TOKEN_A $TOKEN_B $FEE "$HOOK" --private-key "$PRIVATE_KEY")
-    POOL=$(echo "$POOL_OUTPUT" | grep -oE '0x[a-fA-F0-9]{40}' | head -n 1)
-    echo "Uniswap v4 pool created for $CHARITY at: $POOL"
+    # Save charity and forwarder address to file
+    echo "$CHARITY $FORWARDER" >> "$DEPLOYED_FORWARDERS_FILE"
 
-    # Fund the pool with initial liquidity (placeholder amounts)
-    # Replace AMOUNT_VMF and AMOUNT_USDC with actual values
-    AMOUNT_VMF="1000000000000000000"   # 1 VMF (example, in wei)
-    AMOUNT_USDC="1000000"              # 1 USDC (example, in smallest unit)
+    # Fund the forwarder with 1000 VMF from deployer
+    cast send $TOKEN_A "transfer(address,uint256)" "$FORWARDER" $AMOUNT_VMF --private-key "$PRIVATE_KEY"
+    echo "Funded forwarder $FORWARDER for $CHARITY with $AMOUNT_VMF VMF"
 
-    # Approve pool to spend tokens (if needed)
-    cast send $TOKEN_A "approve(address,uint256)" $POOL $AMOUNT_VMF --private-key "$PRIVATE_KEY"
-    cast send $TOKEN_B "approve(address,uint256)" $POOL $AMOUNT_USDC --private-key "$PRIVATE_KEY"
-
-    # Provide liquidity to the pool (replace with correct function for Uniswap v4 pool)
-    # This is a placeholder; update with the actual mint/addLiquidity call as needed
-    echo "Funding pool $POOL for $CHARITY with $AMOUNT_VMF VMF and $AMOUNT_USDC USDC (update with correct function call)"
-    # Example: cast send $POOL "mint(address,uint256,uint256)" $PRIVATE_KEY $AMOUNT_VMF $AMOUNT_USDC --private-key "$PRIVATE_KEY"
+    # Call sellVMF on the forwarder to create a sell order against the pool
+    cast send "$FORWARDER" "sellVMF(address,address,uint256,address)" "$POOL" "$TOKEN_A" $AMOUNT_VMF "$CHARITY" --private-key "$PRIVATE_KEY"
+    echo "Called sellVMF on $FORWARDER for $CHARITY against pool $POOL"
 done
 
 echo "Deployment and pool setup complete for all charities."
