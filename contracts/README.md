@@ -67,5 +67,5 @@ $ cast --help
 
 
 
-CAN ADD NNEW CHARITIES IN add_chirty.sh
+CAN ADD NEW CHARITIES IN add_charity.sh
 addresses and everything
