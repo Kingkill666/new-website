@@ -309,6 +309,34 @@ const OfficersClubPage = () => {
                   View Leaderboard
                 </Button>
               </div>
+
+              {/* Club Amenities */}
+              <div className="mt-16">
+                <div className="text-center mb-12">
+                  <h2 className="text-4xl font-bold text-white mb-6">Club Amenities</h2>
+                  <p className="text-xl text-white/70 max-w-3xl mx-auto">
+                    Everything you need for a great time with fellow service members.
+                  </p>
+                </div>
+                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {clubFeatures.map((feature, index) => (
+                    <Card
+                      key={index}
+                      className="bg-slate-800/50 border-white/10 backdrop-blur-sm hover:bg-slate-700/50 transition-all duration-300 group"
+                    >
+                      <CardContent className="p-6 text-center">
+                        <div
+                          className={`w-14 h-14 ${feature.color} rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform`}
+                        >
+                          {feature.icon}
+                        </div>
+                        <h3 className="text-lg font-bold mb-3 text-white">{feature.title}</h3>
+                        <p className="text-sm text-white/70 leading-relaxed">{feature.description}</p>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -339,37 +367,7 @@ const OfficersClubPage = () => {
           </div>
         </section>
 
-        {/* Features */}
-        <section className="py-16 bg-slate-900">
-          <div className="container mx-auto px-4 sm:px-6">
-            <div className="max-w-6xl mx-auto">
-              <div className="text-center mb-16">
-                <h2 className="text-4xl font-bold text-white mb-6">Club Amenities</h2>
-                <p className="text-xl text-white/70 max-w-3xl mx-auto">
-                  Everything you need for a great time with fellow service members.
-                </p>
-              </div>
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {clubFeatures.map((feature, index) => (
-                  <Card
-                    key={index}
-                    className="bg-slate-800/50 border-white/10 backdrop-blur-sm hover:bg-slate-700/50 transition-all duration-300 group"
-                  >
-                    <CardContent className="p-6 text-center">
-                      <div
-                        className={`w-14 h-14 ${feature.color} rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform`}
-                      >
-                        {feature.icon}
-                      </div>
-                      <h3 className="text-lg font-bold mb-3 text-white">{feature.title}</h3>
-                      <p className="text-sm text-white/70 leading-relaxed">{feature.description}</p>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
+
 
         {/* Coming Soon */}
         <section className="py-16 bg-gradient-to-br from-purple-400 via-pink-300 to-blue-400">
