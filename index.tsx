@@ -681,16 +681,16 @@ const Index = () => {
         </section>
 
         {/* Trading Chart Section */}
-        <section className="py-16 sm:py-20 bg-white" aria-labelledby="trading-chart-heading">
+        <section className="py-2 sm:py-4 bg-white" aria-labelledby="trading-chart-heading">
           <div className="container mx-auto px-2 sm:px-4 lg:px-6">
             <div className="max-w-6xl mx-auto">
-              <div className="text-center mb-16">
-                              <h2 id="trading-chart-heading" className="text-4xl sm:text-5xl font-bold text-slate-900 mb-6">
-                VMF Coin Trading
-              </h2>
-              <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-                Track VMF coin performance and trading activity in real-time. See how your investment supports veterans.
-              </p>
+              <div className="text-center mb-8">
+                <h2 id="trading-chart-heading" className="text-4xl sm:text-5xl font-bold text-slate-900 mb-4">
+                  VMF Coin Trading
+                </h2>
+                <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+                  Track VMF coin performance and trading activity in real-time. See how your investment supports veterans.
+                </p>
               </div>
               <TradingChart tokenAddress="0x2213414893259b0c48066acd1763e7fba97859e5" />
             </div>
