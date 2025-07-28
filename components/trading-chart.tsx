@@ -262,9 +262,10 @@ const TradingChart = ({ tokenAddress }: TradingChartProps) => {
   const getCandlestickBody = (data: PriceData) => {
     const isGreen = data.close >= data.open
     
-    // Simple percentage calculation based on price range
-    const maxPrice = 1.2
-    const minPrice = 0.8
+    // Use real-time price for accurate positioning
+    const currentRealPrice = realTimePrice || 1.0
+    const maxPrice = currentRealPrice * 1.2
+    const minPrice = currentRealPrice * 0.8
     const priceRange = maxPrice - minPrice
     
     // Calculate positions
@@ -374,17 +375,17 @@ const TradingChart = ({ tokenAddress }: TradingChartProps) => {
             
             {/* Price Axis */}
             <div className="absolute right-2 top-0 bottom-0 flex flex-col justify-between text-xs text-gray-400 pointer-events-none">
-              <span>1.2000</span>
-              <span>1.1000</span>
-              <span>1.0000</span>
-              <span>0.9000</span>
-              <span>0.8000</span>
+              <span>{formatPrice((realTimePrice || 1.0) * 1.2)}</span>
+              <span>{formatPrice((realTimePrice || 1.0) * 1.1)}</span>
+              <span>{formatPrice(realTimePrice || 1.0)}</span>
+              <span>{formatPrice((realTimePrice || 1.0) * 0.9)}</span>
+              <span>{formatPrice((realTimePrice || 1.0) * 0.8)}</span>
             </div>
             
             {/* Current Price Line */}
             <div className="absolute left-0 right-8 top-1/2 border-t border-red-500 border-dashed pointer-events-none">
               <div className="absolute right-0 top-0 transform -translate-y-1/2 bg-red-500 text-white text-xs px-1 rounded">
-                {formatPrice(currentPrice)}
+                {formatPrice(realTimePrice || currentPrice)}
               </div>
             </div>
             
