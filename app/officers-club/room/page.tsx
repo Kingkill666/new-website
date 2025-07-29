@@ -6,7 +6,6 @@ import { WalletConnector } from "@/components/wallet-connector"
 import { AlertCircle, CheckCircle, X } from "lucide-react"
 
 export default function OfficersClubRoom() {
-  const [showOnlyBar, setShowOnlyBar] = useState(false)
   const [vmfBalance, setVmfBalance] = useState<number>(0)
   const [isCheckingBalance, setIsCheckingBalance] = useState(false)
   const { walletState } = useWallet()
@@ -178,7 +177,7 @@ export default function OfficersClubRoom() {
 
   const handleEnterClub = () => {
     if (vmfBalance >= REQUIRED_VMF_BALANCE) {
-      setShowOnlyBar(true)
+      // setShowOnlyBar(true) // This line is removed
     }
   }
 
@@ -301,168 +300,27 @@ export default function OfficersClubRoom() {
         />
       </a>
 
-      {/* Overlay for darkening the image, only if overlays are visible */}
-      {!showOnlyBar && <div className="absolute inset-0 bg-black/60" />}
-
-      {/* Overlay content, hidden after button click */}
-      {!showOnlyBar && (
-      <div className="relative z-10 flex flex-col items-center justify-center text-center px-6">
-        <h1 className="text-4xl sm:text-6xl font-extrabold text-yellow-300 drop-shadow-lg mb-6">Welcome to the Officers Club Bar</h1>
-        <p className="text-lg sm:text-2xl text-white/90 font-medium drop-shadow mb-4 max-w-2xl">
-          Grab a seat, enjoy the camaraderie, and celebrate with fellow members. This is your exclusive space to relax, connect, and unwind. Cheers to you!
-        </p>
-
-        
-
-        
-        {/* Wallet Connection Section */}
-        <div className="mb-6">
-          <div className="mb-4">
-            <WalletConnector />
-          </div>
-          
-          {/* Manual Balance Check Button */}
-          {walletState.isConnected && (
-            <div className="mb-4">
-              <button
-                onClick={checkBalanceWithAPI}
-                disabled={isCheckingBalance}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-              >
-                {isCheckingBalance ? "Checking VMF Balance..." : "Check VMF Balance Now"}
-              </button>
-            </div>
-          )}
-          
-          {walletState.isConnected && (
-            <div className="mb-4">
-              <div className="bg-green-500/20 border border-green-500/30 rounded-lg px-4 py-3 mb-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle className="h-5 w-5 text-green-400" />
-                    <span className="text-green-300 font-medium">Coinbase Smart Wallet: {walletState.address?.slice(0, 6)}...{walletState.address?.slice(-4)}</span>
-                  </div>
-                  <button className="text-green-300 hover:text-green-200">
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-                <div className="mt-2 text-green-300 text-sm">
-                  {isCheckingBalance ? "Checking VMF balance..." : `${vmfBalance.toFixed(2)} VMF`}
-                </div>
-              </div>
-              
-              <div className="text-white/80 text-sm mb-2">
-                VMF Balance: {isCheckingBalance ? "Checking..." : `${vmfBalance.toFixed(2)} VMF`}
-              </div>
-              <div className="text-white/80 text-sm mb-2">
-                Status: {hasEnoughVMF ? "✅ Eligible to Enter" : "❌ Need 10+ VMF"}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Members Only Button */}
-        <button
-          className={`inline-block font-bold px-8 py-3 rounded-2xl text-xl shadow-lg mt-4 transition focus:outline-none focus:ring-2 focus:ring-yellow-500 ${
-            walletState.isConnected && hasEnoughVMF
-              ? "bg-yellow-400/90 text-black hover:bg-yellow-300"
-              : "bg-gray-500/70 text-gray-300 cursor-not-allowed"
-          }`}
-          onClick={handleEnterClub}
-          disabled={!walletState.isConnected || !hasEnoughVMF}
-        >
-          {!walletState.isConnected 
-            ? "Members Only" 
-            : isCheckingBalance
-              ? "Checking VMF Balance..."
-              : !hasEnoughVMF 
-                ? `Need ${REQUIRED_VMF_BALANCE} VMF (You have ${vmfBalance.toFixed(2)})` 
-                : "Enter Officers Club"
-          }
-        </button>
-
-        {/* Warning Message */}
-        {walletState.isConnected && !hasEnoughVMF && (
-          <div className="mt-4 flex items-center justify-center space-x-2 bg-red-500/20 border border-red-500/30 rounded-lg px-4 py-3 max-w-md">
-            <AlertCircle className="h-5 w-5 text-red-400" />
-            <p className="text-red-300 text-sm">
-              You need at least {REQUIRED_VMF_BALANCE} VMF tokens to enter the Officers Club
-            </p>
-          </div>
-        )}
-
-        {!walletState.isConnected && (
-          <div className="mt-4 flex items-center justify-center space-x-2 bg-yellow-500/20 border border-yellow-500/30 rounded-lg px-4 py-3 max-w-md">
-            <AlertCircle className="h-5 w-5 text-yellow-400" />
-            <div className="text-yellow-300 text-sm">
-              <p>Connect your wallet to check if you have enough VMF tokens to enter. User must own 10 VMF to enter.</p>
-            </div>
-          </div>
-        )}
-
-        {/* Debug Info - Remove this after fixing */}
-        {walletState.isConnected && (
-          <div className="mt-4 bg-gray-800/50 border border-gray-600 rounded-lg px-4 py-3 max-w-md text-xs text-gray-300">
-            <p>Debug Info:</p>
-            <p>Connected: {walletState.isConnected ? "Yes" : "No"}</p>
-            <p>Address: {walletState.address}</p>
-            <p>Chain ID: {walletState.chainId}</p>
-            <p>VMF Balance: {vmfBalance}</p>
-            <p>Has Enough VMF: {hasEnoughVMF ? "Yes" : "No"}</p>
-            <p>Required: {REQUIRED_VMF_BALANCE}</p>
-            <p>Button Status: {walletState.isConnected && hasEnoughVMF ? "Should be clickable" : "Not clickable"}</p>
-            <button 
-              onClick={checkBalanceWithAPI}
-              className="mt-2 bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs"
-            >
-              Force Check Balance
-            </button>
-            <button 
-              onClick={testBalanceCheck}
-              className="mt-2 ml-2 bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-xs"
-            >
-              Test Known Address
-            </button>
-            <button 
-              onClick={() => {
-                console.log("🔧 Manual override: Setting VMF balance to 100")
-                setVmfBalance(100)
-              }}
-              className="mt-2 ml-2 bg-yellow-600 hover:bg-yellow-700 text-white px-2 py-1 rounded text-xs"
-            >
-              Set 100 VMF (Test)
-            </button>
-          </div>
-        )}
-        </div>
-      )}
-
-      {/* Interactive hotspots, only after Members Only is clicked */}
-      {showOnlyBar && (
-        <>
-          {/* Slot Machine - improved border shape and effect */}
-          <div
-            className="absolute z-20 group"
-            style={{ left: '1.5%', bottom: '10%', width: '11%', height: '60%' }}
-          >
-            <div className="w-full h-full transition-all duration-200 group-hover:border-8 group-hover:border-white group-hover:shadow-[0_0_32px_8px_rgba(255,255,255,0.7)] rounded-[32px]" style={{ border: '4px solid transparent' }} />
-          </div>
-          {/* Jukebox - improved border shape and effect */}
-          <div
-            className="absolute z-20 group"
-            style={{ right: '3.5%', bottom: '10%', width: '12%', height: '48%' }}
-          >
-            <div className="w-full h-full transition-all duration-200 group-hover:border-8 group-hover:border-white group-hover:shadow-[0_0_32px_8px_rgba(255,255,255,0.7)] rounded-[40px]" style={{ border: '4px solid transparent' }} />
-          </div>
-          {/* TV - improved border shape and effect (adjusted position and size) */}
-          <div
-            className="absolute z-30 group"
-            style={{ left: '54%', top: '3%', width: '23%', height: '22%', transform: 'rotate(-6deg)' }}
-          >
-            <div className="w-full h-full transition-all duration-200 group-hover:border-8 group-hover:border-white group-hover:shadow-[0_0_32px_8px_rgba(255,255,255,0.7)] rounded-[48px]" style={{ border: '4px solid transparent' }} />
+      {/* Interactive hotspots - always visible */}
+      <div
+        className="absolute z-20 group"
+        style={{ left: '1.5%', bottom: '10%', width: '11%', height: '60%' }}
+      >
+        <div className="w-full h-full transition-all duration-200 group-hover:border-8 group-hover:border-white group-hover:shadow-[0_0_32px_8px_rgba(255,255,255,0.7)] rounded-[32px]" style={{ border: '4px solid transparent' }} />
       </div>
-        </>
-      )}
+      {/* Jukebox - improved border shape and effect */}
+      <div
+        className="absolute z-20 group"
+        style={{ right: '3.5%', bottom: '10%', width: '12%', height: '48%' }}
+      >
+        <div className="w-full h-full transition-all duration-200 group-hover:border-8 group-hover:border-white group-hover:shadow-[0_0_32px_8px_rgba(255,255,255,0.7)] rounded-[40px]" style={{ border: '4px solid transparent' }} />
+      </div>
+      {/* TV - improved border shape and effect (adjusted position and size) */}
+      <div
+        className="absolute z-30 group"
+        style={{ left: '54%', top: '3%', width: '23%', height: '22%', transform: 'rotate(-6deg)' }}
+      >
+        <div className="w-full h-full transition-all duration-200 group-hover:border-8 group-hover:border-white group-hover:shadow-[0_0_32px_8px_rgba(255,255,255,0.7)] rounded-[48px]" style={{ border: '4px solid transparent' }} />
+      </div>
     </div>
   )
 } 
