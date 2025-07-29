@@ -4,10 +4,12 @@ import { ethers } from "ethers"
 import { useWallet } from "@/hooks/useWallet"
 import { WalletConnector } from "@/components/wallet-connector"
 import { AlertCircle, CheckCircle, X } from "lucide-react"
+import { BartenderChat } from "@/components/bartender-chat"
 
 export default function OfficersClubRoom() {
   const [vmfBalance, setVmfBalance] = useState<number>(0)
   const [isCheckingBalance, setIsCheckingBalance] = useState(false)
+  const [showBartenderChat, setShowBartenderChat] = useState(false)
   const { walletState } = useWallet()
 
   // VMF Token Contract Address on Base
@@ -321,6 +323,27 @@ export default function OfficersClubRoom() {
       >
         <div className="w-full h-full transition-all duration-200 group-hover:border-8 group-hover:border-white group-hover:shadow-[0_0_32px_8px_rgba(255,255,255,0.7)] rounded-[48px]" style={{ border: '4px solid transparent' }} />
       </div>
+      
+      {/* Bartender - new interactive hotspot */}
+      <div
+        className="absolute z-20 group cursor-pointer"
+        style={{ left: '48%', bottom: '45%', width: '6%', height: '15%' }}
+        onClick={() => setShowBartenderChat(true)}
+        title="Chat with the Bartender"
+      >
+        <div className="w-full h-full transition-all duration-200 group-hover:border-8 group-hover:border-white group-hover:shadow-[0_0_32px_8px_rgba(255,255,255,0.7)] rounded-[8px]" style={{ border: '4px solid transparent' }} />
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          <div className="bg-white/90 text-black px-2 py-1 rounded text-xs font-bold">
+            Chat with Bartender
+          </div>
+        </div>
+      </div>
+      
+      {/* Bartender Chat Modal */}
+      <BartenderChat 
+        isOpen={showBartenderChat} 
+        onClose={() => setShowBartenderChat(false)} 
+      />
     </div>
   )
 } 
