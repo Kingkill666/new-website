@@ -303,25 +303,25 @@ export default function OfficersClubRoom() {
       </a>
 
       {/* Interactive hotspots - always visible */}
-      <div
-        className="absolute z-20 group"
-        style={{ left: '1.5%', bottom: '10%', width: '11%', height: '60%' }}
-      >
-        <div className="w-full h-full transition-all duration-200 group-hover:border-8 group-hover:border-white group-hover:shadow-[0_0_32px_8px_rgba(255,255,255,0.7)] rounded-[32px]" style={{ border: '4px solid transparent' }} />
-      </div>
-      {/* Jukebox - improved border shape and effect */}
-      <div
-        className="absolute z-20 group"
-        style={{ right: '3.5%', bottom: '10%', width: '12%', height: '48%' }}
-      >
-        <div className="w-full h-full transition-all duration-200 group-hover:border-8 group-hover:border-white group-hover:shadow-[0_0_32px_8px_rgba(255,255,255,0.7)] rounded-[40px]" style={{ border: '4px solid transparent' }} />
-      </div>
-      {/* TV - improved border shape and effect (adjusted position and size) */}
-      <div
-        className="absolute z-30 group"
-        style={{ left: '54%', top: '3%', width: '23%', height: '22%', transform: 'rotate(-6deg)' }}
-      >
-        <div className="w-full h-full transition-all duration-200 group-hover:border-8 group-hover:border-white group-hover:shadow-[0_0_32px_8px_rgba(255,255,255,0.7)] rounded-[48px]" style={{ border: '4px solid transparent' }} />
+          <div
+            className="absolute z-20 group"
+            style={{ left: '1.5%', bottom: '10%', width: '11%', height: '60%' }}
+          >
+            <div className="w-full h-full transition-all duration-200 group-hover:border-8 group-hover:border-white group-hover:shadow-[0_0_32px_8px_rgba(255,255,255,0.7)] rounded-[32px]" style={{ border: '4px solid transparent' }} />
+          </div>
+          {/* Jukebox - improved border shape and effect */}
+          <div
+            className="absolute z-20 group"
+            style={{ right: '3.5%', bottom: '10%', width: '12%', height: '48%' }}
+          >
+            <div className="w-full h-full transition-all duration-200 group-hover:border-8 group-hover:border-white group-hover:shadow-[0_0_32px_8px_rgba(255,255,255,0.7)] rounded-[40px]" style={{ border: '4px solid transparent' }} />
+          </div>
+          {/* TV - improved border shape and effect (adjusted position and size) */}
+          <div
+            className="absolute z-30 group"
+            style={{ left: '54%', top: '3%', width: '23%', height: '22%', transform: 'rotate(-6deg)' }}
+          >
+            <div className="w-full h-full transition-all duration-200 group-hover:border-8 group-hover:border-white group-hover:shadow-[0_0_32px_8px_rgba(255,255,255,0.7)] rounded-[48px]" style={{ border: '4px solid transparent' }} />
       </div>
       
       {/* Bartender - new interactive hotspot */}

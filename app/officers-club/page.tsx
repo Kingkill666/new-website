@@ -454,7 +454,7 @@ const OfficersClubPage = () => {
                       src="/images/secret-officers-club.jpeg"
                       alt="Secret Officers Club interior"
                       className="w-full h-full object-cover"
-                      style={{ objectPosition: 'center 70%' }}
+                      style={{ objectPosition: 'center 55%' }}
                     />
                   </div>
                 </div>
