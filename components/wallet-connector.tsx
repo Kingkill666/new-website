@@ -455,7 +455,7 @@ export function WalletConnector({
             </div>
             <div className="mb-4">
               <p className="text-gray-600 mb-2">
-                You need at least {REQUIRED_VMF_BALANCE} VMF tokens to enter the Officers Club.
+                You need at least {REQUIRED_VMF_BALANCE} VMF coins to enter the Officers Club.
               </p>
               <p className="text-sm text-gray-500">
                 Current balance: {vmfBalance.toFixed(2)} VMF

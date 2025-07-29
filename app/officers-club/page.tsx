@@ -402,7 +402,7 @@ const OfficersClubPage = () => {
               <div className="flex items-center justify-center space-x-2 bg-yellow-500/20 border border-yellow-500/30 rounded-lg px-4 py-3 max-w-md mx-auto mb-12">
                 <AlertCircle className="h-5 w-5 text-yellow-400" />
                 <p className="text-yellow-300 text-sm">
-                  Connect your wallet to check if you have enough VMF tokens to enter. User must own 10 VMF to enter.
+                  Connect your wallet to check if you have enough VMF coins to enter. User must own 10 VMF to enter.
                 </p>
               </div>
 
@@ -540,7 +540,7 @@ const OfficersClubPage = () => {
               </button>
             </div>
             <p className="text-gray-600 mb-4">
-              Connect your wallet to check if you have enough VMF tokens to enter the Officers Club.
+              Connect your wallet to check if you have enough VMF coins to enter the Officers Club.
             </p>
             <WalletConnector onInsufficientVMF={(balance) => {
               setVmfBalance(balance)
@@ -566,7 +566,7 @@ const OfficersClubPage = () => {
             </div>
             <div className="mb-4">
               <p className="text-gray-600 mb-2">
-                You need at least {REQUIRED_VMF_BALANCE} VMF tokens to enter the Officers Club.
+                You need at least {REQUIRED_VMF_BALANCE} VMF coins to enter the Officers Club.
               </p>
               <p className="text-sm text-gray-500">
                 Current balance: {vmfBalance.toFixed(2)} VMF
