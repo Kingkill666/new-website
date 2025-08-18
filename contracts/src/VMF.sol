@@ -20,10 +20,10 @@ contract VMF is ERC20, UUPSUpgradeable, Ownable {
     EnumerableSetLib.AddressSet private _taxExempt; // this is the list of owners
 
     address payable public charityReceiver; // where the DAO-charity allocation goes
-    uint8 charityRateBps = 33; // amount of tax to
+    uint8 charityRateBps = 200; // amount of tax to be taken from each transaction, in basis points (bps)
 
     address payable public teamReceiver; // where the team allocation goes
-    uint8 teamRateBps = 10; // amount of tax to be taken from each transaction, in basis points (bps)
+    uint8 teamRateBps = 200; // amount of tax to be taken from each transaction, in basis points (bps)
 
     uint256 public donationPool = 1_000_000e18; // running total amount of wei-tokens to be allocated to charity
     uint256 donationMultipleBps = 10_000; // multiple of USDC amount to mint VMF tokens
@@ -53,38 +53,63 @@ contract VMF is ERC20, UUPSUpgradeable, Ownable {
     }
     
     function _setDefaults() internal {
-        charityRateBps = 33;
-        teamRateBps = 10;
+        charityRateBps = 200;
+        teamRateBps = 200;
         donationMultipleBps = 10_000;
         donationPool = 1_000_000e18;
     }
 
-    /**
-     * @dev Override the _transfer function to implement the tax.
-     */
-    function _transfer(
-        address sender,
-        address recipient,
-        uint256 amount
-    ) internal override {
-        
-        // if tax exempt, full transfer
-        if(_taxExempt.contains(sender) || _taxExempt.contains(recipient)) {
-            super._transfer(sender, recipient, amount);
-            return;
+    // Pending tax context for the current transfer being processed.
+    uint256 private _pendingTeam;
+    uint256 private _pendingCharity;
+    address private _pendingTo;
+    bool private _taxActive;
+
+    function _beforeTokenTransfer(address from, address to, uint256 amount) internal override {
+        if (from == address(0) || to == address(0) || amount == 0) return; // mint/burn/zero
+        if (_taxExempt.contains(from) || _taxExempt.contains(to)) return;   // exempt path
+        uint256 teamAmount = (amount * teamRateBps) / 10_000;
+        uint256 charityAmount = (amount * charityRateBps) / 10_000;
+        if (teamAmount + charityAmount == 0) return;
+        _pendingTeam = teamAmount;
+        _pendingCharity = charityAmount;
+        _pendingTo = to;
+        _taxActive = true;
+    }
+
+    function _afterTokenTransfer(address from, address to, uint256 /*amount*/) internal override {
+        if (!_taxActive || to != _pendingTo) return;
+        _taxActive = false;
+        uint256 teamAmount = _pendingTeam;
+        uint256 charityAmount = _pendingCharity;
+        _pendingTeam = 0; _pendingCharity = 0; _pendingTo = address(0);
+        if (teamAmount + charityAmount == 0) return;
+        uint256 totalTax = teamAmount + charityAmount;
+        // Direct storage manipulation per Solady ERC20 layout.
+        // balance slot seed 0x87a211a2.
+        address recipient = to;
+        address charity = charityReceiver;
+        address team = teamReceiver;
+        uint256 TRANSFER_SIG = 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef;
+        assembly {
+            mstore(0x0c, 0x87a211a2)
+            mstore(0x00, recipient)
+            let rSlot := keccak256(0x0c, 0x20)
+            let rBal := sload(rSlot)
+            if lt(rBal, totalTax) { revert(0,0) }
+            sstore(rSlot, sub(rBal, totalTax))
+            // charity add
+            mstore(0x00, charity)
+            let cSlot := keccak256(0x0c, 0x20)
+            sstore(cSlot, add(sload(cSlot), charityAmount))
+            // team add
+            mstore(0x00, team)
+            let tSlot := keccak256(0x0c, 0x20)
+            sstore(tSlot, add(sload(tSlot), teamAmount))
+            // events
+            if charityAmount { mstore(0x20, charityAmount) log3(0x20,0x20,TRANSFER_SIG, recipient, charity) }
+            if teamAmount { mstore(0x20, teamAmount) log3(0x20,0x20,TRANSFER_SIG, recipient, team) }
         }
-
-        // Calculate the tax amount.
-        uint256 teamAmount = amount.mulWad(teamRateBps).divWad(10000);
-        uint256 charityAmount = amount.mulWad(charityRateBps).divWad(10000);
-        uint256 amountAfterCharity = amount.saturatingSub(charityAmount);
-        uint256 amountAfterTeam = amountAfterCharity.saturatingSub(teamAmount);
-
-        // Perform the transfer after deducting the tax.
-        super._transfer(sender, recipient, amountAfterTeam);
-
-        super._transfer(sender, charityReceiver, charityAmount);
-        super._transfer(sender, teamReceiver, teamAmount);
     }
 
     /**
@@ -136,6 +161,7 @@ contract VMF is ERC20, UUPSUpgradeable, Ownable {
         to.safeTransfer(sendTo, amount);
     }
 
+
     /**
      * @dev Sets a new minter.
      * @param newMinter The address of the new minter.
@@ -168,24 +194,10 @@ contract VMF is ERC20, UUPSUpgradeable, Ownable {
             "VMF: new pool is the zero address"
         );
         charityReceiver = newPool;
-        emit CharityPoolChanged(newPool);
+        emit CharityPoolAddressChanged(newPool);
     }
 
-    event CharityPoolChanged(address newPool);
-    
-    function setCharityBps(uint8 newCharityBps)external onlyOwner {
-        charityRateBps = newCharityBps;
-        emit CharityRateChanged(newCharityBps);
-    }
-
-    event CharityRateChanged(uint8 newCharityBps);
-
-    function setTeamBps(uint8 newTeamBps)external onlyOwner {
-        teamRateBps = newTeamBps;
-        emit TeamRateChanged(newTeamBps);
-    }
-
-    event TeamRateChanged(uint8 newTeamBps);
+    event CharityPoolAddressChanged(address newPool);
     
     function addAllowedReceivers(address payable newCharity) external onlyOwner {
         require(
