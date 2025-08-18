@@ -7,6 +7,9 @@ import {EnumerableSetLib} from "solady/utils/EnumerableSetLib.sol";
 import {FixedPointMathLib} from "solady/utils/FixedPointMathLib.sol";
 import {UUPSUpgradeable} from "solady/utils/UUPSUpgradeable.sol";
 import {Ownable} from "solady/auth/Ownable.sol";
+interface IVMFPriceOracle {
+    function spotPriceUSDCPerVMF() external view returns (uint256);
+}
 
 
 contract VMF is ERC20, UUPSUpgradeable, Ownable {
@@ -27,6 +30,11 @@ contract VMF is ERC20, UUPSUpgradeable, Ownable {
 
     uint256 public donationPool = 1_000_000e18; // running total amount of wei-tokens to be allocated to charity
     uint256 donationMultipleBps = 10_000; // multiple of USDC amount to mint VMF tokens
+
+    // Optional on-chain price oracle (Uniswap v4 pool wrapper) returning USDC per VMF scaled 1e18.
+    address public priceOracle; // if set (!=0) overrides donationMultipleBps logic
+
+    event PriceOracleSet(address indexed oracle);
 
     /// @dev Initializes the contract. Can only be called once.
     function initialize(
@@ -59,6 +67,11 @@ contract VMF is ERC20, UUPSUpgradeable, Ownable {
         donationPool = 1_000_000e18;
     }
 
+    function setPriceOracle(address newOracle) external onlyOwner {
+        priceOracle = newOracle; // allow setting to zero to disable
+        emit PriceOracleSet(newOracle);
+    }
+
     // Pending tax context for the current transfer being processed.
     uint256 private _pendingTeam;
     uint256 private _pendingCharity;
@@ -77,7 +90,7 @@ contract VMF is ERC20, UUPSUpgradeable, Ownable {
         _taxActive = true;
     }
 
-    function _afterTokenTransfer(address from, address to, uint256 /*amount*/) internal override {
+    function _afterTokenTransfer(address, address to, uint256) internal override {
         if (!_taxActive || to != _pendingTo) return;
         _taxActive = false;
         uint256 teamAmount = _pendingTeam;
@@ -256,9 +269,17 @@ contract VMF is ERC20, UUPSUpgradeable, Ownable {
         // Transfer USDC from sender to this contract (no allowance check needed as this is a safeTransferFrom)
         address(usdc).safeTransferFrom(msg.sender, address(this), amountUSDC);
 
-        uint256 normalizedUsdcAmount = amountUSDC * (10**12);
-
-        uint256 vmfMatching = normalizedUsdcAmount * (donationMultipleBps / 10000);
+        uint256 normalizedUsdcAmount = amountUSDC * (10**12); // 6 -> 18 decimals
+        uint256 vmfMatching;
+        if (priceOracle != address(0)) {
+            uint256 price = IVMFPriceOracle(priceOracle).spotPriceUSDCPerVMF(); // USDC per 1 VMF scaled 1e18
+            require(price > 0, "VMF: bad price");
+            // amountUSDC (18d) * 1e18 / price => VMF amount (18d)
+            vmfMatching = (normalizedUsdcAmount * 1e18) / price;
+        } else {
+            uint256 donationMultiple = donationMultipleBps / 10000; // integer division bps -> multiplier
+            vmfMatching = normalizedUsdcAmount * donationMultiple;
+        }
         require(vmfMatching <= donationPool, "VMF: donation exceeds pool limit");
         
         donationPool -= vmfMatching;
@@ -290,9 +311,16 @@ contract VMF is ERC20, UUPSUpgradeable, Ownable {
             
             totalUSDC += amounts[i];
             
-            uint256 normalizedAmount = amounts[i] * (10**12);
-            uint256 donationMultiple = FixedPointMathLib.divUp(donationMultipleBps, 10_000);
-            uint256 vmfMatching = normalizedAmount * donationMultiple;
+            uint256 normalizedAmount = amounts[i] * (10**12); // 6 -> 18
+            uint256 vmfMatching;
+            if (priceOracle != address(0)) {
+                uint256 price = IVMFPriceOracle(priceOracle).spotPriceUSDCPerVMF();
+                require(price > 0, "VMF: bad price");
+                vmfMatching = (normalizedAmount * 1e18) / price;
+            } else {
+                uint256 donationMultiple = FixedPointMathLib.divUp(donationMultipleBps, 10_000);
+                vmfMatching = normalizedAmount * donationMultiple;
+            }
             totalVMFMatching += vmfMatching;
         }
 
