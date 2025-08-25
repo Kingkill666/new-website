@@ -6,13 +6,13 @@ import {SafeTransferLib} from "solady/utils/SafeTransferLib.sol";
 import {EnumerableSetLib} from "solady/utils/EnumerableSetLib.sol";
 import {FixedPointMathLib} from "solady/utils/FixedPointMathLib.sol";
 import {UUPSUpgradeable} from "solady/utils/UUPSUpgradeable.sol";
-import {Ownable} from "solady/auth/Ownable.sol";
+import {OwnableRoles} from "solady/auth/OwnableRoles.sol";
 interface IVMFPriceOracle {
     function spotPriceUSDCPerVMF() external view returns (uint256);
 }
 
 
-contract VMF is ERC20, UUPSUpgradeable, Ownable {
+contract VMF is ERC20, UUPSUpgradeable, OwnableRoles {
     using FixedPointMathLib for uint256;
     using SafeTransferLib for address;
     using EnumerableSetLib for EnumerableSetLib.AddressSet;
@@ -23,10 +23,15 @@ contract VMF is ERC20, UUPSUpgradeable, Ownable {
     EnumerableSetLib.AddressSet private _taxExempt; // this is the list of owners
 
     address payable public charityReceiver; // where the DAO-charity allocation goes
-    uint8 charityRateBps = 200; // amount of tax to be taken from each transaction, in basis points (bps)
+    uint8 charityRateBps = 0; // amount of tax to be taken from each transaction, in basis points (bps)
 
     address payable public teamReceiver; // where the team allocation goes
-    uint8 teamRateBps = 200; // amount of tax to be taken from each transaction, in basis points (bps)
+    uint8 teamRateBps = 0; // amount of tax to be taken from each transaction, in basis points (bps)
+
+    // Roles: owner or address with these roles can update the respective BPS values.
+    uint256 internal constant ROLE_SET_TAX = _ROLE_0;
+    uint256 internal constant ROLE_SET_CHARITY = _ROLE_1;
+    uint256 internal constant ROLE_MINTER = _ROLE_2;
 
     uint256 public donationPool = 1_000_000e18; // running total amount of wei-tokens to be allocated to charity
     uint256 donationMultipleBps = 10_000; // multiple of USDC amount to mint VMF tokens
@@ -61,11 +66,32 @@ contract VMF is ERC20, UUPSUpgradeable, Ownable {
     }
     
     function _setDefaults() internal {
-        charityRateBps = 200;
-        teamRateBps = 200;
+        charityRateBps = 0;
+        teamRateBps = 0;
         donationMultipleBps = 10_000;
         donationPool = 1_000_000e18;
     }
+
+    /// @notice Update the charity tax rate in basis points.
+    /// @dev Restricted to owner or holders of ROLE_SET_TAX_RATE.
+    /// Note: Stored as uint8, valid range 0-255 (i.e. up to 2.55%).
+    function setCharityRateBps(uint8 newRate) external onlyOwnerOrRoles(ROLE_SET_TAX) {
+        uint8 old = charityRateBps;
+        charityRateBps = newRate;
+        emit CharityRateBpsChanged(old, newRate);
+    }
+
+    /// @notice Update the team tax rate in basis points.
+    /// @dev Restricted to owner or holders of ROLE_SET_TAX.
+    /// Note: Stored as uint8, valid range 0-255 (i.e. up to 2.55%).
+    function setTeamRateBps(uint8 newRate) external onlyOwnerOrRoles(ROLE_SET_TAX) {
+        uint8 old = teamRateBps;
+        teamRateBps = newRate;
+        emit TeamRateBpsChanged(old, newRate);
+    }
+
+    event CharityRateBpsChanged(uint8 oldRate, uint8 newRate);
+    event TeamRateBpsChanged(uint8 oldRate, uint8 newRate);
 
     function setPriceOracle(address newOracle) external onlyOwner {
         priceOracle = newOracle; // allow setting to zero to disable
@@ -179,7 +205,7 @@ contract VMF is ERC20, UUPSUpgradeable, Ownable {
      * @dev Sets a new minter.
      * @param newMinter The address of the new minter.
      */
-    function setMinter(address newMinter) external onlyOwner {
+    function setMinter(address newMinter) external onlyOwnerOrRoles(ROLE_MINTER) {
         require(
             newMinter != address(0),
             "VMF: new minter is the zero address"
@@ -190,7 +216,7 @@ contract VMF is ERC20, UUPSUpgradeable, Ownable {
     
     event MinterChanged(address newMinter);
 
-    function setTeamAddress(address payable newTeam) external onlyOwner {
+    function setTeamAddress(address payable newTeam) external onlyOwnerOrRoles(ROLE_SET_TAX) {
         require(
             newTeam != address(0),
             "VMF: new team is the zero address"
@@ -201,7 +227,7 @@ contract VMF is ERC20, UUPSUpgradeable, Ownable {
 
     event TeamChanged(address newTeam);
     
-    function setCharityPoolAddress(address payable newPool) external onlyOwner {
+    function setCharityPoolAddress(address payable newPool) external onlyOwnerOrRoles(ROLE_SET_TAX) {
         require(
             newPool!= address(0),
             "VMF: new pool is the zero address"
@@ -212,7 +238,7 @@ contract VMF is ERC20, UUPSUpgradeable, Ownable {
 
     event CharityPoolAddressChanged(address newPool);
     
-    function addAllowedReceivers(address payable newCharity) external onlyOwner {
+    function addAllowedReceivers(address payable newCharity) external onlyOwnerOrRoles(ROLE_SET_CHARITY) {
         require(
             newCharity != address(0),
             "VMF: new receiver is the zero address"
@@ -221,7 +247,7 @@ contract VMF is ERC20, UUPSUpgradeable, Ownable {
         emit ReceiverAdded(newCharity);
     }
 
-    function removeAllowedReceivers(address payable oldCharity) external onlyOwner {
+    function removeAllowedReceivers(address payable oldCharity) external onlyOwnerOrRoles(ROLE_SET_CHARITY) {
         _allowedReceivers.remove(oldCharity);
         emit ReceiverRemoved(oldCharity);
     }
@@ -229,7 +255,7 @@ contract VMF is ERC20, UUPSUpgradeable, Ownable {
     event ReceiverRemoved(address newPool);
     event ReceiverAdded(address newPool);
 
-    function addAllowedTaxExempt(address payable newTaxExempt) external onlyOwner {
+    function addAllowedTaxExempt(address payable newTaxExempt) external onlyOwnerOrRoles(ROLE_SET_TAX) {
         require(
             newTaxExempt != address(0),
             "VMF: new tax exempt is the zero address"
@@ -238,7 +264,7 @@ contract VMF is ERC20, UUPSUpgradeable, Ownable {
         emit TaxExemptAdded(newTaxExempt);
     }
 
-    function removeAllowedTaxExempt(address payable oldTaxExempt) external onlyOwner {
+    function removeAllowedTaxExempt(address payable oldTaxExempt) external onlyOwnerOrRoles(ROLE_SET_TAX) {
         _taxExempt.remove(oldTaxExempt);
         emit TaxExemptRemoved(oldTaxExempt);
     }
@@ -246,16 +272,17 @@ contract VMF is ERC20, UUPSUpgradeable, Ownable {
     event TaxExemptRemoved(address newPool);
     event TaxExemptAdded(address newPool);
 
-    function updateDonationPool(uint256 setDonationPool) external onlyOwner {
+    function updateDonationPool(uint256 setDonationPool) external onlyOwnerOrRoles(ROLE_SET_TAX) {
         donationPool = setDonationPool;
         emit DonationPoolChanged(setDonationPool);
     }
-    function updateDonationMultipleBps(uint256 newDonationMultipleBps) external onlyOwner {
+    function updateDonationMultipleBps(uint256 newDonationMultipleBps) external onlyOwnerOrRoles(ROLE_SET_TAX) {
         donationMultipleBps = newDonationMultipleBps;
-        emit DonationPoolChanged(donationMultipleBps);
+        emit DonationMultipleBpsChanged(donationMultipleBps);
     }
 
     event DonationPoolChanged(uint256 setDonationPool);
+    event DonationMultipleBpsChanged(uint256 setDonationMultipleBps);
 
     /**
      * @dev Function to accept USDC, mint tokens to the sender, and transfer USDC.

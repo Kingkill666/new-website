@@ -47,7 +47,13 @@ contract TokenSplitScript is Script {
         // Loop through each holder to calculate and mint new tokens.
         for (uint8 i = 0; i < holders.length; i++) {
             address holder = holders[i];
+            console.log("Checking tokens of holder %s", holder);
             uint256 currentBalance = token.balanceOf(holder);
+            console.log(
+                    "Checking tokens of holder %s (current balance: %d)",
+                    holder,
+                    currentBalance
+                );
 
             if (currentBalance > 0) {
                 // To achieve a 100x balance, we need to mint 99x the current balance.
