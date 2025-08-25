@@ -9,7 +9,6 @@ optimizer_runs = 200
 evm_version = "cancun"
 via_ir = true
 fs_permissions = [{ access = "read", path = "./holders.json"}]
- 
 [rpc_endpoints]
 base = "https://mainnet.base.org"
 baseSepolia = "https://sepolia.base.org"

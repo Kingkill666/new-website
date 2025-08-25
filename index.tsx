@@ -287,7 +287,7 @@ const Index = () => {
               </div>
 
               {/* Compact Action Buttons */}
-              <div className="flex items-center space-x-1 min-w-0">
+              <div className="flex items-center space-x-3 min-w-0">
                 <Link href="/story">
                   <span
                     className="font-extrabold text-xl whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-3 py-2 transition-all duration-200 text-slate-900 hover:text-blue-600 hover:bg-blue-50 cursor-pointer"
@@ -320,16 +320,17 @@ const Index = () => {
                 </Button>
 
                 {/* Compact Officers Club Button */}
-                <Link href="/officers-club">
+                <a href="https://pizza-party.vmfcoin.com/" target="_blank" rel="noopener noreferrer">
                   <Button
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-2 py-1.5 text-xs shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    className="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-1.5 text-xs shadow-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                     size="sm"
-                    aria-label="Access Officers Club"
+                    aria-label="Play Pizza Party Game"
                   >
-                    <Crown className="h-3 w-3 mr-1" aria-hidden="true" />
-                    <span className="relative z-10 font-extrabold tracking-wide">OFFICERS CLUB</span>
+                    <span className="text-2xl mr-1">🍕</span>
+                    <span className="relative z-10 font-extrabold tracking-wide text-sm">PLAY PIZZA PARTY</span>
+                    <span className="text-2xl ml-1">🍕</span>
                   </Button>
-                </Link>
+                </a>
               </div>
             </div>
 
@@ -440,16 +441,17 @@ const Index = () => {
                   </Button>
 
                   {/* Mobile Officers Club Button */}
-                  <Link href="/officers-club">
+                  <a href="https://pizza-party.vmfcoin.com/" target="_blank" rel="noopener noreferrer">
                     <Button
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                      className="w-full bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-3 shadow-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                       size="sm"
-                      aria-label="Access Officers Club"
+                      aria-label="Play Pizza Party Game"
                     >
-                      <Crown className="h-4 w-4 mr-2" aria-hidden="true" />
-                      <span className="relative z-10 font-extrabold tracking-wide">OFFICERS CLUB</span>
+                      <span className="text-3xl mr-2">🍕</span>
+                      <span className="relative z-10 font-extrabold tracking-wide text-lg">PLAY PIZZA PARTY</span>
+                      <span className="text-3xl ml-2">🍕</span>
                     </Button>
-                  </Link>
+                  </a>
                 </div>
               </div>
             </div>

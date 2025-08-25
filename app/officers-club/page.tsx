@@ -38,7 +38,7 @@ const OfficersClubPage = () => {
   const [vmfBalance, setVmfBalance] = useState<number>(0)
   const [isCheckingBalance, setIsCheckingBalance] = useState(false)
   const [showInsufficientVMF, setShowInsufficientVMF] = useState(false)
-  const { walletState } = useWallet()
+  const { isConnected, connection } = useWallet()
 
   // VMF Token Contract Address on Base
   const VMF_TOKEN_ADDRESS = "0x2213414893259b0c48066acd1763e7fba97859e5"
@@ -65,12 +65,12 @@ const OfficersClubPage = () => {
 
   // Handle wallet connection and balance check
   useEffect(() => {
-    if (walletState.isConnected && walletState.address) {
+    if (isConnected && connection?.address) {
       setShowWalletOptions(false)
       // Automatically check balance when wallet connects
-      checkVMFBalance(walletState.address)
+      checkVMFBalance(connection.address)
     }
-  }, [walletState.isConnected, walletState.address])
+  }, [isConnected, connection?.address])
 
   // Check VMF balance function
   const checkVMFBalance = async (address: string) => {
@@ -125,13 +125,13 @@ const OfficersClubPage = () => {
 
   // Handle Members Only button click
   const handleMembersOnly = async () => {
-    if (!walletState.isConnected) {
+    if (!isConnected) {
       setShowWalletOptions(true)
       return
     }
     
-    if (walletState.address) {
-      const balance = await checkVMFBalance(walletState.address)
+    if (connection?.address) {
+      const balance = await checkVMFBalance(connection.address)
       if (balance >= REQUIRED_VMF_BALANCE) {
         router.push('/officers-club/room')
       } else {

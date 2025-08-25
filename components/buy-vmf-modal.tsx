@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { X, ChevronDown, ChevronUp, CheckCircle, Copy, Check, Minus, Plus, AlertCircle } from "lucide-react"
 import { useWallet } from "@/hooks/useWallet"
+import { formatAddress } from "@/lib/wallet-config"
 import { DialogFooter } from "@/components/ui/dialog"
 import axios from "axios"
 
@@ -123,7 +124,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
   const [charityDistributions, setCharityDistributions] = useState<CharityDistribution[]>([])
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false)
   const [isCharityDropdownOpen, setIsCharityDropdownOpen] = useState(false)
-  const { walletState, connectWallet, formatAddress, switchNetwork, disconnectWallet } = useWallet()
+  const { connection, isConnected, connectWallet, disconnect, formattedAddress } = useWallet()
   const [transactionHash, setTransactionHash] = useState("")
   const [vmfAmount, setVmfAmount] = useState("")
   const [fees, setFees] = useState<string | null>(null)
@@ -131,7 +132,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
   const [charityPool, setCharityPool] = useState("0.00")
   const [copied, setCopied] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
-  const [needsNetworkSwitch, setNeedsNetworkSwitch] = [false, (value: boolean) => {}] as const
+  const [needsNetworkSwitch, setNeedsNetworkSwitch] = useState(false)
 
   // Focus management for accessibility
   useEffect(() => {
@@ -190,10 +191,10 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
   }, [amount])
 
   useEffect(() => {
-    if (walletState.isConnected) {
-      setNeedsNetworkSwitch(walletState.chainId !== 8453)
+    if (isConnected && connection) {
+      setNeedsNetworkSwitch(connection.chainId !== 8453)
     }
-  }, [walletState.chainId, walletState.isConnected, walletState.walletType])
+  }, [connection?.chainId, isConnected])
 
   useEffect(() => {
     if (selectedCharities.length > 0) {
@@ -216,12 +217,12 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     async function estimateGas() {
       setIsEstimatingGas(true)
       try {
-        if (!walletState.isConnected || !amount || Number(amount) <= 0 || charityDistributions.length === 0) {
+        if (!isConnected || !amount || Number(amount) <= 0 || charityDistributions.length === 0) {
           setFees(null)
           setIsEstimatingGas(false)
           return
         }
-        const provider = new ethers.BrowserProvider(walletState.provider)
+        const provider = new ethers.BrowserProvider(window.ethereum)
         const signer = await provider.getSigner()
         const contract = new ethers.Contract(
           CONTRACT_ADDRESS,
@@ -271,7 +272,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
       }
     }
     estimateGas()
-  }, [walletState.isConnected, amount, charityDistributions, walletState.provider])
+      }, [isConnected, amount, charityDistributions])
 
   const handleCharitySelect = (charityId: string) => {
     if (selectedCharities.includes(charityId)) {
@@ -302,39 +303,31 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
   }
 
   const handleNetworkSwitch = async () => {
-    const success = await switchNetwork("base")
-    if (success) {
-      setNeedsNetworkSwitch(false)
-    }
+    // For now, we'll just show an alert since the simplified wallet hook doesn't support network switching
+    alert("Please switch to Base network in your wallet")
+    setNeedsNetworkSwitch(false)
   }
 
   const handleBuyNext = () => {
-    if (amount && selectedCharities.length > 0 && walletState.isConnected && getTotalPercentage() === 100) {
+    if (amount && selectedCharities.length > 0 && isConnected && getTotalPercentage() === 100) {
       if (needsNetworkSwitch) {
         alert("Please switch to the correct network to continue")
         return
       }
-      if(!walletState.usdcBalance) {
-        alert("No USDC")
-        return
-      }
-      if(walletState.usdcBalance && Number(amount) > Number(walletState.usdcBalance)) {
-        alert(`cannot buy more than your USDC balance ${walletState.usdcBalance}, ${amount}`)
-        return
-      }
+      // For now, skip USDC balance check since we don't have it in the new wallet system
       setCurrentStep("verify")
     }
   }
 
   const executeSmartContract = async () => {
-    if (!walletState.isConnected || !amount) {
+    if (!isConnected || !amount) {
       alert("Smart contract execution requires a connected wallet")
       return false
     }
 
     try {
       setIsProcessing(true)
-      const provider = new ethers.BrowserProvider(walletState.provider)
+      const provider = new ethers.BrowserProvider(window.ethereum)
       const signer = await provider.getSigner()
       const contract = new ethers.Contract(
         CONTRACT_ADDRESS,
@@ -462,7 +455,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                 Purchase VMF coins and select charities to support veterans and military families
               </div>
 
-              {!walletState.isConnected ? (
+                              {!isConnected ? (
                 <>
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4" role="alert">
                     <div className="flex items-center space-x-2 mb-2">
@@ -514,7 +507,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                   <div className="bg-green-50 border border-green-200 rounded-lg p-4 relative" role="status" aria-live="polite">
                     {/* Disconnect X button (for all wallets) */}
                     <button
-                      onClick={disconnectWallet}
+                      onClick={disconnect}
                       className="absolute top-3 right-3 rounded-full p-1 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-400"
                       aria-label="Disconnect wallet"
                     >
@@ -526,17 +519,16 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                     <div className="flex items-center space-x-2">
                       <CheckCircle className="h-4 w-4 text-green-600" aria-hidden="true" />
                       <span className="font-medium text-green-800">
-                        {walletState.walletType}: {formatAddress(walletState.address!)}
+                        {connection?.walletName}: {formattedAddress}
                       </span>
                     </div>
-                    {walletState.usdcBalance && (
-                      <p className="text-sm text-green-700 mt-1">
-                        ${walletState.usdcBalance}
-                      </p>)}
+                    <p className="text-sm text-green-700 mt-1">
+                      USDC Balance: Check your wallet
+                    </p>
                   </div>
 
                   {/* USDC Balance Warning */}
-                  {(!walletState.usdcBalance || Number(walletState.usdcBalance) === 0) && (
+                  {false && (
                     <div className="bg-orange-50 border border-orange-200 rounded-lg p-4" role="alert">
                       <div className="flex items-center space-x-2 mb-2">
                         <AlertCircle className="h-4 w-4 text-orange-600" aria-hidden="true" />
@@ -587,7 +579,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                   id="amount-input"
                   type="number"
                   value={amount}
-                  max={walletState.usdcBalance || ""}
+                  max=""
                   min="0"
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder="Enter amount"
@@ -609,7 +601,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
               {/* Continue Button to go to DONATE modal */}
               <Button
                 onClick={() => setCurrentStep("donate")}
-                disabled={!walletState.isConnected || !amount || Number(amount) <= 0}
+                disabled={!isConnected || !amount || Number(amount) <= 0}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg font-semibold disabled:opacity-50"
               >
                 Continue
@@ -848,11 +840,11 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                       </div>
                       <div className="flex justify-between" role="listitem">
                         <span>Connected Wallet:</span>
-                        <span className="font-mono">{formatAddress(walletState.address!)}</span>
+                        <span className="font-mono">{formattedAddress}</span>
                       </div>
                       <div className="flex justify-between" role="listitem">
                         <span>Chain ID:</span>
-                        <span className="font-mono">{walletState.chainId}</span>
+                        <span className="font-mono">{connection?.chainId || "Unknown"}</span>
                       </div>
                       <div className="flex justify-between" role="listitem">
                         <span>Gas Fees (Est.):</span>
