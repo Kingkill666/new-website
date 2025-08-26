@@ -10,8 +10,8 @@ export CHARITY_RECEIVER="0xf521a4fE5910b4fb4A14C9546C2837D33bEc455d"
 export TEAM_RECEIVER="0xf521a4fE5910b4fb4A14C9546C2837D33bEc455d"
 
 # Optional: Uncomment and set these if you want to reuse existing contracts
-# export PROXY_ADDRESS="0x..."           # If proxy already exists
-# export IMPLEMENTATION_ADDRESS="0x..."  # If implementation already exists
+export PROXY_ADDRESS="0x2213414893259b0c48066acd1763e7fba97859e5"
+#export IMPLEMENTATION_ADDRESS="0x..."  # If implementation already exists
 
 source .env
 
