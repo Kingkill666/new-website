@@ -28,6 +28,8 @@ contract VMF is ERC20, UUPSUpgradeable, OwnableRoles {
     address payable public teamReceiver; // where the team allocation goes
     uint8 teamRateBps = 0; // amount of tax to be taken from each transaction, in basis points (bps)
 
+    bool public taxEnabled = false; // Global tax enable/disable switch - disabled by default
+
     // Roles: owner or address with these roles can update the respective BPS values.
     uint256 internal constant ROLE_SET_TAX = _ROLE_0;
     uint256 internal constant ROLE_SET_CHARITY = _ROLE_1;
@@ -70,6 +72,7 @@ contract VMF is ERC20, UUPSUpgradeable, OwnableRoles {
         teamRateBps = 0;
         donationMultipleBps = 10_000;
         donationPool = 1_000_000e18;
+        taxEnabled = false; // Tax disabled by default
     }
 
     /// @notice Update the charity tax rate in basis points.
@@ -92,10 +95,18 @@ contract VMF is ERC20, UUPSUpgradeable, OwnableRoles {
 
     event CharityRateBpsChanged(uint8 oldRate, uint8 newRate);
     event TeamRateBpsChanged(uint8 oldRate, uint8 newRate);
+    event TaxEnabledChanged(bool enabled);
 
     function setPriceOracle(address newOracle) external onlyOwner {
         priceOracle = newOracle; // allow setting to zero to disable
         emit PriceOracleSet(newOracle);
+    }
+
+    /// @notice Enable or disable tax collection globally
+    /// @dev Restricted to owner only. When disabled, all transfers act like normal ERC20
+    function setTaxEnabled(bool enabled) external onlyOwner {
+        taxEnabled = enabled;
+        emit TaxEnabledChanged(enabled);
     }
 
     // Simple tax implementation - override transfer functions directly
@@ -110,8 +121,8 @@ contract VMF is ERC20, UUPSUpgradeable, OwnableRoles {
     }
 
     function _transferWithTax(address from, address to, uint256 amount) internal returns (bool) {
-        // Skip tax for mint/burn or if either party is tax exempt
-        if (from == address(0) || to == address(0) || 
+        // Skip tax for mint/burn, if tax is globally disabled, or if either party is tax exempt
+        if (from == address(0) || to == address(0) || !taxEnabled ||
             _taxExempt.contains(from) || _taxExempt.contains(to)) {
             _transfer(from, to, amount);
             return true;

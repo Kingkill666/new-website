@@ -34,7 +34,8 @@ contract VMFTaxTest is Test {
         uint8 teamBps = 200;    // 2%
         uint8 charityBps = 200; // 2%
         
-        // Set tax rates before transfer
+        // Enable tax and set tax rates before transfer
+        vmf.setTaxEnabled(true);
         vmf.setTeamRateBps(teamBps);
         vmf.setCharityRateBps(charityBps);
         
@@ -93,7 +94,8 @@ contract VMFTaxTest is Test {
         uint8 teamBps = 200;    // 2%
         uint8 charityBps = 200; // 2%
         
-        // Set tax rates before transfers
+        // Enable tax and set tax rates before transfers
+        vmf.setTaxEnabled(true);
         vmf.setTeamRateBps(teamBps);
         vmf.setCharityRateBps(charityBps);
         
@@ -110,5 +112,28 @@ contract VMFTaxTest is Test {
 
         assertEq(vmf.balanceOf(team), expectedTeam, "team accumulative tax");
         assertEq(vmf.balanceOf(charity), expectedCharity, "charity accumulative tax");
+    }
+
+    function test_TaxDisabled() public {
+        uint8 teamBps = 200;    // 2%
+        uint8 charityBps = 200; // 2%
+        
+        // Set tax rates
+        vmf.setTeamRateBps(teamBps);
+        vmf.setCharityRateBps(charityBps);
+        
+        // Disable tax globally
+        vmf.setTaxEnabled(false);
+        
+        uint256 amount = 5_000 ether;
+
+        vm.prank(alice);
+        vmf.transfer(bob, amount);
+
+        // Should act like normal ERC20 transfer with no tax
+        assertEq(vmf.balanceOf(bob), amount, "full amount to recipient when tax disabled");
+        assertEq(vmf.balanceOf(team), 0, "no team tax when disabled");
+        assertEq(vmf.balanceOf(charity), 0, "no charity tax when disabled");
+        assertEq(vmf.balanceOf(alice), INITIAL_MINT - amount, "alice balance deducted normally");
     }
 }
