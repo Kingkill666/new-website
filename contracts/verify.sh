@@ -64,20 +64,16 @@ echo "Implementation address: $IMPLEMENTATION_ADDRESS"
 echo ""
 
 # Use the appropriate verification method based on API validation
-if [ "$USE_V2_API" = true ]; then
-    echo "Etherscan v2 API detected but Forge may have compatibility issues..."
-    echo "Falling back to Basescan direct API for better compatibility"
-    USE_V2_API=false
-fi
 
 if [ "$USE_V2_API" = true ]; then
     echo "Using Etherscan v2 multi-chain API for verification..."
-    # Use Etherscan v2 multi-chain API with the exact URL format from chainlist
+    # Use Etherscan v2 multi-chain API with proper chain ID
     forge verify-contract \
         $IMPLEMENTATION_ADDRESS \
         src/VMF.sol:VMF \
         --verifier etherscan \
-        --verifier-url "https://api.etherscan.io/v2/api?chainid=8453" \
+        --chain-id 8453 \
+        --verifier-url "https://api.etherscan.io/api" \
         --etherscan-api-key "$BASESCAN_API_KEY" \
         --watch
 else
@@ -87,6 +83,7 @@ else
         $IMPLEMENTATION_ADDRESS \
         src/VMF.sol:VMF \
         --verifier etherscan \
+        --chain-id 8453 \
         --verifier-url "https://api.basescan.org/api" \
         --etherscan-api-key "$BASESCAN_API_KEY" \
         --watch
