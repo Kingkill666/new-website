@@ -31,8 +31,13 @@ contract VMFTaxTest is Test {
 
     function test_TaxAppliedBasic() public {
         uint256 amount = 1_000 ether;
-        uint16 teamBps = 200;    // 2%
-        uint16 charityBps = 200; // 2%
+        uint8 teamBps = 200;    // 2%
+        uint8 charityBps = 200; // 2%
+        
+        // Set tax rates before transfer
+        vmf.setTeamRateBps(teamBps);
+        vmf.setCharityRateBps(charityBps);
+        
         uint256 expectedTeam = _tax(amount, teamBps);
         uint256 expectedCharity = _tax(amount, charityBps);
         uint256 expectedRecipient = amount - expectedTeam - expectedCharity;
@@ -85,6 +90,13 @@ contract VMFTaxTest is Test {
     }
 
     function test_MultipleTransfersAccumulateTaxes() public {
+        uint8 teamBps = 200;    // 2%
+        uint8 charityBps = 200; // 2%
+        
+        // Set tax rates before transfers
+        vmf.setTeamRateBps(teamBps);
+        vmf.setCharityRateBps(charityBps);
+        
         uint256 amount1 = 10_000 ether; // expected tax each side 200 bps => 200 ether
         uint256 amount2 = 20_000 ether; // expected each side 400 ether
 

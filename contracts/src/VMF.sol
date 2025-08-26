@@ -98,57 +98,48 @@ contract VMF is ERC20, UUPSUpgradeable, OwnableRoles {
         emit PriceOracleSet(newOracle);
     }
 
-    // Pending tax context for the current transfer being processed.
-    uint256 private _pendingTeam;
-    uint256 private _pendingCharity;
-    address private _pendingTo;
-    bool private _taxActive;
-
-    function _beforeTokenTransfer(address from, address to, uint256 amount) internal override {
-        if (from == address(0) || to == address(0) || amount == 0) return; // mint/burn/zero
-        if (_taxExempt.contains(from) || _taxExempt.contains(to)) return;   // exempt path
-        uint256 teamAmount = (amount * teamRateBps) / 10_000;
-        uint256 charityAmount = (amount * charityRateBps) / 10_000;
-        if (teamAmount + charityAmount == 0) return;
-        _pendingTeam = teamAmount;
-        _pendingCharity = charityAmount;
-        _pendingTo = to;
-        _taxActive = true;
+    // Simple tax implementation - override transfer functions directly
+    function transfer(address to, uint256 amount) public virtual override returns (bool) {
+        return _transferWithTax(msg.sender, to, amount);
     }
 
-    function _afterTokenTransfer(address, address to, uint256) internal override {
-        if (!_taxActive || to != _pendingTo) return;
-        _taxActive = false;
-        uint256 teamAmount = _pendingTeam;
-        uint256 charityAmount = _pendingCharity;
-        _pendingTeam = 0; _pendingCharity = 0; _pendingTo = address(0);
-        if (teamAmount + charityAmount == 0) return;
-        uint256 totalTax = teamAmount + charityAmount;
-        // Direct storage manipulation per Solady ERC20 layout.
-        // balance slot seed 0x87a211a2.
-        address recipient = to;
-        address charity = charityReceiver;
-        address team = teamReceiver;
-        uint256 TRANSFER_SIG = 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef;
-        assembly {
-            mstore(0x0c, 0x87a211a2)
-            mstore(0x00, recipient)
-            let rSlot := keccak256(0x0c, 0x20)
-            let rBal := sload(rSlot)
-            if lt(rBal, totalTax) { revert(0,0) }
-            sstore(rSlot, sub(rBal, totalTax))
-            // charity add
-            mstore(0x00, charity)
-            let cSlot := keccak256(0x0c, 0x20)
-            sstore(cSlot, add(sload(cSlot), charityAmount))
-            // team add
-            mstore(0x00, team)
-            let tSlot := keccak256(0x0c, 0x20)
-            sstore(tSlot, add(sload(tSlot), teamAmount))
-            // events
-            if charityAmount { mstore(0x20, charityAmount) log3(0x20,0x20,TRANSFER_SIG, recipient, charity) }
-            if teamAmount { mstore(0x20, teamAmount) log3(0x20,0x20,TRANSFER_SIG, recipient, team) }
+    function transferFrom(address from, address to, uint256 amount) public virtual override returns (bool) {
+        address spender = msg.sender;
+        _spendAllowance(from, spender, amount);
+        return _transferWithTax(from, to, amount);
+    }
+
+    function _transferWithTax(address from, address to, uint256 amount) internal returns (bool) {
+        // Skip tax for mint/burn or if either party is tax exempt
+        if (from == address(0) || to == address(0) || 
+            _taxExempt.contains(from) || _taxExempt.contains(to)) {
+            _transfer(from, to, amount);
+            return true;
         }
+
+        // Calculate taxes
+        uint256 teamTax = (amount * teamRateBps) / 10_000;
+        uint256 charityTax = (amount * charityRateBps) / 10_000;
+        uint256 totalTax = teamTax + charityTax;
+        
+        if (totalTax == 0) {
+            _transfer(from, to, amount);
+            return true;
+        }
+
+        // Transfer net amount to recipient
+        uint256 netAmount = amount - totalTax;
+        _transfer(from, to, netAmount);
+        
+        // Transfer taxes to respective receivers
+        if (teamTax > 0) {
+            _transfer(from, teamReceiver, teamTax);
+        }
+        if (charityTax > 0) {
+            _transfer(from, charityReceiver, charityTax);
+        }
+        
+        return true;
     }
 
     /**

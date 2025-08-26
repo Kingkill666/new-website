@@ -17,39 +17,25 @@ echo "=== Contract Verification Script ==="
 echo "This script verifies already deployed contracts on Base"
 echo ""
 
-# Try multiple API validation methods
-echo "Validating API key for multi-chain verification..."
+# Validate API key
+echo "Validating Etherscan v2 API key..."
 if [ -z "$BASESCAN_API_KEY" ]; then
     echo "ERROR: BASESCAN_API_KEY is not set in .env file"
     exit 1
 fi
 
-# Test with Etherscan v2 multi-chain API first
+# Test with Etherscan v2 multi-chain API
 echo "Testing Etherscan v2 multi-chain API..."
 API_TEST_V2=$(curl -s "https://api.etherscan.io/v2/api?chainid=8453&module=account&action=balance&address=0x0000000000000000000000000000000000000000&tag=latest&apikey=$BASESCAN_API_KEY")
 if echo "$API_TEST_V2" | grep -q '"status":"1"'; then
     echo "✓ Etherscan v2 multi-chain API key is valid"
-    USE_V2_API=true
 elif echo "$API_TEST_V2" | grep -q "Invalid API Key"; then
-    echo "⚠ Etherscan v2 API key invalid, trying Basescan direct API..."
-    USE_V2_API=false
-    
-    # Fallback to Basescan direct API
-    API_TEST=$(curl -s "https://api.basescan.org/api?module=account&action=balance&address=0x0000000000000000000000000000000000000000&tag=latest&apikey=$BASESCAN_API_KEY")
-    if echo "$API_TEST" | grep -q "Invalid API Key"; then
-        echo "ERROR: API key invalid for both Etherscan v2 and Basescan direct APIs"
-        echo "Please get a valid API key from:"
-        echo "- Etherscan (multi-chain): https://etherscan.io/apis"
-        echo "- Basescan (Base only): https://basescan.org/myapikey"
-        exit 1
-    elif echo "$API_TEST" | grep -q "result"; then
-        echo "✓ Basescan direct API key is valid"
-        USE_V2_API=false
-    fi
+    echo "ERROR: Invalid API key for Etherscan v2 API"
+    echo "Please get a valid API key from: https://etherscan.io/apis"
+    exit 1
 else
     echo "WARNING: Could not validate API key (network issue?)"
-    echo "Proceeding with v2 API..."
-    USE_V2_API=true
+    echo "Proceeding with verification..."
 fi
 echo ""
 
@@ -63,31 +49,16 @@ echo "Verifying VMF implementation contract..."
 echo "Implementation address: $IMPLEMENTATION_ADDRESS"
 echo ""
 
-# Use the appropriate verification method based on API validation
-
-if [ "$USE_V2_API" = true ]; then
-    echo "Using Etherscan v2 multi-chain API for verification..."
-    # Use Etherscan v2 multi-chain API with proper chain ID
-    forge verify-contract \
-        $IMPLEMENTATION_ADDRESS \
-        src/VMF.sol:VMF \
-        --verifier etherscan \
-        --chain-id 8453 \
-        --verifier-url "https://api.etherscan.io/api" \
-        --etherscan-api-key "$BASESCAN_API_KEY" \
-        --watch
-else
-    echo "Using Basescan direct API for verification..."
-    # Use Basescan direct API with basescan.org endpoint
-    forge verify-contract \
-        $IMPLEMENTATION_ADDRESS \
-        src/VMF.sol:VMF \
-        --verifier etherscan \
-        --chain-id 8453 \
-        --verifier-url "https://api.basescan.org/api" \
-        --etherscan-api-key "$BASESCAN_API_KEY" \
-        --watch
-fi
+# Use Etherscan v2 multi-chain API for verification
+echo "Using Etherscan v2 multi-chain API for verification..."
+forge verify-contract \
+    $IMPLEMENTATION_ADDRESS \
+    src/VMF.sol:VMF \
+    --verifier etherscan \
+    --chain-id 8453 \
+    --verifier-url "https://api.etherscan.io/api" \
+    --etherscan-api-key "$BASESCAN_API_KEY" \
+    --watch
 
 echo ""
 echo "=== Verification Complete ==="
