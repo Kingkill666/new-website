@@ -58,15 +58,39 @@ const VMF_ABI = [
  */
 export async function getVMFPriceFromOracle(provider: ethers.Provider): Promise<number> {
   try {
+    console.log("🔍 Testing VMF contract call...");
+    console.log("📍 Contract address:", VMF_CONTRACT_ADDRESS);
+    console.log("🌐 Provider network:", await provider.getNetwork());
+    
     // First check if oracle is set
     const vmfContract = new ethers.Contract(VMF_CONTRACT_ADDRESS, VMF_ABI, provider);
+    console.log("📋 Contract instance created");
+    
+    // Test with raw call first
+    try {
+      const rawResult = await provider.call({
+        to: VMF_CONTRACT_ADDRESS,
+        data: "0x2630c12f" // priceOracle() selector
+      });
+      console.log("🔧 Raw call result:", rawResult);
+    } catch (rawError) {
+      console.error("❌ Raw call failed:", rawError);
+    }
+    
     const oracleAddress = await vmfContract.priceOracle();
+    console.log("📍 Oracle address from contract call:", oracleAddress);
     
     if (oracleAddress === ethers.ZeroAddress) {
+      console.log("⚠️ No oracle set, using fallback price");
       // No oracle set, fall back to static multiple
-      const donationMultipleBps = await vmfContract.donationMultipleBps();
-      // Convert basis points to price (10000 bps = 1:1 ratio)
-      return Number(donationMultipleBps) / 10000;
+      try {
+        const donationMultipleBps = await vmfContract.donationMultipleBps();
+        // Convert basis points to price (10000 bps = 1:1 ratio)
+        return Number(donationMultipleBps) / 10000;
+      } catch (error) {
+        console.log("⚠️ donationMultipleBps not available, using 1:1 fallback");
+        return 1; // 1:1 fallback
+      }
     }
 
     // Oracle is set, get price from oracle
