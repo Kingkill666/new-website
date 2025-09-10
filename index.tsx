@@ -320,7 +320,7 @@ const Index = () => {
                 </Button>
 
                 {/* Compact Officers Club Button */}
-                <a href="https://pizza-party.vmfcoin.com/" target="_blank" rel="noopener noreferrer">
+                <a href="https://farcaster.xyz/miniapps/28-g7Plt7iqO/pizza-party" target="_blank" rel="noopener noreferrer">
                   <Button
                     className="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-1.5 text-xs shadow-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                     size="sm"
@@ -441,7 +441,7 @@ const Index = () => {
                   </Button>
 
                   {/* Mobile Officers Club Button */}
-                  <a href="https://pizza-party.vmfcoin.com/" target="_blank" rel="noopener noreferrer">
+                  <a href="https://farcaster.xyz/miniapps/28-g7Plt7iqO/pizza-party" target="_blank" rel="noopener noreferrer">
                     <Button
                       className="w-full bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-3 shadow-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                       size="sm"

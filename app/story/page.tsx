@@ -266,7 +266,7 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
                 >
                   BUY VMF
                 </Button>
-              <a href="https://pizza-party.vmfcoin.com/" target="_blank" rel="noopener noreferrer">
+              <a href="https://farcaster.xyz/miniapps/28-g7Plt7iqO/pizza-party" target="_blank" rel="noopener noreferrer">
               <Button
                     className="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-1.5 text-xs shadow-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                     size="sm"
@@ -351,7 +351,7 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
                   >
                     Buy VMF
                   </Button>
-                  <a href="https://pizza-party.vmfcoin.com/" target="_blank" rel="noopener noreferrer">
+                  <a href="https://farcaster.xyz/miniapps/28-g7Plt7iqO/pizza-party" target="_blank" rel="noopener noreferrer">
                     <Button
                       className="w-full bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-3 shadow-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                       size="sm"
