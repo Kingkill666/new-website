@@ -59,8 +59,13 @@ const VMF_ABI = [
 export async function getVMFPriceFromOracle(provider: ethers.Provider): Promise<number> {
   try {
     console.log("🔍 getVMFPriceFromOracle: Starting price fetch...");
+    console.log("🌐 Provider network:", await provider.getNetwork());
+    console.log("📍 VMF Contract Address:", VMF_CONTRACT_ADDRESS);
+    
     // First check if oracle is set
     const vmfContract = new ethers.Contract(VMF_CONTRACT_ADDRESS, VMF_ABI, provider);
+    console.log("📋 VMF Contract instance created");
+    
     const oracleAddress = await vmfContract.priceOracle();
     console.log("📍 getVMFPriceFromOracle: Oracle address:", oracleAddress);
     
@@ -123,7 +128,12 @@ export async function calculateVMFAmount(usdcAmount: number, provider: ethers.Pr
 export async function getPriceInfo(provider: ethers.Provider): Promise<{price: number, source: string}> {
   try {
     console.log("🔍 Getting price info from oracle...");
+    console.log("🌐 Provider network:", await provider.getNetwork());
+    console.log("📍 VMF Contract Address:", VMF_CONTRACT_ADDRESS);
+    
     const vmfContract = new ethers.Contract(VMF_CONTRACT_ADDRESS, VMF_ABI, provider);
+    console.log("📋 VMF Contract instance created");
+    
     const oracleAddress = await vmfContract.priceOracle();
     console.log("📍 Oracle address from VMF contract:", oracleAddress);
     
