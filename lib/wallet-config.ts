@@ -36,6 +36,17 @@ export const WALLETS: WalletInfo[] = [
     downloadUrl: "https://wallet.coinbase.com/",
   },
   {
+    id: "coinbaseSmart",
+    name: "Coinbase Smart Wallet",
+    icon: "🪙",
+    color: "bg-blue-600 hover:bg-blue-700",
+    description: "Smart wallet from Coinbase",
+    mobile: true,
+    deepLink: "coinbasewallet://",
+    universalLink: "https://wallet.coinbase.com/",
+    downloadUrl: "https://wallet.coinbase.com/",
+  },
+  {
     id: "trust",
     name: "Trust Wallet",
     icon: "🛡️",
@@ -197,6 +208,7 @@ export const getWalletProvider = (walletId: string): any => {
       case "metamask":
       return providers.find((p: any) => p.isMetaMask);
       case "coinbase":
+      case "coinbaseSmart":
       // Coinbase Wallet extension
       if (window.coinbaseWalletExtension) return window.coinbaseWalletExtension;
       return providers.find((p: any) => p.isCoinbaseWallet);
@@ -316,7 +328,7 @@ export const requestWalletConnection = async (walletId: string): Promise<any> =>
 
     let accounts: string[] = [];
 
-    if (walletId === "coinbase") {
+    if (walletId === "coinbase" || walletId === "coinbaseSmart") {
       // Use special Coinbase function to force fresh connection
       console.log("🟠 Using enhanced Coinbase connection method...")
       
@@ -375,7 +387,7 @@ export const requestWalletConnection = async (walletId: string): Promise<any> =>
           // Return the connection with the existing accounts
           const connection = {
             address: accounts[0],
-            chainId: 84532, // Base Sepolia
+            chainId: 8453, // Base mainnet
             walletName: getWalletDisplayName(walletId),
           }
           return connection
@@ -457,44 +469,44 @@ export const requestWalletConnection = async (walletId: string): Promise<any> =>
 
     console.log(`✅ Connected to ${getWalletDisplayName(walletId)}: ${accounts[0]} on chain ${chainIdNumber}`)
 
-    // Ensure we're on the correct network (Base Sepolia for testing)
-    if (chainIdNumber !== 84532) {
-      console.log(`🔄 Switching to Base Sepolia network (current: ${chainIdNumber})`)
+    // Ensure we're on the correct network (Base mainnet for production)
+    if (chainIdNumber !== 8453) {
+      console.log(`🔄 Switching to Base mainnet (current: ${chainIdNumber})`)
       try {
         await provider.request({
           method: 'wallet_switchEthereumChain',
-          params: [{ chainId: '0x14a34' }], // 84532 in hex
+          params: [{ chainId: '0x2105' }], // 8453 in hex
         })
-        console.log('✅ Switched to Base Sepolia network')
+        console.log('✅ Switched to Base mainnet')
       } catch (switchError: any) {
         if (switchError.code === 4902) {
           // Chain not added, add it
-          console.log('➕ Adding Base Sepolia network to wallet')
+          console.log('➕ Adding Base mainnet to wallet')
           await provider.request({
             method: 'wallet_addEthereumChain',
             params: [{
-              chainId: '0x14a34',
-              chainName: 'Base Sepolia',
+              chainId: '0x2105',
+              chainName: 'Base',
               nativeCurrency: {
                 name: 'Ethereum',
                 symbol: 'ETH',
                 decimals: 18,
               },
-              rpcUrls: ['https://sepolia.base.org'],
-              blockExplorerUrls: ['https://sepolia.basescan.org'],
+              rpcUrls: ['https://mainnet.base.org'],
+              blockExplorerUrls: ['https://basescan.org'],
             }],
           })
-          console.log('✅ Added Base Sepolia network')
+          console.log('✅ Added Base mainnet')
         } else {
           console.error('❌ Failed to switch network:', switchError)
-          throw new Error(`Please switch to Base Sepolia network in your ${getWalletDisplayName(walletId)}`)
+          throw new Error(`Please switch to Base network in your ${getWalletDisplayName(walletId)}`)
         }
       }
     }
 
     const connection = {
       address: accounts[0],
-      chainId: 84532, // Base Sepolia
+      chainId: 8453, // Base mainnet
       walletName: getWalletDisplayName(walletId),
     }
 
@@ -702,33 +714,33 @@ export const forceCoinbaseFreshConnection = async (provider: any): Promise<strin
       }
     }
 
-    // Step 5: Now switch back to Base Sepolia
-    console.log("🔄 Step 5: Switching back to Base Sepolia...")
+    // Step 5: Now switch back to Base mainnet
+    console.log("🔄 Step 5: Switching back to Base mainnet...")
     try {
       await provider.request({
         method: 'wallet_switchEthereumChain',
-        params: [{ chainId: '0x14a34' }] // Base Sepolia
+        params: [{ chainId: '0x2105' }] // Base mainnet
       })
-      console.log("✅ Switched back to Base Sepolia")
+      console.log("✅ Switched back to Base mainnet")
     } catch (switchError: any) {
       if (switchError.code === 4902) {
         // Chain not added, add it
-        console.log("➕ Adding Base Sepolia network to Coinbase")
+        console.log("➕ Adding Base mainnet to Coinbase")
         await provider.request({
           method: 'wallet_addEthereumChain',
           params: [{
-            chainId: '0x14a34',
-            chainName: 'Base Sepolia',
+            chainId: '0x2105',
+            chainName: 'Base',
             nativeCurrency: {
               name: 'Ethereum',
               symbol: 'ETH',
               decimals: 18,
             },
-            rpcUrls: ['https://sepolia.base.org'],
-            blockExplorerUrls: ['https://sepolia.basescan.org'],
+            rpcUrls: ['https://mainnet.base.org'],
+            blockExplorerUrls: ['https://basescan.org'],
           }],
         })
-        console.log("✅ Added Base Sepolia to Coinbase")
+        console.log("✅ Added Base mainnet to Coinbase")
       }
     }
 
