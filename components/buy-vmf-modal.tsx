@@ -347,12 +347,28 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     setNeedsNetworkSwitch(false)
   }
 
-  const handleBuyNext = () => {
+  const handleBuyNext = async () => {
     if (amount && selectedCharities.length > 0 && isConnected && getTotalPercentage() === 100) {
       if (needsNetworkSwitch) {
         alert("Please switch to the correct network to continue")
         return
       }
+      
+      // CRITICAL: Verify we're on Base mainnet before proceeding
+      try {
+        const provider = new ethers.BrowserProvider(window.ethereum)
+        const network = await provider.getNetwork()
+        if (network.chainId !== 8453n) {
+          alert(`❌ WRONG NETWORK! You are on chain ${network.chainId}. Please switch to Base mainnet (chainId 8453) to continue.`)
+          return
+        }
+        console.log("✅ Network verified: Base mainnet (8453)")
+      } catch (error) {
+        console.error("Failed to verify network:", error)
+        alert("Failed to verify network. Please ensure you're connected to Base mainnet.")
+        return
+      }
+      
       // For now, skip USDC balance check since we don't have it in the new wallet system
       setCurrentStep("verify")
     }
@@ -367,6 +383,16 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     try {
       setIsProcessing(true)
       const provider = new ethers.BrowserProvider(window.ethereum)
+      
+      // CRITICAL: Verify we're on Base mainnet before any transaction
+      const network = await provider.getNetwork()
+      if (network.chainId !== 8453n) {
+        alert(`❌ WRONG NETWORK! You are on chain ${network.chainId}. Please switch to Base mainnet (chainId 8453) before making any transactions.`)
+        setIsProcessing(false)
+        return false
+      }
+      
+      console.log("✅ Network verified: Base mainnet (8453)")
       const signer = await provider.getSigner()
       const contract = new ethers.Contract(
         CONTRACT_ADDRESS,
@@ -425,6 +451,21 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
   const handleVerifyConfirm = async () => {
     if (needsNetworkSwitch) {
       alert("Please switch to the correct network first")
+      return
+    }
+
+    // CRITICAL: Double-check network before final transaction
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum)
+      const network = await provider.getNetwork()
+      if (network.chainId !== 8453n) {
+        alert(`❌ WRONG NETWORK! You are on chain ${network.chainId}. Please switch to Base mainnet (chainId 8453) before confirming the transaction.`)
+        return
+      }
+      console.log("✅ Final network verification: Base mainnet (8453)")
+    } catch (error) {
+      console.error("Failed to verify network:", error)
+      alert("Failed to verify network. Please ensure you're connected to Base mainnet.")
       return
     }
 
