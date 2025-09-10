@@ -28,7 +28,7 @@ charity_addresses=(
 
 
 AMOUNT_VMF="1000000000000000000000"   # 1000 VMF in wei (assuming 18 decimals)
-POOL="0xfde8880eb05554a44f9a51e657b637ba733953082b28ea38fd95f0a6ed483414"
+POOL="0x9C83A203133B65982F35D1B00E8283C9fb518cb1"  # SushiSwap VMF/USDC pool
 
 DEPLOYED_FORWARDERS_FILE="deployed_forwarders.txt"
 echo -n "" > "$DEPLOYED_FORWARDERS_FILE" # Clear file before writing

@@ -1,10 +1,10 @@
-# Uniswap v4 Pool Deployment and Hook Integration
+# SushiSwap Pool Deployment and Oracle Integration
 
 ## Overview
 This project now automates the following workflow for a set of charity addresses:
 1. Deploys an `ERC20Forwarded` contract for each charity.
 2. Funds each forwarder contract with VMF tokens from the deployer.
-3. Each forwarder places a sell order for VMF against a known Uniswap v4 pool.
+3. Each forwarder places a sell order for VMF against the SushiSwap VMF/USDC pool.
 4. The deployed forwarder addresses are saved to `deployed_forwarders.txt` for later sweeping.
 
 ## Steps Performed
@@ -19,14 +19,14 @@ This project now automates the following workflow for a set of charity addresses
    - Transfers 1000 VMF from the deployer to each deployed forwarder contract.
 
 4. **Placing Sell Orders**
-   - Each forwarder contract calls its `sellVMF` method to place a sell order for 1000 VMF against the known Uniswap v4 pool.
+   - Each forwarder contract calls its `sellVMF` method to place a sell order for 1000 VMF against the SushiSwap VMF/USDC pool.
 
 5. **Saving Forwarder Addresses**
    - The script saves each charity and deployed forwarder address to `deployed_forwarders.txt` for later use.
 
 ## Next Steps
 - To sweep any remaining tokens from the forwarders to their charities, use the `sweep_forwarders.sh` script. This script reads `deployed_forwarders.txt` and calls `forwardAll()` on each forwarder contract.
-- No need to supply USDC or create new pools; use the existing pool address for sell orders.
+- No need to supply USDC or create new pools; use the existing SushiSwap pool address for sell orders.
 
 ## Notes
 - The main deployment script is `contracts/deploy_forwarder_and_uniswapv4.sh`.
@@ -36,4 +36,17 @@ This project now automates the following workflow for a set of charity addresses
 
 ---
 
-For future agents: This file summarizes the deployment and setup process. To continue, use the known pool addresses and interact with the pool contracts for swaps/sell orders.
+For future agents: This file summarizes the deployment and setup process. To continue, use the SushiSwap pool address (0x9C83A203133B65982F35D1B00E8283C9fb518cb1) and interact with the pool contracts for swaps/sell orders.
+
+## Oracle Setup
+
+To deploy and configure the price oracle with the SushiSwap pool:
+
+```bash
+./deploy_oracle.sh
+```
+
+This will:
+1. Deploy the UniswapV4PriceOracle contract with the SushiSwap pool address
+2. Set the oracle in the VMF contract to enable dynamic pricing
+3. Output the oracle address for future reference
