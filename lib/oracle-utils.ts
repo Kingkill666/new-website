@@ -60,7 +60,17 @@ export async function getVMFPriceFromOracle(provider: ethers.Provider): Promise<
   try {
     console.log("🔍 Testing VMF contract call...");
     console.log("📍 Contract address:", VMF_CONTRACT_ADDRESS);
-    console.log("🌐 Provider network:", await provider.getNetwork());
+    
+    // Check network - MUST be Base mainnet (chainId 8453)
+    const network = await provider.getNetwork();
+    console.log("🌐 Provider network:", network);
+    
+    if (network.chainId !== 8453n) {
+      console.error("❌ Wrong network! Expected Base mainnet (8453), got:", network.chainId);
+      throw new Error(`Wrong network. Expected Base mainnet (8453), got ${network.chainId}. Please switch to Base mainnet.`);
+    }
+    
+    console.log("✅ Network verified: Base mainnet");
     
     // First check if oracle is set
     const vmfContract = new ethers.Contract(VMF_CONTRACT_ADDRESS, VMF_ABI, provider);
@@ -136,6 +146,12 @@ export async function calculateVMFAmount(usdcAmount: number, provider: ethers.Pr
  */
 export async function getPriceInfo(provider: ethers.Provider): Promise<{price: number, source: string}> {
   try {
+    // Check network - MUST be Base mainnet (chainId 8453)
+    const network = await provider.getNetwork();
+    if (network.chainId !== 8453n) {
+      throw new Error(`Wrong network. Expected Base mainnet (8453), got ${network.chainId}. Please switch to Base mainnet.`);
+    }
+    
     const vmfContract = new ethers.Contract(VMF_CONTRACT_ADDRESS, VMF_ABI, provider);
     const oracleAddress = await vmfContract.priceOracle();
     
