@@ -66,15 +66,20 @@ contract UniswapV4PriceOracle {
         uint256 numerator;
         uint256 denominator;
         if (vmfIsToken0) {
-            // price = ratioX192 / 2^192
-            numerator = ratioX192 * 1e18 * (10**6); // scale by 1e18 and USDC decimals
-            denominator = (1 << 192) * (10**18); // adjust for VMF 18 decimals
+            // VMF is token0, USDC is token1
+            // price = (ratioX192 / 2^192) * (10^6 / 10^18) * 1e18
+            // price = (ratioX192 / 2^192) * (1 / 10^12) * 1e18
+            // price = (ratioX192 * 1e18) / (2^192 * 10^12)
+            numerator = ratioX192 * 1e18;
+            denominator = (1 << 192) * (10**12); // 2^192 * 10^12
             priceE18 = numerator / denominator;
         } else {
-            // need inverse: (2^192 / ratioX192)
-            numerator = (1 << 192) * (10**6);
-            numerator = numerator * 1e18;
-            denominator = ratioX192 * (10**18);
+            // VMF is token1, USDC is token0
+            // price = (2^192 / ratioX192) * (10^6 / 10^18) * 1e18
+            // price = (2^192 / ratioX192) * (1 / 10^12) * 1e18
+            // price = (2^192 * 1e18) / (ratioX192 * 10^12)
+            numerator = (1 << 192) * 1e18;
+            denominator = ratioX192 * (10**12); // ratioX192 * 10^12
             priceE18 = numerator / denominator;
         }
     }
