@@ -58,26 +58,36 @@ const VMF_ABI = [
  */
 export async function getVMFPriceFromOracle(provider: ethers.Provider): Promise<number> {
   try {
+    console.log("🔍 getVMFPriceFromOracle: Starting price fetch...");
     // First check if oracle is set
     const vmfContract = new ethers.Contract(VMF_CONTRACT_ADDRESS, VMF_ABI, provider);
     const oracleAddress = await vmfContract.priceOracle();
+    console.log("📍 getVMFPriceFromOracle: Oracle address:", oracleAddress);
     
     if (oracleAddress === ethers.ZeroAddress) {
+      console.log("⚠️ getVMFPriceFromOracle: No oracle set, using static multiple");
       // No oracle set, fall back to static multiple
       const donationMultipleBps = await vmfContract.donationMultipleBps();
       // Convert basis points to price (10000 bps = 1:1 ratio)
-      return Number(donationMultipleBps) / 10000;
+      const price = Number(donationMultipleBps) / 10000;
+      console.log("💰 getVMFPriceFromOracle: Static price:", price);
+      return price;
     }
 
     // Oracle is set, get price from oracle
+    console.log("✅ getVMFPriceFromOracle: Oracle is set, fetching price...");
     const oracleContract = new ethers.Contract(oracleAddress, ORACLE_ABI, provider);
     const priceE18 = await oracleContract.spotPriceUSDCPerVMF();
+    console.log("💰 getVMFPriceFromOracle: Raw price (E18):", priceE18.toString());
     
     // Convert from 1e18 scale to actual price
-    return Number(ethers.formatEther(priceE18));
+    const price = Number(ethers.formatEther(priceE18));
+    console.log("💰 getVMFPriceFromOracle: Formatted price:", price);
+    return price;
   } catch (error) {
-    console.error("Error fetching VMF price from oracle:", error);
+    console.error("❌ getVMFPriceFromOracle: Error fetching VMF price from oracle:", error);
     // Fallback to 1:1 ratio if oracle fails
+    console.log("⚠️ getVMFPriceFromOracle: Using fallback price of 1");
     return 1;
   }
 }
@@ -112,10 +122,13 @@ export async function calculateVMFAmount(usdcAmount: number, provider: ethers.Pr
  */
 export async function getPriceInfo(provider: ethers.Provider): Promise<{price: number, source: string}> {
   try {
+    console.log("🔍 Getting price info from oracle...");
     const vmfContract = new ethers.Contract(VMF_CONTRACT_ADDRESS, VMF_ABI, provider);
     const oracleAddress = await vmfContract.priceOracle();
+    console.log("📍 Oracle address from VMF contract:", oracleAddress);
     
     if (oracleAddress === ethers.ZeroAddress) {
+      console.log("⚠️ No oracle set, using static multiple");
       // No oracle set, using static multiple
       const donationMultipleBps = await vmfContract.donationMultipleBps();
       const price = Number(donationMultipleBps) / 10000;
@@ -123,13 +136,16 @@ export async function getPriceInfo(provider: ethers.Provider): Promise<{price: n
     }
 
     // Oracle is set, get price from oracle
+    console.log("✅ Oracle is set, getting price from oracle contract");
     const oracleContract = new ethers.Contract(oracleAddress, ORACLE_ABI, provider);
     const priceE18 = await oracleContract.spotPriceUSDCPerVMF();
     const price = Number(ethers.formatEther(priceE18));
+    console.log("💰 Oracle price (E18):", priceE18.toString());
+    console.log("💰 Oracle price (formatted):", price);
     
     return { price, source: "Fixed Price Oracle" };
   } catch (error) {
-    console.error("Error getting price info:", error);
+    console.error("❌ Error getting price info:", error);
     return { price: 1, source: "Fallback" };
   }
 }
