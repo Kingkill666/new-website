@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 
 // Contract addresses
 const VMF_CONTRACT_ADDRESS = "0x2213414893259b0C48066Acd1763e7fbA97859E5";
-const ORACLE_ADDRESS = "0xAB54d27d1fAC30a36B5013015bb4213ce930235C"; // Updated to SimplePriceOracle
+const FIXED_PRICE_ORACLE_ADDRESS = "0x9444b5Cf6f89ab72C6173bF0dd13c7F7bec809D2";
 
 // Oracle ABI for reading price
 const ORACLE_ABI = [
@@ -74,15 +74,7 @@ export async function getVMFPriceFromOracle(provider: ethers.Provider): Promise<
     const priceE18 = await oracleContract.spotPriceUSDCPerVMF();
     
     // Convert from 1e18 scale to actual price
-    const price = Number(ethers.formatEther(priceE18));
-    
-    // If price is too small (less than 0.000001), use a reasonable fallback
-    if (price < 0.000001) {
-      console.warn("Oracle price too small, using fallback:", price);
-      return 0.01; // 1 cent per VMF as fallback
-    }
-    
-    return price;
+    return Number(ethers.formatEther(priceE18));
   } catch (error) {
     console.error("Error fetching VMF price from oracle:", error);
     // Fallback to 1:1 ratio if oracle fails
@@ -135,13 +127,7 @@ export async function getPriceInfo(provider: ethers.Provider): Promise<{price: n
     const priceE18 = await oracleContract.spotPriceUSDCPerVMF();
     const price = Number(ethers.formatEther(priceE18));
     
-    // If price is too small, use fallback
-    if (price < 0.000001) {
-      console.warn("Oracle price too small, using fallback:", price);
-      return { price: 0.01, source: "Oracle (Fallback)" };
-    }
-    
-    return { price, source: "SushiSwap Oracle" };
+    return { price, source: "Fixed Price Oracle" };
   } catch (error) {
     console.error("Error getting price info:", error);
     return { price: 1, source: "Fallback" };
