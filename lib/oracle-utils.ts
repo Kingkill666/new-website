@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 // Contract addresses
 const VMF_CONTRACT_ADDRESS = "0x2213414893259b0C48066Acd1763e7fbA97859E5";
 const FIXED_PRICE_ORACLE_ADDRESS = "0x9444b5Cf6f89ab72C6173bF0dd13c7F7bec809D2";
-const SUSHISWAP_ORACLE_ADDRESS = "0x12921C6F353eBDf146e0739512e913F05d4D1a73"; // Real-time SushiSwap oracle
+const SUSHISWAP_ORACLE_ADDRESS = "0xbc1ca9747EEC751FA7cD687A6495E09A632be8D1"; // Corrected SushiSwap oracle
 
 // Oracle ABI for reading price
 const ORACLE_ABI = [
