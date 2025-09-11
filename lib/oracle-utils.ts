@@ -3,6 +3,7 @@ import { ethers } from "ethers";
 // Contract addresses
 const VMF_CONTRACT_ADDRESS = "0x2213414893259b0C48066Acd1763e7fbA97859E5";
 const FIXED_PRICE_ORACLE_ADDRESS = "0x9444b5Cf6f89ab72C6173bF0dd13c7F7bec809D2";
+const SUSHISWAP_ORACLE_ADDRESS = "0x5CAc8337F02700C8D227a99421B0de4BeB85A1b4";
 
 // Oracle ABI for reading price
 const ORACLE_ABI = [
@@ -14,6 +15,24 @@ const ORACLE_ABI = [
         "internalType": "uint256",
         "name": "priceE18",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "validateOracle",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "isValid",
+        "type": "bool"
+      },
+      {
+        "internalType": "string",
+        "name": "reason",
+        "type": "string"
       }
     ],
     "stateMutability": "view",
@@ -192,9 +211,99 @@ export async function getPriceInfo(provider: ethers.Provider): Promise<{price: n
     const priceE18 = await oracleContract.spotPriceUSDCPerVMF();
     const price = Number(ethers.formatEther(priceE18));
     
-    return { price, source: "Fixed Price Oracle" };
+    // Determine oracle source based on address
+    let source = "Unknown Oracle";
+    if (oracleAddress.toLowerCase() === FIXED_PRICE_ORACLE_ADDRESS.toLowerCase()) {
+      source = "Fixed Price Oracle";
+    } else if (oracleAddress.toLowerCase() === SUSHISWAP_ORACLE_ADDRESS.toLowerCase()) {
+      source = "SushiSwap V3 Oracle";
+    } else {
+      source = `Oracle (${oracleAddress.slice(0, 6)}...)`;
+    }
+    
+    return { price, source };
   } catch (error) {
     console.error("Error getting price info:", error);
     return { price: 1, source: "Fallback" };
+  }
+}
+
+/**
+ * Get detailed oracle information including validation status
+ * @param provider - Ethers provider instance
+ * @returns Promise<{oracleAddress: string, price: number, source: string, isValid: boolean, reason: string}> - Detailed oracle info
+ */
+export async function getOracleInfo(provider: ethers.Provider): Promise<{
+  oracleAddress: string;
+  price: number;
+  source: string;
+  isValid: boolean;
+  reason: string;
+}> {
+  try {
+    // Check network - MUST be Base mainnet (chainId 8453)
+    const network = await provider.getNetwork();
+    if (network.chainId !== 8453n) {
+      throw new Error(`Wrong network. Expected Base mainnet (8453), got ${network.chainId}. Please switch to Base mainnet.`);
+    }
+    
+    const vmfContract = new ethers.Contract(VMF_CONTRACT_ADDRESS, VMF_ABI, provider);
+    const oracleAddress = await vmfContract.priceOracle();
+    
+    if (oracleAddress === ethers.ZeroAddress) {
+      return {
+        oracleAddress: "0x0000000000000000000000000000000000000000",
+        price: 1,
+        source: "No Oracle Set",
+        isValid: false,
+        reason: "No oracle configured"
+      };
+    }
+
+    // Get price from oracle
+    const oracleContract = new ethers.Contract(oracleAddress, ORACLE_ABI, provider);
+    const priceE18 = await oracleContract.spotPriceUSDCPerVMF();
+    const price = Number(ethers.formatEther(priceE18));
+    
+    // Determine oracle source based on address
+    let source = "Unknown Oracle";
+    if (oracleAddress.toLowerCase() === FIXED_PRICE_ORACLE_ADDRESS.toLowerCase()) {
+      source = "Fixed Price Oracle";
+    } else if (oracleAddress.toLowerCase() === SUSHISWAP_ORACLE_ADDRESS.toLowerCase()) {
+      source = "SushiSwap V3 Oracle";
+    } else {
+      source = `Oracle (${oracleAddress.slice(0, 6)}...)`;
+    }
+    
+    // Try to validate oracle (if it has validation function)
+    let isValid = true;
+    let reason = "Oracle is valid";
+    
+    try {
+      const [isValidResult, reasonResult] = await oracleContract.validateOracle();
+      isValid = isValidResult;
+      reason = reasonResult;
+    } catch (validationError) {
+      // Oracle doesn't have validation function, assume it's valid if we got a price
+      isValid = price > 0;
+      reason = isValid ? "Oracle working (no validation function)" : "Oracle returned invalid price";
+    }
+    
+    return {
+      oracleAddress,
+      price,
+      source,
+      isValid,
+      reason
+    };
+  } catch (error) {
+    console.error("Error getting oracle info:", error);
+    return {
+      oracleAddress: "0x0000000000000000000000000000000000000000",
+      price: 1,
+      source: "Error",
+      isValid: false,
+      reason: error instanceof Error ? error.message : "Unknown error"
+    };
   }
 }
