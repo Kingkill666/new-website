@@ -87,8 +87,20 @@ export async function getVMFPriceFromOracle(provider: ethers.Provider): Promise<
       console.error("❌ Raw call failed:", rawError);
     }
     
-    const oracleAddress = await vmfContract.priceOracle();
-    console.log("📍 Oracle address from contract call:", oracleAddress);
+    // Test contract method call with detailed error handling
+    let oracleAddress;
+    try {
+      oracleAddress = await vmfContract.priceOracle();
+      console.log("📍 Oracle address from contract call:", oracleAddress);
+    } catch (contractError) {
+      console.error("❌ Contract method call failed:", contractError);
+      console.error("❌ Error details:", {
+        message: contractError.message,
+        code: contractError.code,
+        data: contractError.data
+      });
+      throw contractError;
+    }
     
     if (oracleAddress === ethers.ZeroAddress) {
       console.log("⚠️ No oracle set, using fallback price");
@@ -153,7 +165,20 @@ export async function getPriceInfo(provider: ethers.Provider): Promise<{price: n
     }
     
     const vmfContract = new ethers.Contract(VMF_CONTRACT_ADDRESS, VMF_ABI, provider);
-    const oracleAddress = await vmfContract.priceOracle();
+    
+    let oracleAddress;
+    try {
+      oracleAddress = await vmfContract.priceOracle();
+      console.log("📍 Oracle address from getPriceInfo:", oracleAddress);
+    } catch (contractError) {
+      console.error("❌ Contract method call failed in getPriceInfo:", contractError);
+      console.error("❌ Error details:", {
+        message: contractError.message,
+        code: contractError.code,
+        data: contractError.data
+      });
+      throw contractError;
+    }
     
     if (oracleAddress === ethers.ZeroAddress) {
       // No oracle set, using static multiple
