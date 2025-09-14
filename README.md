@@ -36,3 +36,4 @@ Continue building your app on:
 - See `AGENT_README.md` for operational runbooks, including:
 	- Burning proxy owner (renounceOwnership) to avoid honeypot flags
 	- Disabling upgrades while keeping contract ownership (preferred)
+	- Admin role: delegate owner-like ops (incl. role management) while keeping upgrades owner-only

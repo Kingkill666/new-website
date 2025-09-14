@@ -147,6 +147,7 @@ forge script contracts/script/AdminRoles.s.sol:RevokeAdminRole \
 ```
 
 Notes
+- Admin can now grant/revoke roles in VMF (owner or `ADMIN_ROLE`).
 - Admin cannot upgrade or disable/enable the upgrade fuse — those remain owner-only.
 - You can combine `ROLE_ADMIN` with other roles as needed (e.g., `ROLE_SET_TAX`).
 
@@ -161,6 +162,11 @@ cast send --rpc-url "$BASE_RPC_URL" --private-key "$PRIVATE_KEY" \
 
 # Verify roles bitmask (non-zero indicates some role(s) set)
 cast call --rpc-url "$BASE_RPC_URL" $PROXY_ADDRESS 'rolesOf(address)(uint256)' $ADMIN_ADDRESS
+
+# As admin, grant another role (example: ROLE_SET_TAX)
+ROLE_SET_TAX=$(cast call --rpc-url "$BASE_RPC_URL" $PROXY_ADDRESS 'rolesOf(address)(uint256)' 0x0000000000000000000000000000000000000000 >/dev/null 2>&1; echo $((1<<0)))
+cast send --rpc-url "$BASE_RPC_URL" --private-key "$PRIVATE_KEY" \
+  $PROXY_ADDRESS 'grantRoles(address,uint256)' 0xAnotherAddress $ROLE_SET_TAX -vvvv
 ```
 
 Function reference for ops (admin-capable)

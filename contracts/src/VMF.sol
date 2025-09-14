@@ -169,6 +169,27 @@ contract VMF is ERC20, UUPSUpgradeable, OwnableRoles {
         _;
     }
 
+    // Allow ADMIN_ROLE to manage roles alongside owner.
+    function grantRoles(address user, uint256 roles)
+        public
+        payable
+        virtual
+        override
+        onlyOwnerOrRoles(ROLE_ADMIN)
+    {
+        _grantRoles(user, roles);
+    }
+
+    function revokeRoles(address user, uint256 roles)
+        public
+        payable
+        virtual
+        override
+        onlyOwnerOrRoles(ROLE_ADMIN)
+    {
+        _removeRoles(user, roles);
+    }
+
     /// @dev Permanently disable upgrades (one-way fuse). Owner remains for operational controls.
     function disableUpgrades() external onlyOwner {
         require(!upgradesDisabled, "VMF: upgrades already disabled");
@@ -389,3 +410,4 @@ contract VMF is ERC20, UUPSUpgradeable, OwnableRoles {
     /// @dev Emitted when a batch donation is made
     event BatchDonation(address indexed donor, address indexed recipient, uint256 amount);
 }
+
