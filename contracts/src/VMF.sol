@@ -34,14 +34,19 @@ contract VMF is ERC20, UUPSUpgradeable, OwnableRoles {
     uint256 internal constant ROLE_SET_TAX = _ROLE_0;
     uint256 internal constant ROLE_SET_CHARITY = _ROLE_1;
     uint256 internal constant ROLE_MINTER = _ROLE_2;
+    uint256 internal constant ROLE_ADMIN = _ROLE_3; // can perform owner ops except upgrades
+    function ADMIN_ROLE() external pure returns (uint256) { return ROLE_ADMIN; }
 
     uint256 public donationPool = 1_000_000e18; // running total amount of wei-tokens to be allocated to charity
     uint256 donationMultipleBps = 10_000; // multiple of USDC amount to mint VMF tokens
 
     // Optional on-chain price oracle (Uniswap v4 pool wrapper) returning USDC per VMF scaled 1e18.
     address public priceOracle; // if set (!=0) overrides donationMultipleBps logic
+    // One-way fuse to permanently disable upgrades while keeping contract ownership for ops.
+    bool public upgradesDisabled;
 
     event PriceOracleSet(address indexed oracle);
+    event UpgradesDisabled();
 
     /// @dev Initializes the contract. Can only be called once.
     function initialize(
@@ -97,14 +102,14 @@ contract VMF is ERC20, UUPSUpgradeable, OwnableRoles {
     event TeamRateBpsChanged(uint8 oldRate, uint8 newRate);
     event TaxEnabledChanged(bool enabled);
 
-    function setPriceOracle(address newOracle) external onlyOwner {
+    function setPriceOracle(address newOracle) external onlyOwnerOrRoles(ROLE_ADMIN) {
         priceOracle = newOracle; // allow setting to zero to disable
         emit PriceOracleSet(newOracle);
     }
 
     /// @notice Enable or disable tax collection globally
     /// @dev Restricted to owner only. When disabled, all transfers act like normal ERC20
-    function setTaxEnabled(bool enabled) external onlyOwner {
+    function setTaxEnabled(bool enabled) external onlyOwnerOrRoles(ROLE_ADMIN) {
         taxEnabled = enabled;
         emit TaxEnabledChanged(enabled);
     }
@@ -164,9 +169,18 @@ contract VMF is ERC20, UUPSUpgradeable, OwnableRoles {
         _;
     }
 
+    /// @dev Permanently disable upgrades (one-way fuse). Owner remains for operational controls.
+    function disableUpgrades() external onlyOwner {
+        require(!upgradesDisabled, "VMF: upgrades already disabled");
+        upgradesDisabled = true;
+        emit UpgradesDisabled();
+    }
+
     /// @dev Authorizes an upgrade to a new implementation.
-    /// Only the owner can authorize upgrades.
-    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
+    /// Only the owner can authorize upgrades and only if upgrades are not disabled.
+    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {
+        require(!upgradesDisabled, "VMF: upgrades disabled");
+    }
 
     function name() public view virtual override returns (string memory) {
         return "VMF";
@@ -218,7 +232,7 @@ contract VMF is ERC20, UUPSUpgradeable, OwnableRoles {
     
     event MinterChanged(address newMinter);
 
-    function setTeamAddress(address payable newTeam) external onlyOwnerOrRoles(ROLE_SET_TAX) {
+    function setTeamAddress(address payable newTeam) external onlyOwnerOrRoles(ROLE_SET_TAX | ROLE_ADMIN) {
         require(
             newTeam != address(0),
             "VMF: new team is the zero address"
@@ -229,7 +243,7 @@ contract VMF is ERC20, UUPSUpgradeable, OwnableRoles {
 
     event TeamChanged(address newTeam);
     
-    function setCharityPoolAddress(address payable newPool) external onlyOwnerOrRoles(ROLE_SET_TAX) {
+    function setCharityPoolAddress(address payable newPool) external onlyOwnerOrRoles(ROLE_SET_TAX | ROLE_ADMIN) {
         require(
             newPool!= address(0),
             "VMF: new pool is the zero address"
@@ -240,7 +254,7 @@ contract VMF is ERC20, UUPSUpgradeable, OwnableRoles {
 
     event CharityPoolAddressChanged(address newPool);
     
-    function addAllowedReceivers(address payable newCharity) external onlyOwnerOrRoles(ROLE_SET_CHARITY) {
+    function addAllowedReceivers(address payable newCharity) external onlyOwnerOrRoles(ROLE_SET_CHARITY | ROLE_ADMIN) {
         require(
             newCharity != address(0),
             "VMF: new receiver is the zero address"
@@ -249,7 +263,7 @@ contract VMF is ERC20, UUPSUpgradeable, OwnableRoles {
         emit ReceiverAdded(newCharity);
     }
 
-    function removeAllowedReceivers(address payable oldCharity) external onlyOwnerOrRoles(ROLE_SET_CHARITY) {
+    function removeAllowedReceivers(address payable oldCharity) external onlyOwnerOrRoles(ROLE_SET_CHARITY | ROLE_ADMIN) {
         _allowedReceivers.remove(oldCharity);
         emit ReceiverRemoved(oldCharity);
     }
@@ -257,7 +271,7 @@ contract VMF is ERC20, UUPSUpgradeable, OwnableRoles {
     event ReceiverRemoved(address newPool);
     event ReceiverAdded(address newPool);
 
-    function addAllowedTaxExempt(address payable newTaxExempt) external onlyOwnerOrRoles(ROLE_SET_TAX) {
+    function addAllowedTaxExempt(address payable newTaxExempt) external onlyOwnerOrRoles(ROLE_SET_TAX | ROLE_ADMIN) {
         require(
             newTaxExempt != address(0),
             "VMF: new tax exempt is the zero address"
@@ -266,7 +280,7 @@ contract VMF is ERC20, UUPSUpgradeable, OwnableRoles {
         emit TaxExemptAdded(newTaxExempt);
     }
 
-    function removeAllowedTaxExempt(address payable oldTaxExempt) external onlyOwnerOrRoles(ROLE_SET_TAX) {
+    function removeAllowedTaxExempt(address payable oldTaxExempt) external onlyOwnerOrRoles(ROLE_SET_TAX | ROLE_ADMIN) {
         _taxExempt.remove(oldTaxExempt);
         emit TaxExemptRemoved(oldTaxExempt);
     }
@@ -274,11 +288,11 @@ contract VMF is ERC20, UUPSUpgradeable, OwnableRoles {
     event TaxExemptRemoved(address newPool);
     event TaxExemptAdded(address newPool);
 
-    function updateDonationPool(uint256 setDonationPool) external onlyOwnerOrRoles(ROLE_SET_TAX) {
+    function updateDonationPool(uint256 setDonationPool) external onlyOwnerOrRoles(ROLE_SET_TAX | ROLE_ADMIN) {
         donationPool = setDonationPool;
         emit DonationPoolChanged(setDonationPool);
     }
-    function updateDonationMultipleBps(uint256 newDonationMultipleBps) external onlyOwnerOrRoles(ROLE_SET_TAX) {
+    function updateDonationMultipleBps(uint256 newDonationMultipleBps) external onlyOwnerOrRoles(ROLE_SET_TAX | ROLE_ADMIN) {
         donationMultipleBps = newDonationMultipleBps;
         emit DonationMultipleBpsChanged(donationMultipleBps);
     }

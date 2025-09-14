@@ -30,3 +30,9 @@ Continue building your app on:
 4. Vercel deploys the latest version from this repository
 5. To find LocalHost type in new terminnal: npm run dev
 6. 
+
+## Agent Ops
+
+- See `AGENT_README.md` for operational runbooks, including:
+	- Burning proxy owner (renounceOwnership) to avoid honeypot flags
+	- Disabling upgrades while keeping contract ownership (preferred)
