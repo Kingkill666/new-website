@@ -11,7 +11,7 @@ export PROXY_ADDRESS="0x2213414893259b0C48066Acd1763e7fbA97859E5"
 
 # You'll need to set the implementation address after upgrade
 # Check the upgrade transaction or logs to get this address
-export IMPLEMENTATION_ADDRESS=0x6D4C02b6D00A4f7dfad6F554eD59e8CB976FB069
+export IMPLEMENTATION_ADDRESS=0x7857F9C0dDCc07bBf52E96B8A3BeB14ECCff56BE
 
 echo "=== Contract Verification Script ==="
 echo "This script verifies already deployed contracts on Base"
