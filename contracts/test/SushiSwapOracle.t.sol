@@ -2,7 +2,7 @@
 pragma solidity ^0.8.23;
 
 import "forge-std/Test.sol";
-import "../src/SushiSwapV3PriceOracle.sol";
+import "../src/SushiSwapV3PriceOracleFixed.sol";
 
 /// @title SushiSwapOracleTest
 /// @notice Tests for SushiSwap V3 Price Oracle validation
@@ -16,14 +16,14 @@ contract SushiSwapOracleTest is Test {
     uint256 constant MIN_PRICE_USDC_PER_VMF = 0.001e18; // 0.001 USDC per VMF (scaled to 1e18)
     uint256 constant MAX_PRICE_USDC_PER_VMF = 0.01e18;  // 0.01 USDC per VMF (scaled to 1e18)
     
-    SushiSwapV3PriceOracle public oracle;
+    SushiSwapV3PriceOracleFixed public oracle;
     
     function setUp() public {
         // Deploy oracle on Base mainnet
         vm.createSelectFork("https://mainnet.base.org");
         
-        // Deploy the oracle contract
-        oracle = new SushiSwapV3PriceOracle(SUSHISWAP_POOL, VMF_ADDRESS, USDC_ADDRESS);
+    // Deploy the fixed oracle contract
+    oracle = new SushiSwapV3PriceOracleFixed(SUSHISWAP_POOL, VMF_ADDRESS, USDC_ADDRESS);
         
         console.log("=== SushiSwap Oracle Test Setup ===");
         console.log("VMF Address:", VMF_ADDRESS);
