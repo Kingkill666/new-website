@@ -57,8 +57,15 @@ forge script contracts/script/Upgrade.s.sol:UpgradeScript \
   --private-key "$PRIVATE_KEY" \
   --broadcast \
   --verify \
+  --verifier etherscan \
+  --chain-id 8453 \
+  --verifier-url "https://api.etherscan.io/api" \
   --etherscan-api-key "$BASESCAN_API_KEY" \
   -vvvv
+
+# ⚠️ IMPORTANT: If verification fails with "Invalid API Key" or "Not Found"
+# The old Etherscan v1 endpoint has been REMOVED. Use the commands above with 
+# --verifier-url "https://api.etherscan.io/api" for v2 multi-chain API
 
 # Verify post-upgrade
 cast call --rpc-url "$BASE_RPC_URL" $PROXY_ADDRESS 'owner()(address)'

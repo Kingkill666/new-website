@@ -104,6 +104,7 @@ cast logs --from-block 16000000 --to-block latest \
 | `migrate-holders.sh` | Migrate holders to existing contract | NEW_VMF_ADDRESS |
 | `update-holders.sh` | Update holders.json with latest balances | BASE_RPC_URL |
 | `fetch-all-holders.sh` | Comprehensive holder discovery | BASESCAN_API_KEY (optional) |
+| `test-api-key.sh` | Validate Etherscan v2 API key compatibility | BASESCAN_API_KEY |
 
 ## Contract Architecture
 
@@ -137,10 +138,27 @@ anvil
 ```
 
 ### Verification
+
+**⚠️ CRITICAL: Etherscan v1 API Deprecated**
+The old Etherscan v1 endpoint has been removed. You MUST use the v2 multi-chain API.
+
 ```bash
-# Verify on BaseScan
+# ❌ DEPRECATED - This will fail:
+# forge verify-contract --etherscan-api-key $API_KEY --chain base
+
+# ✅ CORRECT - Use Etherscan v2 multi-chain API:
 forge verify-contract <address> VMF \
-  --chain base \
+  --verifier etherscan \
+  --chain-id 8453 \
+  --verifier-url "https://api.etherscan.io/api" \
+  --etherscan-api-key "$BASESCAN_API_KEY" \
+  --constructor-args $(cast abi-encode "constructor(address,address)" $USDC_ADDRESS $INITIAL_OWNER)
+
+# Alternative: Use BaseScan directly (also works)
+forge verify-contract <address> VMF \
+  --verifier etherscan \
+  --verifier-url "https://api.basescan.org/api" \
+  --etherscan-api-key "$BASESCAN_API_KEY" \
   --constructor-args $(cast abi-encode "constructor(address,address)" $USDC_ADDRESS $INITIAL_OWNER)
 ```
 
@@ -149,9 +167,14 @@ forge verify-contract <address> VMF \
 ### Common Issues
 
 1. **RPC Errors:** Base RPC can be unstable, use multiple endpoints
-2. **Holder Discovery:** Static lists miss traders, use indexer APIs
+2. **Holder Discovery:** Static lists miss traders, use indexer APIs  
 3. **Migration Failures:** Check gas limits and nonce management
-4. **Verification Issues:** Ensure exact constructor parameters
+4. **Verification Issues:** 
+   - **CRITICAL:** Etherscan v1 API deprecated - use v2 multi-chain API
+   - Ensure exact constructor parameters
+   - Use `--verifier-url "https://api.etherscan.io/api"` for Etherscan v2
+   - Alternative: Use BaseScan API directly with `--verifier-url "https://api.basescan.org/api"`
+   - If you get "Invalid API Key" errors, your key may be v1-only (get new v2 key)
 
 ### Debugging Commands
 ```bash
@@ -181,3 +204,46 @@ cast send $VMF_ADDRESS "setTaxRate(uint256)" $NEW_RATE \
   --private-key $PRIVATE_KEY \
   --rpc-url $BASE_RPC_URL
 ```
+
+## Verification Guide
+
+### Etherscan v1 API Deprecation Notice
+
+**🚨 BREAKING CHANGE:** Etherscan removed their v1 API endpoint in late 2024. All verification must now use the v2 multi-chain API.
+
+### Symptoms of Using Deprecated v1 Endpoint:
+- `Invalid API Key provided` errors
+- `Not Found` responses during verification
+- Verification hanging indefinitely
+
+### Solution: Use v2 Multi-Chain API
+
+**Method 1: Etherscan v2 Multi-Chain (Recommended)**
+```bash
+forge verify-contract $CONTRACT_ADDRESS VMF \
+  --verifier etherscan \
+  --chain-id 8453 \
+  --verifier-url "https://api.etherscan.io/api" \
+  --etherscan-api-key "$BASESCAN_API_KEY"
+```
+
+**Method 2: BaseScan Direct (Alternative)**
+```bash  
+forge verify-contract $CONTRACT_ADDRESS VMF \
+  --verifier etherscan \
+  --verifier-url "https://api.basescan.org/api" \
+  --etherscan-api-key "$BASESCAN_API_KEY"
+```
+
+### API Key Requirements:
+- Must be generated from [etherscan.io/apis](https://etherscan.io/apis)
+- v2 multi-chain API keys work for all EVM chains
+- Old v1-only keys will not work
+
+### Testing Your API Key:
+```bash
+# Test v2 API compatibility
+curl -s "https://api.etherscan.io/v2/api?chainid=8453&module=account&action=balance&address=0x0000000000000000000000000000000000000000&tag=latest&apikey=$BASESCAN_API_KEY"
+```
+
+If you get `Invalid API Key` error, generate a new key from etherscan.io

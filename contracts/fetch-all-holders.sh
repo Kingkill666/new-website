@@ -14,9 +14,9 @@ if [ ! -z "$BASESCAN_API_KEY" ]; then
     echo "Using BaseScan API..."
     HOLDERS_FILE="holders_basescan.json"
     
-    # Fetch token holders from BaseScan API
+    # Fetch token holders from BaseScan API (filter out zero address)
     curl -s "https://api.basescan.org/api?module=token&action=tokenholderlist&contractaddress=$VMF_CONTRACT&page=1&offset=10000&apikey=$BASESCAN_API_KEY" \
-        | jq -r '.result[] | .TokenHolderAddress' > temp_holders.txt
+        | jq -r '.result[] | select(.TokenHolderAddress != "0x0000000000000000000000000000000000000000") | .TokenHolderAddress' > temp_holders.txt
     
     # Convert to JSON array
     echo "[" > $HOLDERS_FILE
@@ -77,7 +77,8 @@ while IFS= read -r address; do
         # Remove quotes from JSON
         clean_address=$(echo $address | tr -d '"' | tr -d ',')
         
-        if [ "$clean_address" != "0x0000000000000000000000000000000000000000" ]; then
+        # Skip zero address (should already be filtered but double-check)
+        if [ "$clean_address" != "0x0000000000000000000000000000000000000000" ] && [ ! -z "$clean_address" ]; then
             # Check balance (with retry logic)
             balance=""
             for retry in {1..3}; do

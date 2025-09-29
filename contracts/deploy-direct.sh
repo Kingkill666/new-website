@@ -19,6 +19,10 @@ echo "This script deploys VMF directly without a proxy:"
 echo "• No upgrade functionality"
 echo "• Immutable contract" 
 echo "• Clean deployment for honeypot scanners"
+echo ""
+echo "⚠️  VERIFICATION NOTICE: Etherscan v1 API has been deprecated."
+echo "This script uses Etherscan v2 multi-chain API for verification."
+echo "If verification fails, ensure your BASESCAN_API_KEY supports v2 API."
 
 if [ -n "$OLD_VMF_ADDRESS" ]; then
     echo "• Will migrate existing holders from: $OLD_VMF_ADDRESS"
@@ -33,6 +37,9 @@ forge script script/DirectDeploy.s.sol:DirectDeployScript \
     --private-key "$PRIVATE_KEY" \
     --broadcast \
     --verify \
+    --verifier etherscan \
+    --chain-id 8453 \
+    --verifier-url "https://api.etherscan.io/api" \
     --etherscan-api-key "$BASESCAN_API_KEY"
 
 echo ""

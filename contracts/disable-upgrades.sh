@@ -12,11 +12,15 @@ source .env
 
 echo "Disabling upgrades on proxy ${PROXY_ADDRESS}..."
 
+echo "⚠️  Using Etherscan v2 multi-chain API for verification (v1 deprecated)"
 forge script script/DisableUpgrades.s.sol:DisableUpgradesScript \
   --rpc-url "${BASE_RPC_URL}" \
   --private-key "${PRIVATE_KEY}" \
   --broadcast \
   --verify \
+  --verifier etherscan \
+  --chain-id 8453 \
+  --verifier-url "https://api.etherscan.io/api" \
   --etherscan-api-key "${BASESCAN_API_KEY}" \
   -vvvv
 
