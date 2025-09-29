@@ -5,14 +5,13 @@ import {ERC20} from "solady/tokens/ERC20.sol";
 import {SafeTransferLib} from "solady/utils/SafeTransferLib.sol";
 import {EnumerableSetLib} from "solady/utils/EnumerableSetLib.sol";
 import {FixedPointMathLib} from "solady/utils/FixedPointMathLib.sol";
-import {UUPSUpgradeable} from "solady/utils/UUPSUpgradeable.sol";
 import {OwnableRoles} from "solady/auth/OwnableRoles.sol";
+
 interface IVMFPriceOracle {
     function spotPriceUSDCPerVMF() external view returns (uint256);
 }
 
-
-contract VMF is ERC20, UUPSUpgradeable, OwnableRoles {
+contract VMF is ERC20, OwnableRoles {
     using FixedPointMathLib for uint256;
     using SafeTransferLib for address;
     using EnumerableSetLib for EnumerableSetLib.AddressSet;
@@ -42,21 +41,16 @@ contract VMF is ERC20, UUPSUpgradeable, OwnableRoles {
 
     // Optional on-chain price oracle (Uniswap v4 pool wrapper) returning USDC per VMF scaled 1e18.
     address public priceOracle; // if set (!=0) overrides donationMultipleBps logic
-    // One-way fuse to permanently disable upgrades while keeping contract ownership for ops.
-    bool public upgradesDisabled;
 
     event PriceOracleSet(address indexed oracle);
-    event UpgradesDisabled();
 
-    /// @dev Initializes the contract. Can only be called once.
-    function initialize(
+    /// @dev Constructor that initializes the contract (replaces the proxy initialize function).
+    constructor(
         address _usdc,
         address payable initCharityReceiver,
         address payable initTeamReceiver,
         address initialOwner
-    ) external {
-        // Ensure this can only be called once
-        require(minter == address(0), "VMF: already initialized");
+    ) {
         require(initialOwner != address(0), "VMF: must have an initial owner");
         require(_usdc != address(0), "VMF: must have a valid USDC address");
 
@@ -65,19 +59,15 @@ contract VMF is ERC20, UUPSUpgradeable, OwnableRoles {
         charityReceiver = initCharityReceiver;
         teamReceiver = initTeamReceiver;
 
-        // when working with a proxy, we want to set the storage locations again
-        _setDefaults();
-        
-        // Initialize Ownable
-        _initializeOwner(initialOwner);
-    }
-    
-    function _setDefaults() internal {
+        // Set default values
         charityRateBps = 0;
         teamRateBps = 0;
         donationMultipleBps = 10_000;
         donationPool = 1_000_000e18;
         taxEnabled = false; // Tax disabled by default
+        
+        // Initialize Ownable
+        _initializeOwner(initialOwner);
     }
 
     /// @notice Update the charity tax rate in basis points.
@@ -108,7 +98,7 @@ contract VMF is ERC20, UUPSUpgradeable, OwnableRoles {
     }
 
     /// @notice Enable or disable tax collection globally
-    /// @dev Restricted to owner only. When disabled, all transfers act like normal ERC20
+    /// @dev Restricted to owner or admin roles. When disabled, all transfers act like normal ERC20
     function setTaxEnabled(bool enabled) external onlyOwnerOrRoles(ROLE_ADMIN) {
         taxEnabled = enabled;
         emit TaxEnabledChanged(enabled);
@@ -188,19 +178,6 @@ contract VMF is ERC20, UUPSUpgradeable, OwnableRoles {
         onlyOwnerOrRoles(ROLE_ADMIN)
     {
         _removeRoles(user, roles);
-    }
-
-    /// @dev Permanently disable upgrades (one-way fuse). Owner remains for operational controls.
-    function disableUpgrades() external onlyOwner {
-        require(!upgradesDisabled, "VMF: upgrades already disabled");
-        upgradesDisabled = true;
-        emit UpgradesDisabled();
-    }
-
-    /// @dev Authorizes an upgrade to a new implementation.
-    /// Only the owner can authorize upgrades and only if upgrades are not disabled.
-    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {
-        require(!upgradesDisabled, "VMF: upgrades disabled");
     }
 
     function name() public view virtual override returns (string memory) {
