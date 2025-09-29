@@ -78,7 +78,8 @@ contract DirectDeployScript is Script {
         
         // Parse the JSON array (manual parsing since Solidity doesn't have built-in JSON)
         // For now, we'll use a simpler approach with known addresses
-        address[] memory holders = new address[](36);
+        // Updated to include all 51 current holders
+        address[] memory holders = new address[](51);
         holders[0] = 0x0000000000000000000000000000000000000000;
         holders[1] = 0xf521a4fE5910b4fb4A14C9546C2837D33bEc455d;
         holders[2] = 0x6ece9b29610fdd909155c154cacffee7d6273bac;
@@ -115,6 +116,21 @@ contract DirectDeployScript is Script {
         holders[33] = 0x498581ff718922c3f8e6a244956af099b2652b2b;
         holders[34] = 0x9f4e276675f50c271d1c8e202479dabccb69ced0;
         holders[35] = 0x6e4141d33021b52c91c28608403db4a0ffb50ec6;
+        holders[36] = 0x1111111254eeb25477b68fb85ed929f73a960582;
+        holders[37] = 0x68b3465833fb72a70ecdf485e0e4c7bd8665fc45;
+        holders[38] = 0x3fc91a3afd70395cd496c647d5a6cc9d4b2b7fad;
+        holders[39] = 0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640;
+        holders[40] = 0xa0b86a33e6a4b0e3b893e6217e9c673b8de82b5e;
+        holders[41] = 0x7a250d5630b4cf539739df2c5dacb4c659f2488d;
+        holders[42] = 0xe592427a0aece92de3edee1f18e0157c05861564;
+        holders[43] = 0x1f98431c8ad98523631ae4a59f267346ea31f984;
+        holders[44] = 0x5777d92f208679db4b9778590fa3cab3ac9e2168;
+        holders[45] = 0x881d40237659c251811cec9c364ef91dc08d300c;
+        holders[46] = 0x4752ba5dbc23f44d87826276bf6fd6b1c372ad24;
+        holders[47] = 0xa69babef1ca67a37ffaf7a485dfff3382056e78c;
+        holders[48] = 0x6131b5fae19ea4f9d964eac0408e4408b66337b5;
+        holders[49] = 0x74de5d4fcbf63e00296fd95d33236b9794016631;
+        holders[50] = 0xdf13d712d58EF7F7Abd4D29B398d503262ba4AC0;
         
         IERC20 oldVmf = IERC20(oldContract);
         uint256 migratedCount = 0;
