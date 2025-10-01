@@ -84,7 +84,7 @@ export async function getVMFPriceFromOracle(provider: ethers.Provider): Promise<
     const network = await provider.getNetwork();
     console.log("🌐 Provider network:", network);
     
-    if (network.chainId !== 8453n) {
+    if (network.chainId !== BigInt(8453)) {
       console.error("❌ Wrong network! Expected Base mainnet (8453), got:", network.chainId);
       throw new Error(`Wrong network. Expected Base mainnet (8453), got ${network.chainId}. Please switch to Base mainnet.`);
     }
@@ -343,7 +343,7 @@ export async function getPriceInfo(provider: ethers.Provider): Promise<{price: n
     try {
       // Check network - MUST be Base mainnet (chainId 8453)
       const network = await provider.getNetwork();
-      if (network.chainId !== 8453n) {
+      if (network.chainId !== BigInt(8453)) {
         throw new Error(`Wrong network. Expected Base mainnet (8453), got ${network.chainId}. Please switch to Base mainnet.`);
       }
       
@@ -421,7 +421,7 @@ export async function getOracleInfo(provider: ethers.Provider): Promise<{
   try {
     // Check network - MUST be Base mainnet (chainId 8453)
     const network = await provider.getNetwork();
-    if (network.chainId !== 8453n) {
+    if (network.chainId !== BigInt(8453)) {
       throw new Error(`Wrong network. Expected Base mainnet (8453), got ${network.chainId}. Please switch to Base mainnet.`);
     }
     

@@ -372,7 +372,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
       try {
         const provider = new ethers.BrowserProvider(window.ethereum)
         const network = await provider.getNetwork()
-        if (network.chainId !== 8453n) {
+        if (network.chainId !== BigInt(8453)) {
           alert(`❌ WRONG NETWORK! You are on chain ${network.chainId}. Please switch to Base mainnet (chainId 8453) to continue.`)
           return
         }
@@ -400,7 +400,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
       
       // CRITICAL: Verify we're on Base mainnet before any transaction
       const network = await provider.getNetwork()
-      if (network.chainId !== 8453n) {
+      if (network.chainId !== BigInt(8453)) {
         alert(`❌ WRONG NETWORK! You are on chain ${network.chainId}. Please switch to Base mainnet (chainId 8453) before making any transactions.`)
         setIsProcessing(false)
         return false
@@ -472,7 +472,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     try {
       const provider = new ethers.BrowserProvider(window.ethereum)
       const network = await provider.getNetwork()
-      if (network.chainId !== 8453n) {
+      if (network.chainId !== BigInt(8453)) {
         alert(`❌ WRONG NETWORK! You are on chain ${network.chainId}. Please switch to Base mainnet (chainId 8453) before confirming the transaction.`)
         return
       }
