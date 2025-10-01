@@ -1,19 +1,19 @@
 "use client"
-import dynamic from "next/dynamic"
 
-// Dynamic import to avoid SSR issues
-const StakingContent = dynamic(() => import("./staking-content"), {
-  ssr: false,
-  loading: () => (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-        <p className="text-gray-600">Loading staking page...</p>
-      </div>
-    </div>
-  )
-})
+import React from "react";
+import { AppProviders } from "./providers/AppProviders";
+import { Header } from "./components/Header";
+import { StakingDashboard } from "./components/StakingDashboard";
 
 export default function StakingPage() {
-  return <StakingContent />
+  return (
+    <AppProviders>
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <main>
+          <StakingDashboard />
+        </main>
+      </div>
+    </AppProviders>
+  );
 }
