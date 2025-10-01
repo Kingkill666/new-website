@@ -4,57 +4,93 @@ export async function GET(request: NextRequest) {
   try {
     console.log('🔍 [API] Fetching VMF price from external sources...')
     
-    // Try DexScreener first
+    // Try DexScreener with pool address first (most reliable)
     try {
-      console.log('📡 [API] Trying DexScreener...')
-      const DEXSCREENER_URL = `https://api.dexscreener.com/latest/dex/tokens/0x2213414893259b0C48066Acd1763e7fbA97859E5`
+      console.log('📡 [API] Trying DexScreener with pool address...')
+      const SUSHISWAP_POOL = '0x9c83a203133b65982f35d1b00e8283c9fb518cb1'
+      const DEXSCREENER_POOL_URL = `https://api.dexscreener.com/latest/dex/pairs/base/${SUSHISWAP_POOL}`
       
-      const response = await fetch(DEXSCREENER_URL, {
+      const poolResponse = await fetch(DEXSCREENER_POOL_URL, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         }
       })
       
-      console.log('📡 [API] DexScreener response status:', response.status)
+      console.log('📡 [API] DexScreener pool response status:', poolResponse.status)
+      
+      if (poolResponse.ok) {
+        const poolData = await poolResponse.json()
+        console.log('📡 [API] DexScreener pool data:', JSON.stringify(poolData).substring(0, 300))
+        
+        if (poolData.pair && poolData.pair.priceUsd) {
+          const price = parseFloat(poolData.pair.priceUsd)
+          const liquidity = poolData.pair.liquidity?.usd || 0
+          const volume24h = poolData.pair.volume?.h24 || 0
+          
+          console.log('📡 [API] Pool details:')
+          console.log('  - Price:', price, 'USD')
+          console.log('  - Liquidity:', liquidity, 'USD')
+          console.log('  - 24h Volume:', volume24h, 'USD')
+          console.log('  - DEX:', poolData.pair.dexId)
+          
+          if (price > 0) {
+            console.log('✅ [API] DexScreener price fetched from pool:', price)
+            return NextResponse.json({ 
+              price, 
+              source: `${poolData.pair.dexId} (Live)`,
+              success: true,
+              liquidity: liquidity,
+              volume24h: volume24h
+            })
+          }
+        }
+      }
+    } catch (poolError) {
+      console.error('❌ [API] DexScreener pool lookup failed:', poolError)
+    }
+    
+    // Fallback: Try DexScreener with token address
+    try {
+      console.log('📡 [API] Trying DexScreener with token address...')
+      const VMF_CONTRACT = '0x2213414893259b0C48066Acd1763e7fbA97859E5'
+      const DEXSCREENER_TOKEN_URL = `https://api.dexscreener.com/latest/dex/tokens/${VMF_CONTRACT}`
+      
+      const response = await fetch(DEXSCREENER_TOKEN_URL, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      })
+      
+      console.log('📡 [API] DexScreener token response status:', response.status)
       
       if (response.ok) {
         const data = await response.json()
-        console.log('📡 [API] DexScreener data:', JSON.stringify(data).substring(0, 200))
         
         if (data.pairs && data.pairs.length > 0) {
-          console.log('📡 [API] Found', data.pairs.length, 'pairs')
+          console.log('📡 [API] Found', data.pairs.length, 'pairs from token lookup')
           
-          // Find the most liquid pair (highest liquidity)
+          // Find the most liquid pair on Base
           const sortedPairs = data.pairs
             .filter((pair: any) => pair.chainId === 'base' && pair.priceUsd)
             .sort((a: any, b: any) => parseFloat(b.liquidity?.usd || '0') - parseFloat(a.liquidity?.usd || '0'))
-          
-          console.log('📡 [API] Filtered to', sortedPairs.length, 'Base pairs')
           
           if (sortedPairs.length > 0) {
             const bestPair = sortedPairs[0]
             const price = parseFloat(bestPair.priceUsd)
             
-            console.log('📡 [API] Best pair:', bestPair.dexId, 'Price:', price)
-            
-            if (price > 0) {
-              console.log('✅ [API] DexScreener price fetched:', price)
-              return NextResponse.json({ 
-                price, 
-                source: `DexScreener (${bestPair.dexId})`,
-                success: true 
-              })
-            }
+            console.log('✅ [API] DexScreener price from token lookup:', price)
+            return NextResponse.json({ 
+              price, 
+              source: `${bestPair.dexId} (Live)`,
+              success: true 
+            })
           }
-        } else {
-          console.log('⚠️ [API] No pairs found in DexScreener response')
         }
-      } else {
-        console.log('⚠️ [API] DexScreener request failed with status:', response.status)
       }
     } catch (dexError) {
-      console.error('❌ [API] DexScreener failed:', dexError)
+      console.error('❌ [API] DexScreener token lookup failed:', dexError)
     }
     
     // Try CoinGecko as fallback
