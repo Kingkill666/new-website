@@ -847,6 +847,9 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                       {isLoadingPrice ? "..." : vmfAmount}
                     </p>
                     <p className="text-xs text-green-600 mt-1">VMF</p>
+                    <p className="text-xs text-blue-600 mt-1 font-medium">
+                      + ${amount} USDC donated to charities
+                    </p>
                   </div>
                 </div>
                 
@@ -1171,8 +1174,26 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                 </div>
 
                 <div className="flex justify-between items-center py-2 border-b border-gray-200" role="listitem">
-                  <span className="font-medium text-gray-700">Amount:</span>
+                  <span className="font-medium text-gray-700">Total USDC Spent:</span>
                   <span className="font-semibold">${amount}</span>
+                </div>
+                
+                <div className="bg-blue-50 p-3 rounded-lg my-4">
+                  <p className="text-sm text-blue-800 font-medium mb-2">Transaction Breakdown:</p>
+                  <div className="text-xs text-blue-700 space-y-1">
+                    <div className="flex justify-between">
+                      <span>VMF Tokens Received:</span>
+                      <span className="font-medium">{vmfAmount} VMF</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>USDC Donated to Charities:</span>
+                      <span className="font-medium">${amount} USDC</span>
+                    </div>
+                    <div className="text-xs text-blue-600 mt-2 pt-2 border-t border-blue-200">
+                      <strong>Note:</strong> Your wallet may show the VMF token value (~${(parseFloat(vmfAmount) * (priceInfo?.price || 1)).toFixed(2)}), 
+                      but you actually spent ${amount} USDC total.
+                    </div>
+                  </div>
                 </div>
 
           {transactionHash && (

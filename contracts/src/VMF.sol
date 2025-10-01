@@ -382,9 +382,20 @@ contract VMF is ERC20, OwnableRoles {
             address(usdc).safeTransfer(recipients[i], amounts[i]);
             emit BatchDonation(msg.sender, recipients[i], amounts[i]);
         }
+        
+        // Emit comprehensive transaction summary for wallet display
+        emit BatchDonationComplete(msg.sender, totalUSDC, totalVMFMatching, recipients.length);
     }
 
     /// @dev Emitted when a batch donation is made
     event BatchDonation(address indexed donor, address indexed recipient, uint256 amount);
+    
+    /// @dev Emitted when a complete batch donation transaction is processed
+    event BatchDonationComplete(
+        address indexed donor, 
+        uint256 totalUSDC, 
+        uint256 totalVMFMinted, 
+        uint256 charityCount
+    );
 }
 
