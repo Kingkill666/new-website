@@ -10,7 +10,7 @@ import { X, ChevronDown, ChevronUp, CheckCircle, Copy, Check, Minus, Plus, Alert
 import { useWallet } from "@/hooks/useWallet"
 import { formatAddress } from "@/lib/wallet-config"
 import { DialogFooter } from "@/components/ui/dialog"
-import { calculateVMFAmount, getPriceInfo, getPriceInfoNoProvider } from "@/lib/oracle-utils"
+import { calculateVMFAmount, getPriceInfo, getPriceInfoNoProvider, testContractOracle } from "@/lib/oracle-utils"
 import axios from "axios"
 
 interface BuyVMFModalProps {
@@ -185,29 +185,46 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     return () => document.removeEventListener("keydown", handleKeyDown)
   }, [isOpen, onClose])
 
-  // Load price info from Uniswap (works even when not connected)
+  // Load price info with 10-second polling
   useEffect(() => {
+    let intervalId: NodeJS.Timeout | null = null;
+
     async function loadPriceInfo() {
+      console.log("🔄 Loading price info...");
       setIsLoadingPrice(true)
       try {
         let info;
         if (isConnected && connection?.chainId === 8453) {
-          // Use provider-based pricing (tries Uniswap first, then oracle)
+          // Use provider-based pricing (prioritizes contract oracle)
           const provider = new ethers.BrowserProvider(window.ethereum)
           info = await getPriceInfo(provider)
+          console.log("✅ Got price from provider:", info);
         } else {
-          // Use Uniswap-only pricing when not connected or wrong network
+          // Use external sources when not connected or wrong network
           info = await getPriceInfoNoProvider()
+          console.log("✅ Got price from external sources:", info);
         }
         setPriceInfo(info)
       } catch (error) {
-        console.error("Failed to load price info:", error)
+        console.error("❌ Failed to load price info:", error)
         setPriceInfo({ price: 1, source: "Fallback" })
       } finally {
         setIsLoadingPrice(false)
       }
     }
+
+    // Load immediately
     loadPriceInfo()
+
+    // Set up polling every 10 seconds
+    intervalId = setInterval(loadPriceInfo, 10000)
+
+    // Cleanup interval on unmount
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId)
+      }
+    }
   }, [isConnected, connection?.chainId])
 
   // Calculate VMF amount based on current price (Uniswap or oracle)
@@ -708,6 +725,22 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                     </p>
                   </div>
                 </div>
+                
+                {/* Debug button for testing contract oracle */}
+                {isConnected && connection?.chainId === 8453 && (
+                  <div className="mt-2 pt-2 border-t border-green-300">
+                    <button
+                      onClick={async () => {
+                        console.log("🧪 Testing contract oracle...");
+                        const provider = new ethers.BrowserProvider(window.ethereum);
+                        await testContractOracle(provider);
+                      }}
+                      className="text-xs text-green-600 hover:text-green-800 underline"
+                    >
+                      🧪 Test Contract Oracle (Check Console)
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Description */}
