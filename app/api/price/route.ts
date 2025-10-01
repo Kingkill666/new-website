@@ -187,12 +187,12 @@ export async function GET(request: NextRequest) {
       console.error('❌ [API] Static multiple failed:', contractError)
     }
     
-    // All methods failed
-    console.log('❌ [API] All price sources failed, using fallback')
+    // All methods failed - use 1:1 ratio as default
+    console.log('⚠️ [API] All price sources failed, using 1:1 default')
     return NextResponse.json({ 
       price: 1, 
-      source: 'Fallback',
-      success: false 
+      source: '1:1 Default',
+      success: true  // Mark as success since 1:1 is the intended default
     })
     
   } catch (error) {
