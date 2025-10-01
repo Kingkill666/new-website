@@ -1,13 +1,9 @@
-"use client"
-
 import React from "react";
 import { AppProviders } from "./providers/AppProviders";
 import { Header } from "./components/Header";
 import { StakingDashboard } from "./components/StakingDashboard";
 
-export const dynamicParams = true;
-
-export default function StakingPage() {
+function App() {
   return (
     <AppProviders>
       <div className="min-h-screen bg-gray-50">
@@ -19,3 +15,5 @@ export default function StakingPage() {
     </AppProviders>
   );
 }
+
+export default App;

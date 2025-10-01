@@ -1,6 +1,6 @@
 "use client"
 
-import { useQuery } from "@apollo/client/react-hooks";
+import { useQuery } from "@apollo/client";
 import { useAccount } from "wagmi";
 import { readContract } from "@wagmi/core";
 import { GET_USER_STAKES } from "../graphql/queries";

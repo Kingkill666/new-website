@@ -1,6 +1,13 @@
-"use client"
-
 import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  Box,
+  LinearProgress,
+  CircularProgress,
+} from "@mui/material";
 import { useRealTimeYield } from "../hooks/useRealTimeYield";
 import { formatDuration } from "../utils/formatDuration";
 import { formatUnits } from "viem";
@@ -82,78 +89,154 @@ export const StakeCard: React.FC<StakeCardProps> = ({
   }, [startTime, stakingPeriod]);
 
   return (
-    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 mb-4 transition-transform hover:transform hover:-translate-y-1">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xl font-semibold text-gray-900">
-          Stake #{stakeId}
-        </h3>
-        {(isProcessingYield || isProcessingStake) && (
-          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
-        )}
-      </div>
-
-      <div className="space-y-4">
-        <div>
-          <p className="text-sm text-gray-600 mb-1">Staked Amount</p>
-          <p className="text-lg font-semibold text-gray-900">
-            {Number(formatUnits(amount, 18)).toLocaleString()} VMF
-          </p>
-        </div>
-
-        <div>
-          <p className="text-sm text-gray-600 mb-1">Current Yield</p>
-          <p className="text-lg font-semibold text-green-600">
-            {currentYield} VMF
-          </p>
-        </div>
-
-        <div>
-          <p className="text-sm text-gray-600 mb-2">Staking Progress</p>
-          <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-            <div
-              className={`h-2 rounded-full transition-all duration-300 ${
-                progress === 100 ? "bg-green-500" : "bg-blue-500"
-              }`}
-              style={{ width: `${Math.min(progress, 100)}%` }}
-            ></div>
-          </div>
-          <div className="flex justify-between text-sm text-gray-600">
-            <span>Time Remaining: {formatDuration(timeRemaining)}</span>
-            <span>{Math.floor(progress)}%</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex gap-3 mt-6">
-        <button
-          onClick={handleWithdrawYield}
-          disabled={isProcessingYield || Number(currentYield) === 0}
-          className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center"
+    <Card
+      sx={{
+        mb: 2,
+        background: "linear-gradient(145deg, #ffffff 0%, #f5f7fa 100%)",
+        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+        borderRadius: "16px",
+        overflow: "hidden",
+        transition: "transform 0.2s ease-in-out",
+        "&:hover": {
+          transform: "translateY(-2px)",
+        },
+      }}
+    >
+      <CardContent sx={{ p: 3 }}>
+        <Typography
+          variant="h5"
+          gutterBottom
+          sx={{
+            fontWeight: 600,
+            color: "#1a237e",
+            mb: 3,
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+          }}
         >
-          {isProcessingYield ? (
-            <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-              Processing...
-            </>
-          ) : (
-            "Withdraw Yield"
+          <span>Stake #{stakeId}</span>
+          {(isProcessingYield || isProcessingStake) && (
+            <CircularProgress size={20} thickness={4} sx={{ ml: 2 }} />
           )}
-        </button>
-        <button
-          onClick={handleWithdrawStake}
-          disabled={isProcessingStake || !canWithdrawStake}
-          className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center"
+        </Typography>
+
+        <Box sx={{ mb: 4 }}>
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+              Staked Amount
+            </Typography>
+            <Typography variant="h6" sx={{ fontWeight: 600 }}>
+              {Number(formatUnits(amount, 18)).toLocaleString()} VMF
+            </Typography>
+          </Box>
+
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+              Current Yield
+            </Typography>
+            <Typography variant="h6" sx={{ color: "#4caf50", fontWeight: 600 }}>
+              {currentYield} VMF
+            </Typography>
+          </Box>
+
+          <Box>
+            <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+              Staking Progress
+            </Typography>
+            <Box sx={{ mt: 1 }}>
+              <LinearProgress
+                variant="determinate"
+                value={progress}
+                sx={{
+                  height: 8,
+                  borderRadius: 4,
+                  mb: 1,
+                  backgroundColor: "rgba(0, 0, 0, 0.1)",
+                  "& .MuiLinearProgress-bar": {
+                    backgroundColor: progress === 100 ? "#4caf50" : "#3f51b5",
+                  },
+                }}
+              />
+              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Typography variant="body2" color="text.secondary">
+                  Time Remaining: {formatDuration(timeRemaining)}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {Math.floor(progress)}%
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
+        </Box>
+
+        <Box
+          sx={{
+            display: "flex",
+            gap: 2,
+            "& button": {
+              flex: 1,
+              py: 1.5,
+              borderRadius: "8px",
+              textTransform: "none",
+              fontWeight: 600,
+              transition: "all 0.2s ease-in-out",
+              "&:not(:disabled):hover": {
+                transform: "translateY(-1px)",
+              },
+            },
+          }}
         >
-          {isProcessingStake ? (
-            <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-              Processing...
-            </>
-          ) : (
-            "Withdraw Stake"
-          )}
-        </button>
-      </div>
-    </div>
+          <Button
+            variant="contained"
+            onClick={handleWithdrawYield}
+            disabled={isProcessingYield || Number(currentYield) === 0}
+            sx={{
+              backgroundColor: "#4caf50",
+              "&:hover": {
+                backgroundColor: "#43a047",
+              },
+            }}
+          >
+            {isProcessingYield ? (
+              <>
+                <CircularProgress
+                  size={20}
+                  thickness={4}
+                  sx={{ mr: 1, color: "white" }}
+                />
+                Processing...
+              </>
+            ) : (
+              "Withdraw Yield"
+            )}
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleWithdrawStake}
+            disabled={isProcessingStake || !canWithdrawStake}
+            sx={{
+              backgroundColor: "#3f51b5",
+              "&:hover": {
+                backgroundColor: "#303f9f",
+              },
+            }}
+          >
+            {isProcessingStake ? (
+              <>
+                <CircularProgress
+                  size={20}
+                  thickness={4}
+                  sx={{ mr: 1, color: "white" }}
+                />
+                Processing...
+              </>
+            ) : (
+              "Withdraw Stake"
+            )}
+          </Button>
+        </Box>
+      </CardContent>
+    </Card>
   );
 };

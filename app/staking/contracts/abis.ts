@@ -307,7 +307,8 @@ export const STAKING_ABI = [
           {
             internalType: "uint40",
             name: "lastYieldClaimAt",
-            type: "uint40" },
+            type: "uint40",
+          },
         ],
         internalType: "struct VMFStaking.StakingInfo",
         name: "",
