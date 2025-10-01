@@ -470,6 +470,7 @@ export const requestWalletConnection = async (walletId: string): Promise<any> =>
     console.log(`✅ Connected to ${getWalletDisplayName(walletId)}: ${accounts[0]} on chain ${chainIdNumber}`)
 
     // Ensure we're on the correct network (Base mainnet for production)
+    let finalChainId = chainIdNumber
     if (chainIdNumber !== 8453) {
       console.log(`🔄 Switching to Base mainnet (current: ${chainIdNumber})`)
       try {
@@ -478,6 +479,10 @@ export const requestWalletConnection = async (walletId: string): Promise<any> =>
           params: [{ chainId: '0x2105' }], // 8453 in hex
         })
         console.log('✅ Switched to Base mainnet')
+        finalChainId = 8453
+        
+        // Wait a moment for the network switch to complete
+        await new Promise(resolve => setTimeout(resolve, 1000))
       } catch (switchError: any) {
         if (switchError.code === 4902) {
           // Chain not added, add it
@@ -486,7 +491,7 @@ export const requestWalletConnection = async (walletId: string): Promise<any> =>
             method: 'wallet_addEthereumChain',
             params: [{
               chainId: '0x2105',
-              chainName: 'Base',
+              chainName: 'Base Mainnet',
               nativeCurrency: {
                 name: 'Ethereum',
                 symbol: 'ETH',
@@ -497,16 +502,32 @@ export const requestWalletConnection = async (walletId: string): Promise<any> =>
             }],
           })
           console.log('✅ Added Base mainnet')
+          finalChainId = 8453
+          
+          // Wait a moment for the network addition to complete
+          await new Promise(resolve => setTimeout(resolve, 1000))
+        } else if (switchError.code === 4001) {
+          // User rejected the network switch
+          console.log('⚠️ User rejected network switch')
+          throw new Error(`Please switch to Base network in your ${getWalletDisplayName(walletId)} to use VMF`)
         } else {
           console.error('❌ Failed to switch network:', switchError)
           throw new Error(`Please switch to Base network in your ${getWalletDisplayName(walletId)}`)
         }
       }
+      
+      // Verify the network switch was successful
+      const newChainId = await provider.request({ method: 'eth_chainId' }) as string
+      const newChainIdNumber = parseInt(newChainId, 16)
+      console.log(`🔍 Network after switch: ${newChainIdNumber}`)
+      finalChainId = newChainIdNumber
+    } else {
+      console.log('✅ Already on Base mainnet')
     }
 
     const connection = {
       address: accounts[0],
-      chainId: 8453, // Base mainnet
+      chainId: finalChainId,
       walletName: getWalletDisplayName(walletId),
     }
 
