@@ -562,28 +562,22 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
   }
 
   const handleVerifyConfirm = async () => {
-    if (needsNetworkSwitch) {
-      alert("Please switch to the correct network first")
-      return
-    }
-
-    // CRITICAL: Double-check network before final transaction
-    console.log("🔍 Checking network - wallet chainId:", connection?.chainId)
+    // For now, redirect to SushiSwap to buy VMF directly
+    // This bypasses the need for whitelisted charity addresses
+    const sushiswapUrl = `https://www.sushi.com/swap?chainId=8453&token0=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913&token1=0x2213414893259b0C48066Acd1763e7fbA97859E5&amount=${amount}`
     
-    // Use wallet connection state instead of creating new provider
-    if (!connection || connection.chainId !== 8453) {
-      const currentChain = connection?.chainId || 'unknown'
-      console.error("❌ Wrong network detected:", currentChain)
-      alert(`❌ WRONG NETWORK! You are on chain ${currentChain}. Please switch to Base mainnet (chainId 8453) before confirming the transaction.`)
-      return
-    }
+    console.log("🔄 Redirecting to SushiSwap for VMF purchase...")
+    console.log("💰 Amount:", amount, "USDC")
+    console.log("🔗 SushiSwap URL:", sushiswapUrl)
     
-    console.log("✅ Final network verification: Base mainnet (8453)")
-
-    const success = await executeSmartContract()
-    if (success) {
-      setCurrentStep("success")
-    }
+    // Open SushiSwap in new tab
+    window.open(sushiswapUrl, '_blank')
+    
+    // Show success message
+    alert(`✅ Opening SushiSwap to buy ${vmfAmount} VMF for $${amount} USDC!\n\nYou'll be redirected to SushiSwap where you can complete the purchase.`)
+    
+    // Close the modal
+    handleClose()
   }
 
   const handleCopyHash = () => {
