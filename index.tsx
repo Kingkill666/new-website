@@ -494,7 +494,7 @@ const Index = () => {
                       With VMF, your purchase supports Veterans.
                     </p>
 
-                    <div className="flex justify-center mb-8">
+                    <div className="flex flex-col items-center gap-4 mb-8">
                       <Button
                         size="sm"
                         className="bg-blue-600 hover:bg-blue-700 text-white px-14 py-2 sm:px-16 sm:py-4 text-base sm:text-lg font-semibold shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
@@ -502,6 +502,14 @@ const Index = () => {
                         aria-label="Buy VMF coins to support veterans"
                       >
                         Buy VMF
+                      </Button>
+                      <Button
+                        size="sm"
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-14 py-2 sm:px-16 sm:py-4 text-base sm:text-lg font-semibold shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        onClick={() => {/* TODO: Add staking functionality */}}
+                        aria-label="Stake VMF tokens"
+                      >
+                        Staking
                       </Button>
                     </div>
 
