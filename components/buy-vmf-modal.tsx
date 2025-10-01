@@ -814,24 +814,40 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
               {/* Price Information */}
               <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-green-800">Current VMF Price</p>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="text-sm font-medium text-green-800">Current VMF Price</p>
+                      {!isLoadingPrice && priceInfo && priceInfo.source.includes('Live') && (
+                        <span className="flex items-center gap-1 text-xs text-green-600">
+                          <span className="relative flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                          </span>
+                          <span className="text-xs">Live</span>
+                        </span>
+                      )}
+                    </div>
                     {isLoadingPrice ? (
-                      <p className="text-xs text-green-600">Loading price...</p>
+                      <p className="text-xs text-green-600">Updating price...</p>
                     ) : priceInfo ? (
-                      <p className="text-xs text-green-600">
-                        ${priceInfo.price.toFixed(6)} USDC per VMF
-                        <span className="ml-2 text-xs text-green-500">({priceInfo.source})</span>
-                      </p>
+                      <div className="space-y-1">
+                        <p className="text-lg font-bold text-green-700">
+                          ${priceInfo.price.toFixed(6)} USDC
+                        </p>
+                        <p className="text-xs text-green-600">
+                          {priceInfo.source} • Updates every 10s
+                        </p>
+                      </div>
                     ) : (
                       <p className="text-xs text-green-600">Price unavailable</p>
                     )}
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-medium text-green-800">You'll Receive</p>
-                    <p className="text-lg font-bold text-green-700">
-                      {isLoadingPrice ? "..." : vmfAmount} VMF
+                    <p className="text-sm font-medium text-green-800 mb-1">You'll Receive</p>
+                    <p className="text-2xl font-bold text-green-700">
+                      {isLoadingPrice ? "..." : vmfAmount}
                     </p>
+                    <p className="text-xs text-green-600 mt-1">VMF</p>
                   </div>
                 </div>
                 
