@@ -199,8 +199,21 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
           const provider = new ethers.BrowserProvider(window.ethereum)
           info = await getPriceInfo(provider)
           console.log("✅ Got price from provider:", info);
+        } else if (isConnected && connection?.chainId !== 8453) {
+          // Wrong network - try to switch to Base
+          console.log("⚠️ Wrong network detected, attempting to switch to Base...");
+          try {
+            await switchToBaseNetwork();
+            // Retry with Base network
+            const provider = new ethers.BrowserProvider(window.ethereum)
+            info = await getPriceInfo(provider)
+            console.log("✅ Got price after network switch:", info);
+          } catch (switchError) {
+            console.warn("⚠️ Network switch failed, using external sources:", switchError);
+            info = await getPriceInfoNoProvider()
+          }
         } else {
-          // Use external sources when not connected or wrong network
+          // Use external sources when not connected
           info = await getPriceInfoNoProvider()
           console.log("✅ Got price from external sources:", info);
         }
@@ -226,6 +239,39 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
       }
     }
   }, [isConnected, connection?.chainId])
+
+  // Function to switch to Base network
+  const switchToBaseNetwork = async () => {
+    if (!window.ethereum) {
+      throw new Error("No wallet detected");
+    }
+
+    try {
+      // Try to switch to Base network
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: "0x2105" }], // Base mainnet
+      });
+      console.log("✅ Successfully switched to Base network");
+    } catch (switchError: any) {
+      if (switchError.code === 4902) {
+        // Chain not added, try to add Base Mainnet
+        await window.ethereum.request({
+          method: "wallet_addEthereumChain",
+          params: [{
+            chainId: "0x2105",
+            chainName: "Base Mainnet",
+            nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+            rpcUrls: ["https://mainnet.base.org"],
+            blockExplorerUrls: ["https://basescan.org"],
+          }],
+        });
+        console.log("✅ Successfully added Base network");
+      } else {
+        throw switchError;
+      }
+    }
+  }
 
   // Calculate VMF amount based on current price (Uniswap or oracle)
   useEffect(() => {
@@ -726,21 +772,40 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                   </div>
                 </div>
                 
-                {/* Debug button for testing contract oracle */}
-                {isConnected && connection?.chainId === 8453 && (
-                  <div className="mt-2 pt-2 border-t border-green-300">
-                    <button
-                      onClick={async () => {
-                        console.log("🧪 Testing contract oracle...");
-                        const provider = new ethers.BrowserProvider(window.ethereum);
-                        await testContractOracle(provider);
-                      }}
-                      className="text-xs text-green-600 hover:text-green-800 underline"
-                    >
-                      🧪 Test Contract Oracle (Check Console)
-                    </button>
-                  </div>
-                )}
+                {/* Network status and debug section */}
+                <div className="mt-2 pt-2 border-t border-green-300">
+                  {isConnected ? (
+                    connection?.chainId === 8453 ? (
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-green-600">✅ Connected to Base Mainnet</span>
+                        <button
+                          onClick={async () => {
+                            console.log("🧪 Testing contract oracle...");
+                            const provider = new ethers.BrowserProvider(window.ethereum);
+                            await testContractOracle(provider);
+                          }}
+                          className="text-xs text-green-600 hover:text-green-800 underline"
+                        >
+                          🧪 Test Oracle
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-orange-600">
+                          ⚠️ Wrong Network (ChainId: {connection?.chainId})
+                        </span>
+                        <button
+                          onClick={switchToBaseNetwork}
+                          className="text-xs text-blue-600 hover:text-blue-800 underline"
+                        >
+                          🔄 Switch to Base
+                        </button>
+                      </div>
+                    )
+                  ) : (
+                    <span className="text-xs text-gray-500">Connect wallet to Base network for real-time pricing</span>
+                  )}
+                </div>
               </div>
 
               {/* Description */}

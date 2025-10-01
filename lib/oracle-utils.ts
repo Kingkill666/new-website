@@ -220,141 +220,33 @@ export async function testContractOracle(provider: ethers.Provider): Promise<voi
 
 export async function getUniswapPrice(): Promise<{price: number, source: string}> {
   try {
-    console.log("🔍 Fetching VMF price from multiple sources...");
+    console.log("🔍 Fetching VMF price from external sources via API...");
     
-    // Try DexScreener first
-    try {
-      console.log("📡 Trying DexScreener...");
-      const DEXSCREENER_URL = `https://api.dexscreener.com/latest/dex/tokens/${VMF_CONTRACT_ADDRESS}`;
-      
-      const response = await fetch(DEXSCREENER_URL, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        
-        if (data.pairs && data.pairs.length > 0) {
-          // Find the most liquid pair (highest liquidity)
-          const sortedPairs = data.pairs
-            .filter((pair: any) => pair.chainId === 'base' && pair.priceUsd)
-            .sort((a: any, b: any) => parseFloat(b.liquidity?.usd || '0') - parseFloat(a.liquidity?.usd || '0'));
-          
-          if (sortedPairs.length > 0) {
-            const bestPair = sortedPairs[0];
-            const price = parseFloat(bestPair.priceUsd);
-            
-            if (price > 0) {
-              console.log("✅ DexScreener price fetched:", price);
-              console.log("📍 Best pair:", bestPair.dexId, bestPair.baseToken.symbol, "/", bestPair.quoteToken.symbol);
-              
-              return { 
-                price, 
-                source: `DexScreener (${bestPair.dexId})` 
-              };
-            }
-          }
-        }
+    // Use our server-side API endpoint to avoid CORS issues
+    const response = await fetch('/api/price', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
       }
-    } catch (dexError) {
-      console.warn("⚠️ DexScreener failed:", dexError);
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      
+      if (data.success && data.price > 0) {
+        console.log("✅ External price fetched via API:", data.price, "from", data.source);
+        return { 
+          price: data.price, 
+          source: data.source 
+        };
+      }
     }
     
-    // Try CoinGecko as fallback
-    try {
-      console.log("📡 Trying CoinGecko...");
-      const COINGECKO_URL = `https://api.coingecko.com/api/v3/simple/token_price/base?contract_addresses=${VMF_CONTRACT_ADDRESS}&vs_currencies=usd`;
-      
-      const response = await fetch(COINGECKO_URL, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        const tokenData = data[VMF_CONTRACT_ADDRESS.toLowerCase()];
-        
-        if (tokenData && tokenData.usd && tokenData.usd > 0) {
-          console.log("✅ CoinGecko price fetched:", tokenData.usd);
-          return { 
-            price: tokenData.usd, 
-            source: "CoinGecko" 
-          };
-        }
-      }
-    } catch (cgError) {
-      console.warn("⚠️ CoinGecko failed:", cgError);
-    }
-    
-    // Try direct Uniswap V3 subgraph (newer endpoint)
-    try {
-      console.log("📡 Trying Uniswap V3 subgraph...");
-      const UNISWAP_GRAPH_URL = "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3";
-      
-      const query = `
-        query GetTokenPrice($tokenId: String!) {
-          token(id: $tokenId) {
-            id
-            symbol
-            name
-            decimals
-            derivedETH
-          }
-          bundle(id: "1") {
-            ethPriceUSD
-          }
-        }
-      `;
-      
-      const variables = {
-        tokenId: VMF_CONTRACT_ADDRESS.toLowerCase()
-      };
-      
-      const response = await fetch(UNISWAP_GRAPH_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          query,
-          variables
-        })
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        
-        if (!data.errors && data.data?.token && data.data?.bundle) {
-          const token = data.data.token;
-          const bundle = data.data.bundle;
-          
-          const priceInETH = parseFloat(token.derivedETH);
-          const ethPriceUSD = parseFloat(bundle.ethPriceUSD);
-          
-          if (priceInETH > 0 && ethPriceUSD > 0) {
-            const price = priceInETH * ethPriceUSD;
-            console.log("✅ Uniswap V3 price fetched:", price);
-            return { 
-              price, 
-              source: "Uniswap V3" 
-            };
-          }
-        }
-      }
-    } catch (uniError) {
-      console.warn("⚠️ Uniswap V3 failed:", uniError);
-    }
-    
-    // All methods failed
-    throw new Error("All price sources failed");
+    // If API fails, throw error
+    throw new Error("External price API failed");
     
   } catch (error) {
-    console.error("❌ Error fetching price from all sources:", error);
+    console.error("❌ Error fetching price from external API:", error);
     throw error;
   }
 }
@@ -365,14 +257,18 @@ export async function getUniswapPrice(): Promise<{price: number, source: string}
  */
 export async function getPriceInfoNoProvider(): Promise<{price: number, source: string}> {
   try {
-    // Try to get price from external sources
+    // Try external price sources via API
+    console.log("📡 Fetching external price without provider...");
     const externalPrice = await getUniswapPrice();
-    console.log("✅ Using external price:", externalPrice);
+    console.log("✅ External price fetched:", externalPrice);
     return externalPrice;
   } catch (error) {
-    console.error("Error getting price info (no provider):", error);
-    return { price: 1, source: "Fallback" };
+    console.warn("⚠️ External price sources failed:", error);
   }
+  
+  // Ultimate fallback
+  console.log("⚠️ All price sources failed, using fallback");
+  return { price: 1, source: "Fallback" };
 }
 
 /**
