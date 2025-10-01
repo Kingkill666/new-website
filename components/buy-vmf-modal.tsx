@@ -134,6 +134,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
   const [copied, setCopied] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [needsNetworkSwitch, setNeedsNetworkSwitch] = useState(false)
+  const [isOnBaseNetwork, setIsOnBaseNetwork] = useState(false)
   const [priceInfo, setPriceInfo] = useState<{price: number, source: string} | null>(null)
   const [isLoadingPrice, setIsLoadingPrice] = useState(false)
 
@@ -147,6 +148,24 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
       }
     }
   }, [isOpen])
+
+  // Check network status
+  useEffect(() => {
+    const checkNetworkStatus = () => {
+      if (isConnected && connection?.chainId === 8453) {
+        setIsOnBaseNetwork(true)
+        setNeedsNetworkSwitch(false)
+      } else if (isConnected && connection?.chainId !== 8453) {
+        setIsOnBaseNetwork(false)
+        setNeedsNetworkSwitch(true)
+      } else {
+        setIsOnBaseNetwork(false)
+        setNeedsNetworkSwitch(false)
+      }
+    }
+
+    checkNetworkStatus()
+  }, [isConnected, connection?.chainId])
 
   // Trap focus within modal
   useEffect(() => {
@@ -243,32 +262,48 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
   // Function to switch to Base network
   const switchToBaseNetwork = async () => {
     if (!window.ethereum) {
-      throw new Error("No wallet detected");
+      alert("❌ No wallet detected! Please install a Web3 wallet like MetaMask or Coinbase Wallet.");
+      return;
     }
 
     try {
+      console.log("🔄 Attempting to switch to Base network...");
+      
       // Try to switch to Base network
       await window.ethereum.request({
         method: "wallet_switchEthereumChain",
         params: [{ chainId: "0x2105" }], // Base mainnet
       });
       console.log("✅ Successfully switched to Base network");
+      
+      // Show success message
+      alert("✅ Successfully switched to Base network! You can now use VMF features.");
+      
     } catch (switchError: any) {
+      console.log("⚠️ Switch failed, trying to add Base network...");
+      
       if (switchError.code === 4902) {
         // Chain not added, try to add Base Mainnet
-        await window.ethereum.request({
-          method: "wallet_addEthereumChain",
-          params: [{
-            chainId: "0x2105",
-            chainName: "Base Mainnet",
-            nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
-            rpcUrls: ["https://mainnet.base.org"],
-            blockExplorerUrls: ["https://basescan.org"],
-          }],
-        });
-        console.log("✅ Successfully added Base network");
+        try {
+          await window.ethereum.request({
+            method: "wallet_addEthereumChain",
+            params: [{
+              chainId: "0x2105",
+              chainName: "Base Mainnet",
+              nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+              rpcUrls: ["https://mainnet.base.org"],
+              blockExplorerUrls: ["https://basescan.org"],
+            }],
+          });
+          console.log("✅ Successfully added Base network");
+          alert("✅ Successfully added Base network! You can now use VMF features.");
+        } catch (addError) {
+          console.error("❌ Failed to add Base network:", addError);
+          alert("❌ Failed to add Base network. Please manually add Base network to your wallet:\n\nNetwork Name: Base Mainnet\nRPC URL: https://mainnet.base.org\nChain ID: 8453\nCurrency Symbol: ETH\nBlock Explorer: https://basescan.org");
+        }
       } else {
-        throw switchError;
+        console.error("❌ Failed to switch to Base network:", switchError);
+        alert("❌ Failed to switch to Base network. Please manually switch to Base network in your wallet to use VMF features.");
       }
     }
   }
@@ -607,10 +642,38 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                 <X className="h-4 w-4" />
               </Button>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-6 relative">
               <div id="modal-description" className="sr-only">
                 Purchase VMF coins and select charities to support veterans and military families
               </div>
+
+              {/* Network blocking overlay - only show when connected but not on Base */}
+              {isConnected && !isOnBaseNetwork && (
+                <div className="absolute inset-0 bg-white/90 backdrop-blur-sm z-50 rounded-lg flex items-center justify-center">
+                  <div className="text-center p-6 bg-red-50 border-2 border-red-200 rounded-lg max-w-md">
+                    <div className="mb-4">
+                      <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-2" />
+                      <h3 className="text-lg font-bold text-red-800 mb-2">Wrong Network!</h3>
+                      <p className="text-sm text-red-700 mb-4">
+                        VMF requires Base network to function properly.
+                        <br />
+                        Current network: ChainId {connection?.chainId}
+                        <br />
+                        Required: Base Mainnet (ChainId 8453)
+                      </p>
+                    </div>
+                    <Button
+                      onClick={switchToBaseNetwork}
+                      className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-lg"
+                    >
+                      🔄 Switch to Base Network
+                    </Button>
+                    <p className="text-xs text-red-600 mt-2">
+                      This will automatically add Base network to your wallet if needed.
+                    </p>
+                  </div>
+                </div>
+              )}
 
                               {!isConnected ? (
                 <>

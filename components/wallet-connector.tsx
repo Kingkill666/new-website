@@ -254,6 +254,10 @@ export function WalletConnector({
     }
   }
 
+  // Check if user is on the correct network for VMF
+  const isOnCorrectNetwork = walletState.chainId === 8453
+  const needsNetworkSwitch = walletState.isConnected && !isOnCorrectNetwork
+
   const getInstallUrl = (walletId: string) => {
     switch (walletId) {
       case "metamask":
@@ -371,15 +375,27 @@ export function WalletConnector({
   if (walletState.isConnected) {
     return (
       <div className="flex items-center space-x-2">
-        <div className="flex items-center space-x-2 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
-          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+        <div className={`flex items-center space-x-2 rounded-lg px-3 py-2 ${
+          isOnCorrectNetwork 
+            ? "bg-green-50 border border-green-200" 
+            : "bg-red-50 border border-red-200"
+        }`}>
+          <div className={`w-2 h-2 rounded-full ${
+            isOnCorrectNetwork ? "bg-green-500" : "bg-red-500"
+          }`}></div>
           <div className="text-sm">
-            <div className="font-medium text-green-700 flex items-center space-x-1">
+            <div className={`font-medium flex items-center space-x-1 ${
+              isOnCorrectNetwork ? "text-green-700" : "text-red-700"
+            }`}>
               <span>
                 {walletState.walletType}: {formatAddress(walletState.address!)}
               </span>
               {showChainId && walletState.chainId && (
-                <span className="text-xs bg-green-100 px-1 rounded">{getChainName(walletState.chainId)}</span>
+                <span className={`text-xs px-1 rounded ${
+                  isOnCorrectNetwork ? "bg-green-100" : "bg-red-100"
+                }`}>
+                  {getChainName(walletState.chainId)}
+                </span>
               )}
             </div>
             {showBalance && walletState.balance && (
@@ -393,7 +409,17 @@ export function WalletConnector({
           </div>
         </div>
 
-
+        {/* Network switch button when on wrong network */}
+        {needsNetworkSwitch && (
+          <Button
+            variant="outline"
+            size={size}
+            onClick={() => handleNetworkSwitch("base")}
+            className="text-orange-600 border-orange-200 hover:bg-orange-50"
+          >
+            🔄 Switch to Base
+          </Button>
+        )}
 
         <Button
           variant="outline"
