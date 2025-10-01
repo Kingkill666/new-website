@@ -509,7 +509,7 @@ const Index = () => {
                         onClick={() => {/* TODO: Add staking functionality */}}
                         aria-label="Stake VMF tokens"
                       >
-                        Staking
+                        Stake VMF
                       </Button>
                     </div>
 
