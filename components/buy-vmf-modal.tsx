@@ -835,40 +835,6 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                   </div>
                 </div>
                 
-                {/* Network status and debug section */}
-                <div className="mt-2 pt-2 border-t border-green-300">
-                  {isConnected ? (
-                    connection?.chainId === 8453 ? (
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-green-600">✅ Connected to Base Mainnet</span>
-                        <button
-                          onClick={async () => {
-                            console.log("🧪 Testing contract oracle...");
-                            const provider = new ethers.BrowserProvider(window.ethereum);
-                            await testContractOracle(provider);
-                          }}
-                          className="text-xs text-green-600 hover:text-green-800 underline"
-                        >
-                          🧪 Test Oracle
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-orange-600">
-                          ⚠️ Wrong Network (ChainId: {connection?.chainId})
-                        </span>
-                        <button
-                          onClick={switchToBaseNetwork}
-                          className="text-xs text-blue-600 hover:text-blue-800 underline"
-                        >
-                          🔄 Switch to Base
-                        </button>
-                      </div>
-                    )
-                  ) : (
-                    <span className="text-xs text-gray-500">Connect wallet to Base network for real-time pricing</span>
-                  )}
-                </div>
               </div>
 
               {/* Description */}
