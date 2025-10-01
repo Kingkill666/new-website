@@ -148,21 +148,22 @@ export async function getVMFPriceFromOracle(provider: ethers.Provider): Promise<
 }
 
 /**
- * Calculate VMF amount based on USDC amount and current oracle price
+ * Calculate VMF amount based on USDC amount and current price (Uniswap or oracle)
  * @param usdcAmount - Amount in USDC (as number)
  * @param provider - Ethers provider instance
  * @returns Promise<number> - VMF amount to receive
  */
 export async function calculateVMFAmount(usdcAmount: number, provider: ethers.Provider): Promise<number> {
   try {
-    const pricePerVMF = await getVMFPriceFromOracle(provider);
+    // Get price info (tries Uniswap first, then falls back to oracle)
+    const priceInfo = await getPriceInfo(provider);
     
-    if (pricePerVMF <= 0) {
-      throw new Error("Invalid price from oracle");
+    if (priceInfo.price <= 0) {
+      throw new Error("Invalid price from price source");
     }
     
     // Calculate: USDC amount / price per VMF = VMF amount
-    return usdcAmount / pricePerVMF;
+    return usdcAmount / priceInfo.price;
   } catch (error) {
     console.error("Error calculating VMF amount:", error);
     // Fallback to 1:1 ratio
@@ -171,57 +172,234 @@ export async function calculateVMFAmount(usdcAmount: number, provider: ethers.Pr
 }
 
 /**
- * Get price information for display
+ * Fetch real-time VMF price from multiple sources (DexScreener, CoinGecko, etc.)
+ * @returns Promise<{price: number, source: string}> - Price and source info
+ */
+export async function getUniswapPrice(): Promise<{price: number, source: string}> {
+  try {
+    console.log("🔍 Fetching VMF price from multiple sources...");
+    
+    // Try DexScreener first
+    try {
+      console.log("📡 Trying DexScreener...");
+      const DEXSCREENER_URL = `https://api.dexscreener.com/latest/dex/tokens/${VMF_CONTRACT_ADDRESS}`;
+      
+      const response = await fetch(DEXSCREENER_URL, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        
+        if (data.pairs && data.pairs.length > 0) {
+          // Find the most liquid pair (highest liquidity)
+          const sortedPairs = data.pairs
+            .filter((pair: any) => pair.chainId === 'base' && pair.priceUsd)
+            .sort((a: any, b: any) => parseFloat(b.liquidity?.usd || '0') - parseFloat(a.liquidity?.usd || '0'));
+          
+          if (sortedPairs.length > 0) {
+            const bestPair = sortedPairs[0];
+            const price = parseFloat(bestPair.priceUsd);
+            
+            if (price > 0) {
+              console.log("✅ DexScreener price fetched:", price);
+              console.log("📍 Best pair:", bestPair.dexId, bestPair.baseToken.symbol, "/", bestPair.quoteToken.symbol);
+              
+              return { 
+                price, 
+                source: `DexScreener (${bestPair.dexId})` 
+              };
+            }
+          }
+        }
+      }
+    } catch (dexError) {
+      console.warn("⚠️ DexScreener failed:", dexError);
+    }
+    
+    // Try CoinGecko as fallback
+    try {
+      console.log("📡 Trying CoinGecko...");
+      const COINGECKO_URL = `https://api.coingecko.com/api/v3/simple/token_price/base?contract_addresses=${VMF_CONTRACT_ADDRESS}&vs_currencies=usd`;
+      
+      const response = await fetch(COINGECKO_URL, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        const tokenData = data[VMF_CONTRACT_ADDRESS.toLowerCase()];
+        
+        if (tokenData && tokenData.usd && tokenData.usd > 0) {
+          console.log("✅ CoinGecko price fetched:", tokenData.usd);
+          return { 
+            price: tokenData.usd, 
+            source: "CoinGecko" 
+          };
+        }
+      }
+    } catch (cgError) {
+      console.warn("⚠️ CoinGecko failed:", cgError);
+    }
+    
+    // Try direct Uniswap V3 subgraph (newer endpoint)
+    try {
+      console.log("📡 Trying Uniswap V3 subgraph...");
+      const UNISWAP_GRAPH_URL = "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3";
+      
+      const query = `
+        query GetTokenPrice($tokenId: String!) {
+          token(id: $tokenId) {
+            id
+            symbol
+            name
+            decimals
+            derivedETH
+          }
+          bundle(id: "1") {
+            ethPriceUSD
+          }
+        }
+      `;
+      
+      const variables = {
+        tokenId: VMF_CONTRACT_ADDRESS.toLowerCase()
+      };
+      
+      const response = await fetch(UNISWAP_GRAPH_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query,
+          variables
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        
+        if (!data.errors && data.data?.token && data.data?.bundle) {
+          const token = data.data.token;
+          const bundle = data.data.bundle;
+          
+          const priceInETH = parseFloat(token.derivedETH);
+          const ethPriceUSD = parseFloat(bundle.ethPriceUSD);
+          
+          if (priceInETH > 0 && ethPriceUSD > 0) {
+            const price = priceInETH * ethPriceUSD;
+            console.log("✅ Uniswap V3 price fetched:", price);
+            return { 
+              price, 
+              source: "Uniswap V3" 
+            };
+          }
+        }
+      }
+    } catch (uniError) {
+      console.warn("⚠️ Uniswap V3 failed:", uniError);
+    }
+    
+    // All methods failed
+    throw new Error("All price sources failed");
+    
+  } catch (error) {
+    console.error("❌ Error fetching price from all sources:", error);
+    throw error;
+  }
+}
+
+/**
+ * Get price information for display without provider (external sources only)
+ * @returns Promise<{price: number, source: string}> - Price and source info
+ */
+export async function getPriceInfoNoProvider(): Promise<{price: number, source: string}> {
+  try {
+    // Try to get price from external sources
+    const externalPrice = await getUniswapPrice();
+    console.log("✅ Using external price:", externalPrice);
+    return externalPrice;
+  } catch (error) {
+    console.error("Error getting price info (no provider):", error);
+    return { price: 1, source: "Fallback" };
+  }
+}
+
+/**
+ * Get price information for display - prioritizes contract oracle, then external sources
  * @param provider - Ethers provider instance
  * @returns Promise<{price: number, source: string}> - Price and source info
  */
 export async function getPriceInfo(provider: ethers.Provider): Promise<{price: number, source: string}> {
   try {
-    // Check network - MUST be Base mainnet (chainId 8453)
-    const network = await provider.getNetwork();
-    if (network.chainId !== 8453n) {
-      throw new Error(`Wrong network. Expected Base mainnet (8453), got ${network.chainId}. Please switch to Base mainnet.`);
-    }
-    
-    const vmfContract = new ethers.Contract(VMF_CONTRACT_ADDRESS, VMF_ABI, provider);
-    
-    let oracleAddress;
+    // First try to get price from contract oracle (most reliable for VMF)
     try {
-      oracleAddress = await vmfContract.priceOracle();
-      console.log("📍 Oracle address from getPriceInfo:", oracleAddress);
-    } catch (contractError) {
-      console.error("❌ Contract method call failed in getPriceInfo:", contractError);
-      console.error("❌ Error details:", {
-        message: contractError.message,
-        code: contractError.code,
-        data: contractError.data
-      });
-      throw contractError;
+      // Check network - MUST be Base mainnet (chainId 8453)
+      const network = await provider.getNetwork();
+      if (network.chainId !== 8453n) {
+        throw new Error(`Wrong network. Expected Base mainnet (8453), got ${network.chainId}. Please switch to Base mainnet.`);
+      }
+      
+      const vmfContract = new ethers.Contract(VMF_CONTRACT_ADDRESS, VMF_ABI, provider);
+      
+      let oracleAddress;
+      try {
+        oracleAddress = await vmfContract.priceOracle();
+        console.log("📍 Oracle address from getPriceInfo:", oracleAddress);
+      } catch (contractError) {
+        console.error("❌ Contract method call failed in getPriceInfo:", contractError);
+        throw contractError;
+      }
+      
+      if (oracleAddress !== ethers.ZeroAddress) {
+        // Oracle is set, get price from oracle
+        const oracleContract = new ethers.Contract(oracleAddress, ORACLE_ABI, provider);
+        const priceE18 = await oracleContract.spotPriceUSDCPerVMF();
+        const price = Number(ethers.formatEther(priceE18));
+        
+        // Determine oracle source based on address
+        let source = "Unknown Oracle";
+        if (oracleAddress.toLowerCase() === FIXED_PRICE_ORACLE_ADDRESS.toLowerCase()) {
+          source = "Fixed Price Oracle";
+        } else if (oracleAddress.toLowerCase() === SUSHISWAP_ORACLE_ADDRESS.toLowerCase()) {
+          source = "SushiSwap V3 Oracle";
+        } else {
+          source = `Oracle (${oracleAddress.slice(0, 6)}...)`;
+        }
+        
+        console.log("✅ Contract oracle price fetched:", price);
+        return { price, source };
+      } else {
+        // No oracle set, using static multiple
+        const donationMultipleBps = await vmfContract.donationMultipleBps();
+        const price = Number(donationMultipleBps) / 10000;
+        console.log("✅ Static multiple price fetched:", price);
+        return { price, source: "Static Multiple" };
+      }
+    } catch (oracleError) {
+      console.warn("⚠️ Contract oracle failed, trying external sources:", oracleError);
     }
     
-    if (oracleAddress === ethers.ZeroAddress) {
-      // No oracle set, using static multiple
-      const donationMultipleBps = await vmfContract.donationMultipleBps();
-      const price = Number(donationMultipleBps) / 10000;
-      return { price, source: "Static Multiple" };
-    }
-
-    // Oracle is set, get price from oracle
-    const oracleContract = new ethers.Contract(oracleAddress, ORACLE_ABI, provider);
-    const priceE18 = await oracleContract.spotPriceUSDCPerVMF();
-    const price = Number(ethers.formatEther(priceE18));
-    
-    // Determine oracle source based on address
-    let source = "Unknown Oracle";
-    if (oracleAddress.toLowerCase() === FIXED_PRICE_ORACLE_ADDRESS.toLowerCase()) {
-      source = "Fixed Price Oracle";
-    } else if (oracleAddress.toLowerCase() === SUSHISWAP_ORACLE_ADDRESS.toLowerCase()) {
-      source = "SushiSwap V3 Oracle";
-    } else {
-      source = `Oracle (${oracleAddress.slice(0, 6)}...)`;
+    // Fallback to external price sources
+    try {
+      const externalPrice = await getUniswapPrice();
+      console.log("✅ External price fetched:", externalPrice);
+      return externalPrice;
+    } catch (externalError) {
+      console.warn("⚠️ External price sources failed:", externalError);
     }
     
-    return { price, source };
+    // Ultimate fallback
+    console.log("⚠️ All price sources failed, using fallback");
+    return { price: 1, source: "Fallback" };
+    
   } catch (error) {
     console.error("Error getting price info:", error);
     return { price: 1, source: "Fallback" };

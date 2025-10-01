@@ -10,7 +10,7 @@ import { X, ChevronDown, ChevronUp, CheckCircle, Copy, Check, Minus, Plus, Alert
 import { useWallet } from "@/hooks/useWallet"
 import { formatAddress } from "@/lib/wallet-config"
 import { DialogFooter } from "@/components/ui/dialog"
-import { calculateVMFAmount, getPriceInfo } from "@/lib/oracle-utils"
+import { calculateVMFAmount, getPriceInfo, getPriceInfoNoProvider } from "@/lib/oracle-utils"
 import axios from "axios"
 
 interface BuyVMFModalProps {
@@ -185,45 +185,59 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     return () => document.removeEventListener("keydown", handleKeyDown)
   }, [isOpen, onClose])
 
-  // Load price info when connected
+  // Load price info from Uniswap (works even when not connected)
   useEffect(() => {
     async function loadPriceInfo() {
-      if (isConnected && connection?.chainId === 8453) {
-        setIsLoadingPrice(true)
-        try {
+      setIsLoadingPrice(true)
+      try {
+        let info;
+        if (isConnected && connection?.chainId === 8453) {
+          // Use provider-based pricing (tries Uniswap first, then oracle)
           const provider = new ethers.BrowserProvider(window.ethereum)
-          const info = await getPriceInfo(provider)
-          setPriceInfo(info)
-        } catch (error) {
-          console.error("Failed to load price info:", error)
-          setPriceInfo({ price: 1, source: "Fallback" })
-        } finally {
-          setIsLoadingPrice(false)
+          info = await getPriceInfo(provider)
+        } else {
+          // Use Uniswap-only pricing when not connected or wrong network
+          info = await getPriceInfoNoProvider()
         }
+        setPriceInfo(info)
+      } catch (error) {
+        console.error("Failed to load price info:", error)
+        setPriceInfo({ price: 1, source: "Fallback" })
+      } finally {
+        setIsLoadingPrice(false)
       }
     }
     loadPriceInfo()
   }, [isConnected, connection?.chainId])
 
-  // Calculate VMF amount based on oracle price
+  // Calculate VMF amount based on current price (Uniswap or oracle)
   useEffect(() => {
     async function calculateVMF() {
-      if (amount && isConnected && connection?.chainId === 8453 && priceInfo) {
+      if (amount && priceInfo) {
         try {
-          const provider = new ethers.BrowserProvider(window.ethereum)
-          const vmfAmount = await calculateVMFAmount(Number(amount), provider)
-          setVmfAmount(vmfAmount.toFixed(4))
+          if (isConnected && connection?.chainId === 8453) {
+            // Use provider-based calculation (tries Uniswap first, then oracle)
+            const provider = new ethers.BrowserProvider(window.ethereum)
+            const vmfAmount = await calculateVMFAmount(Number(amount), provider)
+            setVmfAmount(vmfAmount.toFixed(4))
+          } else {
+            // Use price info directly when not connected
+            const vmfAmount = Number(amount) / priceInfo.price
+            setVmfAmount(vmfAmount.toFixed(4))
+          }
           setCharityPool(amount)
         } catch (error) {
           console.error("Failed to calculate VMF amount:", error)
-          // Fallback to simple calculation
-          setVmfAmount(Number.parseFloat(amount).toFixed(4))
+          // Fallback to simple calculation using current price
+          if (priceInfo && priceInfo.price > 0) {
+            const vmfAmount = Number(amount) / priceInfo.price
+            setVmfAmount(vmfAmount.toFixed(4))
+          } else {
+            // Ultimate fallback to 1:1 ratio
+            setVmfAmount(Number.parseFloat(amount).toFixed(4))
+          }
           setCharityPool(amount)
         }
-      } else if (amount) {
-        // Fallback when not connected or on wrong network
-        setVmfAmount(Number.parseFloat(amount).toFixed(4))
-        setCharityPool(amount)
       }
     }
     calculateVMF()
@@ -672,31 +686,29 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
             </div>
 
               {/* Price Information */}
-              {isConnected && connection?.chainId === 8453 && (
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-green-800">Current VMF Price</p>
-                      {isLoadingPrice ? (
-                        <p className="text-xs text-green-600">Loading price...</p>
-                      ) : priceInfo ? (
-                        <p className="text-xs text-green-600">
-                          ${priceInfo.price.toFixed(6)} USDC per VMF
-                          <span className="ml-2 text-xs text-green-500">({priceInfo.source})</span>
-                        </p>
-                      ) : (
-                        <p className="text-xs text-green-600">Price unavailable</p>
-                      )}
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-medium text-green-800">You'll Receive</p>
-                      <p className="text-lg font-bold text-green-700">
-                        {isLoadingPrice ? "..." : vmfAmount} VMF
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-green-800">Current VMF Price</p>
+                    {isLoadingPrice ? (
+                      <p className="text-xs text-green-600">Loading price...</p>
+                    ) : priceInfo ? (
+                      <p className="text-xs text-green-600">
+                        ${priceInfo.price.toFixed(6)} USDC per VMF
+                        <span className="ml-2 text-xs text-green-500">({priceInfo.source})</span>
                       </p>
-                    </div>
+                    ) : (
+                      <p className="text-xs text-green-600">Price unavailable</p>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-medium text-green-800">You'll Receive</p>
+                    <p className="text-lg font-bold text-green-700">
+                      {isLoadingPrice ? "..." : vmfAmount} VMF
+                    </p>
                   </div>
                 </div>
-              )}
+              </div>
 
               {/* Description */}
               <div className="bg-blue-50 p-4 rounded-lg mb-4">
