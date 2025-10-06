@@ -11,7 +11,7 @@ import { useWallet } from "@/hooks/useWallet"
 import { formatAddress } from "@/lib/wallet-config"
 import { DialogFooter } from "@/components/ui/dialog"
 import { calculateVMFAmount, getPriceInfo, getPriceInfoNoProvider, testContractOracle } from "@/lib/oracle-utils"
-import { isBaseNetwork, switchToBaseNetwork as switchToBase, getNetworkName } from "@/lib/network-utils"
+import { isBaseNetwork, getNetworkName, getBaseNetworkInstructions } from "@/lib/network-utils"
 import axios from "axios"
 
 interface BuyVMFModalProps {
@@ -220,18 +220,9 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
           info = await getPriceInfo(provider)
           console.log("✅ Got price from provider:", info);
         } else if (isConnected && !isBaseNetwork(connection?.chainId)) {
-          // Wrong network - try to switch to Base
-          console.log("⚠️ Wrong network detected, attempting to switch to Base...");
-          try {
-            await switchToBase();
-            // Retry with Base network
-            const provider = new ethers.BrowserProvider(window.ethereum)
-            info = await getPriceInfo(provider)
-            console.log("✅ Got price after network switch:", info);
-          } catch (switchError) {
-            console.warn("⚠️ Network switch failed, using external sources:", switchError);
-            info = await getPriceInfoNoProvider()
-          }
+          // Wrong network - use external sources only
+          console.log("⚠️ Wrong network detected, using external price sources only");
+          info = await getPriceInfoNoProvider()
         } else {
           // Use external sources when not connected
           info = await getPriceInfoNoProvider()
@@ -260,14 +251,9 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     }
   }, [isConnected, connection?.chainId])
 
-  // Function to switch to Base network
-  const switchToBaseNetwork = async () => {
-    try {
-      await switchToBase();
-      alert("✅ Successfully switched to Base network! You can now use VMF features.");
-    } catch (error: any) {
-      alert(`❌ Failed to switch to Base network: ${error.message}`);
-    }
+  // Function to show Base network instructions
+  const showBaseNetworkInstructions = () => {
+    alert(getBaseNetworkInstructions());
   }
 
   // Calculate VMF amount based on current price (Uniswap or oracle)
@@ -415,16 +401,14 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     return ((Number.parseFloat(amount) * percentage) / 100).toFixed(2)
   }
 
-  const handleNetworkSwitch = async () => {
-    // For now, we'll just show an alert since the simplified wallet hook doesn't support network switching
-    alert("Please switch to Base network in your wallet")
-    setNeedsNetworkSwitch(false)
+  const handleNetworkSwitch = () => {
+    alert(getBaseNetworkInstructions())
   }
 
   const handleBuyNext = async () => {
     if (amount && selectedCharities.length > 0 && isConnected && getTotalPercentage() === 100) {
       if (needsNetworkSwitch) {
-        alert("Please switch to the correct network to continue")
+        alert(getBaseNetworkInstructions())
         return
       }
       
@@ -525,7 +509,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
 
   const handleVerifyConfirm = async () => {
     if (needsNetworkSwitch) {
-      alert("Please switch to the correct network first")
+      alert(getBaseNetworkInstructions())
       return
     }
 
@@ -624,13 +608,13 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                       </p>
                     </div>
                     <Button
-                      onClick={switchToBaseNetwork}
+                      onClick={showBaseNetworkInstructions}
                       className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-lg"
                     >
-                      🔄 Switch to Base Network
+                      📋 Show Network Instructions
                     </Button>
                     <p className="text-xs text-red-600 mt-2">
-                      This will automatically add Base network to your wallet if needed.
+                      You must manually switch to Base network in your wallet.
                     </p>
                   </div>
                 </div>

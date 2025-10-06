@@ -31,9 +31,14 @@ if (!projectId) {
     projectId: projectId!,
     // Pass networks directly (type is now correctly inferred from config)
     networks: networks,
-    defaultNetwork: base, // Base network for VMF
+    defaultNetwork: base, // Base network for VMF - REQUIRED
     metadata,
-    features: { analytics: true }, // Optional features
+    features: { 
+      analytics: true,
+      email: false, // Disable email features
+      socials: false, // Disable social login features
+    },
+    enableNetworkSwitching: false, // Disable automatic network switching
   })
 }
 
