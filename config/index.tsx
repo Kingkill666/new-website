@@ -15,7 +15,7 @@ if (!projectId) {
 // Define supported networks - Base only for VMF
 export const networks: [Chain, ...Chain[]] = [base] // Base network only for VMF token
 
-// Create the Wagmi adapter instance
+// Create the Wagmi adapter instance with explicit configuration
 export const wagmiAdapter = new WagmiAdapter({
   storage: createStorage({ storage: cookieStorage }), // Use cookieStorage for SSR
   ssr: true, // Enable SSR support
