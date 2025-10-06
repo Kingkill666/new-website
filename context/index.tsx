@@ -13,10 +13,10 @@ import { mainnet } from '@reown/appkit/networks'
 const queryClient = new QueryClient()
 
 const metadata = {
-  name: 'VMF Website',
-  description: 'VMF Token Website',
-  url: typeof window !== 'undefined' ? window.location.origin : 'https://your-app-url.com', // Replace with your actual URL
-  icons: ['/favicon.png'], // Replace with your actual icon URL
+  name: 'VMF - Veterans & Military Families',
+  description: 'Supporting those who served through blockchain technology',
+  url: typeof window !== 'undefined' ? window.location.origin : 'https://vmfcoin.com',
+  icons: ['https://vmfcoin.com/favicon.png'],
 }
 
 // Initialize AppKit *outside* the component render cycle
