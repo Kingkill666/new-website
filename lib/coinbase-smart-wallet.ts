@@ -1,19 +1,30 @@
-// Coinbase Smart Wallet integration
+// Coinbase Smart Wallet integration - Client-side only
 import { CoinbaseWalletSDK } from '@coinbase/wallet-sdk'
 import { base } from 'viem/chains'
 
-// Initialize the Coinbase Wallet SDK
-const coinbaseWallet = new CoinbaseWalletSDK({
-  appName: 'VMF - Veterans & Military Families',
-  appLogoUrl: 'https://vmfcoin.com/favicon.png',
-  darkMode: false
-})
+// Initialize the Coinbase Wallet SDK only on client-side
+let coinbaseWallet: CoinbaseWalletSDK | null = null
+let coinbaseSmartWalletProvider: any = null
 
-// Create the provider that connects to the Smart Wallet
-export const coinbaseSmartWalletProvider = coinbaseWallet.makeWeb3Provider({
-  chain: base, // Use Base network for VMF
-  options: 'smartWalletOnly' // This is key for the new embedded experience
-})
+// Initialize SDK only when needed and on client-side
+function initializeCoinbaseWallet() {
+  if (typeof window === 'undefined') return null
+  
+  if (!coinbaseWallet) {
+    coinbaseWallet = new CoinbaseWalletSDK({
+      appName: 'VMF - Veterans & Military Families',
+      appLogoUrl: 'https://vmfcoin.com/favicon.png',
+      darkMode: false
+    })
+    
+    coinbaseSmartWalletProvider = coinbaseWallet.makeWeb3Provider({
+      chain: base, // Use Base network for VMF
+      options: 'smartWalletOnly' // This is key for the new embedded experience
+    })
+  }
+  
+  return coinbaseSmartWalletProvider
+}
 
 /**
  * Connect to Coinbase Smart Wallet
@@ -23,8 +34,13 @@ export async function connectCoinbaseSmartWallet(): Promise<string[]> {
   try {
     console.log('🔄 VMF: Connecting to Coinbase Smart Wallet...')
     
+    const provider = initializeCoinbaseWallet()
+    if (!provider) {
+      throw new Error('Coinbase Smart Wallet not available on this platform')
+    }
+    
     // This triggers the pop-up for passkey sign-in
-    const accounts = await coinbaseSmartWalletProvider.request({ 
+    const accounts = await provider.request({ 
       method: 'eth_requestAccounts' 
     }) as string[]
     
@@ -41,12 +57,12 @@ export async function connectCoinbaseSmartWallet(): Promise<string[]> {
  * Check if Coinbase Smart Wallet is available
  */
 export function isCoinbaseSmartWalletAvailable(): boolean {
-  return typeof window !== 'undefined' && !!coinbaseSmartWallet
+  return typeof window !== 'undefined' && !!initializeCoinbaseWallet()
 }
 
 /**
  * Get the Coinbase Smart Wallet provider for use with ethers.js
  */
 export function getCoinbaseSmartWalletProvider() {
-  return coinbaseSmartWalletProvider
+  return initializeCoinbaseWallet()
 }
