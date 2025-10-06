@@ -164,7 +164,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
 
   // Check network status and force Base network
   useEffect(() => {
-    const checkNetworkStatus = () => {
+    const checkNetworkStatus = async () => {
       if (isConnected && chain && isBaseNetwork(chain.id)) {
         setIsOnBaseNetwork(true)
         setNeedsNetworkSwitch(false)
