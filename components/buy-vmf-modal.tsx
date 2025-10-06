@@ -11,6 +11,7 @@ import { useWallet } from "@/hooks/useWallet"
 import { formatAddress } from "@/lib/wallet-config"
 import { DialogFooter } from "@/components/ui/dialog"
 import { calculateVMFAmount, getPriceInfo, getPriceInfoNoProvider, testContractOracle } from "@/lib/oracle-utils"
+import { isBaseNetwork, switchToBaseNetwork as switchToBase, getNetworkName } from "@/lib/network-utils"
 import axios from "axios"
 
 interface BuyVMFModalProps {
@@ -152,10 +153,10 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
   // Check network status
   useEffect(() => {
     const checkNetworkStatus = () => {
-      if (isConnected && connection?.chainId === 8453) {
+      if (isConnected && isBaseNetwork(connection?.chainId)) {
         setIsOnBaseNetwork(true)
         setNeedsNetworkSwitch(false)
-      } else if (isConnected && connection?.chainId !== 8453) {
+      } else if (isConnected && !isBaseNetwork(connection?.chainId)) {
         setIsOnBaseNetwork(false)
         setNeedsNetworkSwitch(true)
       } else {
@@ -213,16 +214,16 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
       setIsLoadingPrice(true)
       try {
         let info;
-        if (isConnected && connection?.chainId === 8453) {
+        if (isConnected && isBaseNetwork(connection?.chainId)) {
           // Use provider-based pricing (prioritizes contract oracle)
           const provider = new ethers.BrowserProvider(window.ethereum)
           info = await getPriceInfo(provider)
           console.log("✅ Got price from provider:", info);
-        } else if (isConnected && connection?.chainId !== 8453) {
+        } else if (isConnected && !isBaseNetwork(connection?.chainId)) {
           // Wrong network - try to switch to Base
           console.log("⚠️ Wrong network detected, attempting to switch to Base...");
           try {
-            await switchToBaseNetwork();
+            await switchToBase();
             // Retry with Base network
             const provider = new ethers.BrowserProvider(window.ethereum)
             info = await getPriceInfo(provider)
@@ -261,50 +262,11 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
 
   // Function to switch to Base network
   const switchToBaseNetwork = async () => {
-    if (!window.ethereum) {
-      alert("❌ No wallet detected! Please install a Web3 wallet like MetaMask or Coinbase Wallet.");
-      return;
-    }
-
     try {
-      console.log("🔄 Attempting to switch to Base network...");
-      
-      // Try to switch to Base network
-      await window.ethereum.request({
-        method: "wallet_switchEthereumChain",
-        params: [{ chainId: "0x2105" }], // Base mainnet
-      });
-      console.log("✅ Successfully switched to Base network");
-      
-      // Show success message
+      await switchToBase();
       alert("✅ Successfully switched to Base network! You can now use VMF features.");
-      
-    } catch (switchError: any) {
-      console.log("⚠️ Switch failed, trying to add Base network...");
-      
-      if (switchError.code === 4902) {
-        // Chain not added, try to add Base Mainnet
-        try {
-          await window.ethereum.request({
-            method: "wallet_addEthereumChain",
-            params: [{
-              chainId: "0x2105",
-              chainName: "Base Mainnet",
-              nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
-              rpcUrls: ["https://mainnet.base.org"],
-              blockExplorerUrls: ["https://basescan.org"],
-            }],
-          });
-          console.log("✅ Successfully added Base network");
-          alert("✅ Successfully added Base network! You can now use VMF features.");
-        } catch (addError) {
-          console.error("❌ Failed to add Base network:", addError);
-          alert("❌ Failed to add Base network. Please manually add Base network to your wallet:\n\nNetwork Name: Base Mainnet\nRPC URL: https://mainnet.base.org\nChain ID: 8453\nCurrency Symbol: ETH\nBlock Explorer: https://basescan.org");
-        }
-      } else {
-        console.error("❌ Failed to switch to Base network:", switchError);
-        alert("❌ Failed to switch to Base network. Please manually switch to Base network in your wallet to use VMF features.");
-      }
+    } catch (error: any) {
+      alert(`❌ Failed to switch to Base network: ${error.message}`);
     }
   }
 
@@ -313,7 +275,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     async function calculateVMF() {
       if (amount && priceInfo) {
         try {
-          if (isConnected && connection?.chainId === 8453) {
+          if (isConnected && isBaseNetwork(connection?.chainId)) {
             // Use provider-based calculation (tries Uniswap first, then oracle)
             const provider = new ethers.BrowserProvider(window.ethereum)
             const vmfAmount = await calculateVMFAmount(Number(amount), provider)
@@ -343,7 +305,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
 
   useEffect(() => {
     if (isConnected && connection) {
-      setNeedsNetworkSwitch(connection.chainId !== 8453)
+      setNeedsNetworkSwitch(!isBaseNetwork(connection.chainId))
     }
   }, [connection?.chainId, isConnected])
 
@@ -469,10 +431,10 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
       // CRITICAL: Verify we're on Base mainnet before proceeding
       console.log("🔍 Initial network check - wallet chainId:", connection?.chainId)
       
-      if (!connection || connection.chainId !== 8453) {
-        const currentChain = connection?.chainId || 'unknown'
-        console.error("❌ Wrong network detected:", currentChain)
-        alert(`❌ WRONG NETWORK! You are on chain ${currentChain}. Please switch to Base mainnet (chainId 8453) to continue.`)
+      if (!connection || !isBaseNetwork(connection.chainId)) {
+        const currentNetwork = getNetworkName(connection?.chainId)
+        console.error("❌ Wrong network detected:", connection?.chainId)
+        alert(`❌ WRONG NETWORK! You are on ${currentNetwork}. Please switch to Base network to continue.`)
         return
       }
       
@@ -495,10 +457,10 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
       // CRITICAL: Verify we're on Base mainnet before any transaction
       console.log("🔍 Transaction network check - wallet chainId:", connection?.chainId)
       
-      if (!connection || connection.chainId !== 8453) {
-        const currentChain = connection?.chainId || 'unknown'
-        console.error("❌ Wrong network detected:", currentChain)
-        alert(`❌ WRONG NETWORK! You are on chain ${currentChain}. Please switch to Base mainnet (chainId 8453) before making any transactions.`)
+      if (!connection || !isBaseNetwork(connection.chainId)) {
+        const currentNetwork = getNetworkName(connection?.chainId)
+        console.error("❌ Wrong network detected:", connection?.chainId)
+        alert(`❌ WRONG NETWORK! You are on ${currentNetwork}. Please switch to Base network before making any transactions.`)
         setIsProcessing(false)
         return false
       }
@@ -571,10 +533,10 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     console.log("🔍 Checking network - wallet chainId:", connection?.chainId)
     
     // Use wallet connection state instead of creating new provider
-    if (!connection || connection.chainId !== 8453) {
-      const currentChain = connection?.chainId || 'unknown'
-      console.error("❌ Wrong network detected:", currentChain)
-      alert(`❌ WRONG NETWORK! You are on chain ${currentChain}. Please switch to Base mainnet (chainId 8453) before confirming the transaction.`)
+    if (!connection || !isBaseNetwork(connection.chainId)) {
+      const currentNetwork = getNetworkName(connection?.chainId)
+      console.error("❌ Wrong network detected:", connection?.chainId)
+      alert(`❌ WRONG NETWORK! You are on ${currentNetwork}. Please switch to Base network before confirming the transaction.`)
       return
     }
     
@@ -656,9 +618,9 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                       <p className="text-sm text-red-700 mb-4">
                         VMF requires Base network to function properly.
                         <br />
-                        Current network: ChainId {connection?.chainId}
+                        Current network: {getNetworkName(connection?.chainId)}
                         <br />
-                        Required: Base Mainnet (ChainId 8453)
+                        Required: Base Network
                       </p>
                     </div>
                     <Button

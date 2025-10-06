@@ -8,7 +8,7 @@ import { createAppKit } from '@reown/appkit/react'
 // Import config, networks, projectId, and wagmiAdapter from your config file
 import { config, networks, projectId, wagmiAdapter } from '@/config'
 // Import the default network separately if needed
-import { mainnet } from '@reown/appkit/networks'
+import { base } from '@reown/appkit/networks'
 
 const queryClient = new QueryClient()
 
@@ -31,7 +31,7 @@ if (!projectId) {
     projectId: projectId!,
     // Pass networks directly (type is now correctly inferred from config)
     networks: networks,
-    defaultNetwork: mainnet, // Or your preferred default
+    defaultNetwork: base, // Base network for VMF
     metadata,
     features: { analytics: true }, // Optional features
   })

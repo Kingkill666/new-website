@@ -1,7 +1,7 @@
 // config/index.tsx
 import { cookieStorage, createStorage } from 'wagmi' // Use 'wagmi' directly (Wagmi v2+)
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
-import { mainnet, arbitrum } from '@reown/appkit/networks'
+import { base } from '@reown/appkit/networks'
 import type { Chain } from 'viem' // Import Chain type for explicit typing
 
 // Read Project ID from environment variables
@@ -12,8 +12,8 @@ if (!projectId) {
   throw new Error('NEXT_PUBLIC_PROJECT_ID is not defined. Please set it in .env.local')
 }
 
-// Define supported networks, explicitly typed as a non-empty array of Chains
-export const networks: [Chain, ...Chain[]] = [mainnet, arbitrum] // Add other desired networks
+// Define supported networks - Base only for VMF
+export const networks: [Chain, ...Chain[]] = [base] // Base network only for VMF token
 
 // Create the Wagmi adapter instance
 export const wagmiAdapter = new WagmiAdapter({
