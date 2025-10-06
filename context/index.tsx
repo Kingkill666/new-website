@@ -38,7 +38,7 @@ if (!projectId) {
       email: false, // Disable email features
       socials: false, // Disable social login features
     },
-    enableNetworkSwitching: false, // Disable automatic network switching
+    enableNetworkSwitching: true, // Enable automatic network switching to Base
   })
 }
 

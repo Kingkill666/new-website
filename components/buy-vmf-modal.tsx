@@ -11,7 +11,7 @@ import { useWallet } from "@/hooks/useWallet"
 import { formatAddress } from "@/lib/wallet-config"
 import { DialogFooter } from "@/components/ui/dialog"
 import { calculateVMFAmount, getPriceInfo, getPriceInfoNoProvider, testContractOracle } from "@/lib/oracle-utils"
-import { isBaseNetwork, getNetworkName, getBaseNetworkInstructions } from "@/lib/network-utils"
+import { isBaseNetwork, switchToBaseNetwork as switchToBase, getNetworkName, forceBaseNetwork } from "@/lib/network-utils"
 import axios from "axios"
 
 interface BuyVMFModalProps {
@@ -150,15 +150,21 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     }
   }, [isOpen])
 
-  // Check network status
+  // Check network status and force Base network
   useEffect(() => {
-    const checkNetworkStatus = () => {
+    const checkNetworkStatus = async () => {
       if (isConnected && isBaseNetwork(connection?.chainId)) {
         setIsOnBaseNetwork(true)
         setNeedsNetworkSwitch(false)
       } else if (isConnected && !isBaseNetwork(connection?.chainId)) {
         setIsOnBaseNetwork(false)
         setNeedsNetworkSwitch(true)
+        // Automatically try to switch to Base network
+        try {
+          await forceBaseNetwork()
+        } catch (error) {
+          console.warn('Could not auto-switch to Base network:', error)
+        }
       } else {
         setIsOnBaseNetwork(false)
         setNeedsNetworkSwitch(false)
@@ -220,9 +226,18 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
           info = await getPriceInfo(provider)
           console.log("✅ Got price from provider:", info);
         } else if (isConnected && !isBaseNetwork(connection?.chainId)) {
-          // Wrong network - use external sources only
-          console.log("⚠️ Wrong network detected, using external price sources only");
-          info = await getPriceInfoNoProvider()
+          // Wrong network - automatically switch to Base
+          console.log("⚠️ VMF: Wrong network detected, automatically switching to Base...");
+          try {
+            await forceBaseNetwork();
+            // Retry with Base network
+            const provider = new ethers.BrowserProvider(window.ethereum)
+            info = await getPriceInfo(provider)
+            console.log("✅ VMF: Got price after automatic network switch:", info);
+          } catch (switchError) {
+            console.warn("⚠️ VMF: Automatic network switch failed, using external sources:", switchError);
+            info = await getPriceInfoNoProvider()
+          }
         } else {
           // Use external sources when not connected
           info = await getPriceInfoNoProvider()
@@ -251,9 +266,14 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     }
   }, [isConnected, connection?.chainId])
 
-  // Function to show Base network instructions
-  const showBaseNetworkInstructions = () => {
-    alert(getBaseNetworkInstructions());
+  // Function to switch to Base network
+  const switchToBaseNetwork = async () => {
+    try {
+      await switchToBase();
+      alert("✅ Successfully switched to Base network! You can now use VMF features.");
+    } catch (error: any) {
+      alert(`❌ Failed to switch to Base network: ${error.message}`);
+    }
   }
 
   // Calculate VMF amount based on current price (Uniswap or oracle)
@@ -401,14 +421,16 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     return ((Number.parseFloat(amount) * percentage) / 100).toFixed(2)
   }
 
-  const handleNetworkSwitch = () => {
-    alert(getBaseNetworkInstructions())
+  const handleNetworkSwitch = async () => {
+    // For now, we'll just show an alert since the simplified wallet hook doesn't support network switching
+    alert("Please switch to Base network in your wallet")
+    setNeedsNetworkSwitch(false)
   }
 
   const handleBuyNext = async () => {
     if (amount && selectedCharities.length > 0 && isConnected && getTotalPercentage() === 100) {
       if (needsNetworkSwitch) {
-        alert(getBaseNetworkInstructions())
+        alert("Please switch to the correct network to continue")
         return
       }
       
@@ -509,7 +531,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
 
   const handleVerifyConfirm = async () => {
     if (needsNetworkSwitch) {
-      alert(getBaseNetworkInstructions())
+      alert("Please switch to the correct network first")
       return
     }
 
@@ -600,22 +622,22 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                       <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-2" />
                       <h3 className="text-lg font-bold text-red-800 mb-2">Wrong Network!</h3>
                       <p className="text-sm text-red-700 mb-4">
-                        VMF requires Base network to function properly.
+                        VMF automatically switches to Base network.
                         <br />
                         Current network: {getNetworkName(connection?.chainId)}
                         <br />
-                        Required: Base Network
+                        Switching to: Base Network
                       </p>
                     </div>
                     <Button
-                      onClick={showBaseNetworkInstructions}
+                      onClick={switchToBaseNetwork}
                       className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-lg"
                     >
-                      📋 Show Network Instructions
+                      🔄 Switch to Base Network
                     </Button>
-                    <p className="text-xs text-red-600 mt-2">
-                      You must manually switch to Base network in your wallet.
-                    </p>
+                      <p className="text-xs text-red-600 mt-2">
+                        VMF automatically switches to Base network when you connect your wallet.
+                      </p>
                   </div>
                 </div>
               )}
