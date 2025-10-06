@@ -164,7 +164,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
 
   // Check network status and force Base network
   useEffect(() => {
-    const checkNetworkStatus = async () => {
+    async function checkNetworkStatus() {
       if (isConnected && chain && isBaseNetwork(chain.id)) {
         setIsOnBaseNetwork(true)
         setNeedsNetworkSwitch(false)
@@ -283,8 +283,9 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     try {
       await switchToBase();
       alert("✅ Successfully switched to Base network! You can now use VMF features.");
-    } catch (error: any) {
-      alert(`❌ Failed to switch to Base network: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      alert(`❌ Failed to switch to Base network: ${errorMessage}`);
     }
   }
 

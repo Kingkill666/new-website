@@ -1,7 +1,7 @@
 // context/index.tsx
 'use client'
 
-import React, { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { WagmiProvider, cookieToInitialState, type Config } from 'wagmi'
 import { createAppKit } from '@reown/appkit/react'
@@ -27,8 +27,8 @@ if (!projectId) {
 } else {
   createAppKit({
     adapters: [wagmiAdapter],
-    // Use non-null assertion `!` as projectId is checked runtime, needed for TypeScript
-    projectId: projectId!,
+    // Project ID is required and already checked above
+    projectId: projectId,
     // Pass networks directly (type is now correctly inferred from config)
     networks: networks,
     defaultNetwork: base, // Base network for VMF - REQUIRED
@@ -36,9 +36,8 @@ if (!projectId) {
     features: { 
       analytics: true,
       email: false, // Disable email features
-      socials: false, // Disable social login features
+      socials: [], // Disable social login features
     },
-    enableNetworkSwitching: true, // Enable automatic network switching to Base
   })
 }
 
