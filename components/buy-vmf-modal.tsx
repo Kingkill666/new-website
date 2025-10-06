@@ -670,52 +670,47 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                       Please connect your wallet to continue with the purchase.
                     </p>
                     
-                    {/* Mobile: Coinbase Smart Wallet button + AppKit */}
-                    <div className="md:hidden space-y-3">
-                      <div className="bg-blue-100 border border-blue-300 rounded-lg p-3 mb-3">
-                        <p className="text-xs text-blue-800 leading-relaxed">
-                          <strong>📱 Mobile Note:</strong> Clicking a wallet option will open the wallet app on your device. 
-                          Complete the connection there, then return to this page to continue your purchase.
-                        </p>
-                      </div>
-                      <Button
-                        onClick={() => {
-                          // Open Coinbase Smart Wallet directly
-                          const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-                          if (isMobile) {
-                            // For mobile, use deep link
-                            window.location.href = `https://go.cb-w.com/dapp?cb_url=${encodeURIComponent(window.location.href)}`;
-                          } else {
-                            // For desktop, just trigger the modal
-                            const button = document.querySelector('appkit-button');
-                            if (button) {
-                              (button as HTMLElement).click();
-                            }
-                          }
-                        }}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2"
-                        aria-label="Connect with Coinbase Smart Wallet"
-                      >
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <title>Coinbase Smart Wallet Logo</title>
-                          <rect width="24" height="24" rx="6" fill="white"/>
-                          <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" fill="#0052FF"/>
-                          <path d="M9.5 8.5H14.5C14.7761 8.5 15 8.72386 15 9V15C15 15.2761 14.7761 15.5 14.5 15.5H9.5C9.22386 15.5 9 15.2761 9 15V9C9 8.72386 9.22386 8.5 9.5 8.5Z" fill="white"/>
-                        </svg>
-                        Coinbase Smart Wallet
-                      </Button>
-                      <div className="relative">
-                        <div className="absolute inset-0 flex items-center">
-                          <div className="w-full border-t border-gray-300"></div>
-                        </div>
-                        <div className="relative flex justify-center text-xs">
-                          <span className="px-2 bg-blue-50 text-gray-500">or connect other wallets</span>
-                        </div>
-                      </div>
-                      <div className="w-full">
-                        <appkit-button />
-                      </div>
-                    </div>
+                     {/* Mobile: Coinbase Web Wallet button + AppKit */}
+                     <div className="md:hidden space-y-3">
+                       <div className="bg-blue-100 border border-blue-300 rounded-lg p-3 mb-3">
+                         <p className="text-xs text-blue-800 leading-relaxed">
+                           <strong>📱 Mobile Note:</strong> Clicking a wallet option will open the wallet app on your device. 
+                           Complete the connection there, then return to this page to continue your purchase.
+                         </p>
+                       </div>
+                       <Button
+                         onClick={() => {
+                           // Open Coinbase Web Wallet directly
+                           const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                           if (isMobile) {
+                             // For mobile, use Coinbase Web Wallet deep link
+                             window.location.href = `https://wallet.coinbase.com/dapp?cb_url=${encodeURIComponent(window.location.href)}`;
+                           } else {
+                             // For desktop, just trigger the modal
+                             const button = document.querySelector('appkit-button');
+                             if (button) {
+                               (button as HTMLElement).click();
+                             }
+                           }
+                         }}
+                         className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2"
+                         aria-label="Connect with Coinbase Web Wallet"
+                       >
+                         <img src="/images/coinbase-logo.png" alt="Coinbase" className="h-6 w-6" />
+                         Coinbase Web Wallet
+                       </Button>
+                       <div className="relative">
+                         <div className="absolute inset-0 flex items-center">
+                           <div className="w-full border-t border-gray-300"></div>
+                         </div>
+                         <div className="relative flex justify-center text-xs">
+                           <span className="px-2 bg-blue-50 text-gray-500">or connect other wallets</span>
+                         </div>
+                       </div>
+                       <div className="w-full">
+                         <appkit-button />
+                       </div>
+                     </div>
                     
                     {/* Desktop: Just AppKit button */}
                     <div className="hidden md:block w-full">
