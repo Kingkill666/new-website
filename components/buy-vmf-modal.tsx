@@ -1,6 +1,6 @@
 "use client"
 
-import type React from "react"
+import React from "react"
 
 import { ethers } from "ethers"
 import { useState, useEffect } from "react"
@@ -134,7 +134,6 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
   // Use Wagmi hooks for wallet connection
   const { address, isConnected, chain } = useAccount()
   const { disconnect } = useDisconnect()
-  const { switchChain } = useSwitchChain()
   
   const [transactionHash, setTransactionHash] = useState("")
   const [vmfAmount, setVmfAmount] = useState("")
@@ -150,6 +149,9 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
   
   // Format address for display
   const formattedAddress = address ? formatAddress(address) : null
+
+  // Generate unique id for modal description
+  const modalDescriptionId = React.useId()
 
   // Focus management for accessibility
   useEffect(() => {
@@ -596,11 +598,8 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
 
   return (
     <div
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-      role="dialog"
-      aria-modal="true"
       aria-labelledby="modal-title"
-      aria-describedby="modal-description"
+      aria-describedby={modalDescriptionId}
     >
       <div
         className="bg-white rounded-3xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto focus:outline-none"
@@ -626,6 +625,9 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
               </Button>
             </CardHeader>
             <CardContent className="space-y-6 relative">
+              <div id={modalDescriptionId} className="sr-only">
+                Purchase VMF coins and select charities to support veterans and military families
+              </div>
               <div id="modal-description" className="sr-only">
                 Purchase VMF coins and select charities to support veterans and military families
               </div>
@@ -659,8 +661,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
               )}
 
                               {!isConnected ? (
-                <>
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4" role="alert">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4" role="alert">
                     <div className="flex items-center space-x-2 mb-2">
                       <AlertCircle className="h-4 w-4 text-blue-600" aria-hidden="true" />
                       <span className="font-medium text-blue-800">Connect Your Wallet</span>
@@ -671,6 +672,12 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                     
                     {/* Mobile: Coinbase Smart Wallet button + AppKit */}
                     <div className="md:hidden space-y-3">
+                      <div className="bg-blue-100 border border-blue-300 rounded-lg p-3 mb-3">
+                        <p className="text-xs text-blue-800 leading-relaxed">
+                          <strong>📱 Mobile Note:</strong> Clicking a wallet option will open the wallet app on your device. 
+                          Complete the connection there, then return to this page to continue your purchase.
+                        </p>
+                      </div>
                       <Button
                         onClick={() => {
                           // Open Coinbase Smart Wallet directly
@@ -690,6 +697,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                         aria-label="Connect with Coinbase Smart Wallet"
                       >
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <title>Coinbase Smart Wallet Logo</title>
                           <rect width="24" height="24" rx="6" fill="white"/>
                           <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" fill="#0052FF"/>
                           <path d="M9.5 8.5H14.5C14.7761 8.5 15 8.72386 15 9V15C15 15.2761 14.7761 15.5 14.5 15.5H9.5C9.22386 15.5 9 15.2761 9 15V9C9 8.72386 9.22386 8.5 9.5 8.5Z" fill="white"/>
@@ -714,7 +722,6 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                       <appkit-button />
                     </div>
                   </div>
-                </>
               ) : (
                 <>
                   {/* Connected Wallet Display */}
