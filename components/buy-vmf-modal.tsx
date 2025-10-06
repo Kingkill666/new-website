@@ -684,7 +684,8 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                     <p className="text-sm text-blue-700 mb-3">
                       Please select a wallet to connect and continue with the purchase.
                     </p>
-                    <div className="grid grid-cols-1 gap-3">
+                    {/* Desktop: Individual wallet buttons */}
+                    <div className="hidden md:grid grid-cols-1 gap-3">
                       <Button
                         onClick={() => connectWallet("coinbaseSmart")}
                         className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2"
@@ -717,6 +718,13 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" rx="6" fill="#8C6DFD"/><path d="M7 18V10.5C7 8.01472 9.01472 6 11.5 6H12.5C14.9853 6 17 8.01472 17 10.5V18H15V12C15 10.8954 14.1046 10 13 10H11C9.89543 10 9 10.8954 9 12V18H7Z" fill="white"/></svg>
                         Farcaster Wallet
                       </Button>
+                    </div>
+
+                    {/* Mobile: AppKit wallet connection button */}
+                    <div className="md:hidden">
+                      <div className="w-full">
+                        <appkit-button />
+                      </div>
                     </div>
                   </div>
                 </>

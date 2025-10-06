@@ -430,10 +430,6 @@ const Index = () => {
                     </span>
                   </Link>
                   
-                  {/* Mobile Wallet Connection Button */}
-                  <div className="w-full">
-                    <appkit-button />
-                  </div>
                   
                   <Button
                     className="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
