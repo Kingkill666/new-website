@@ -5,6 +5,8 @@ import { createPortal } from "react-dom"
 import { Button } from "@/components/ui/button"
 import { Wallet, ExternalLink, AlertCircle, CheckCircle, X } from "lucide-react"
 import { useWallet } from "@/hooks/useWallet"
+import { usePrivyWallet } from "@/hooks/usePrivyWallet"
+import { isMobile } from "@/lib/wallet-config"
 import { useRouter } from "next/navigation"
 
 // VMF Token Contract Address on Base
@@ -27,6 +29,15 @@ export function WalletConnector({
   showChainId = false,
   onInsufficientVMF,
 }: WalletConnectorProps) {
+  // Use Privy for mobile devices, regular wallet for desktop
+  const isMobileDevice = isMobile()
+  
+  const privyWallet = usePrivyWallet()
+  const regularWallet = useWallet()
+  
+  // Choose which wallet system to use based on device type
+  const wallet = isMobileDevice ? privyWallet : regularWallet
+  
   const {
     walletState,
     isConnecting,
@@ -37,7 +48,7 @@ export function WalletConnector({
     switchNetwork,
     addNetwork,
     error,
-  } = useWallet()
+  } = wallet
 
   const [showWalletOptions, setShowWalletOptions] = useState(false)
   const [showNetworkOptions, setShowNetworkOptions] = useState(false)
@@ -227,7 +238,13 @@ export function WalletConnector({
   }, [showWalletOptions, mounted])
 
   const handleWalletConnect = async (walletId: string) => {
-    await connectWallet(walletId)
+    if (isMobileDevice) {
+      // For mobile devices using Privy, just call connectWallet without walletId
+      await connectWallet()
+    } else {
+      // For desktop, use the regular wallet connection
+      await connectWallet(walletId)
+    }
     setShowWalletOptions(false)
   }
 
@@ -299,71 +316,125 @@ export function WalletConnector({
         </div>
 
         <div className="py-2">
-          {availableWallets.map((wallet) => (
-            <div key={wallet.id} className="relative">
+          {isMobileDevice ? (
+            // Mobile: Show Privy connection option
+            <div className="relative">
               <button
-                onClick={() =>
-                  wallet.installed ? handleWalletConnect(wallet.id) : window.open(getInstallUrl(wallet.id), "_blank")
-                }
+                onClick={() => handleWalletConnect('privy')}
                 disabled={isConnecting}
                 className="w-full flex items-center justify-between px-4 py-4 hover:bg-gray-50 transition-colors disabled:opacity-50 border-b border-gray-50 last:border-b-0"
               >
                 <div className="flex items-center space-x-4">
-                  {/* Wallet Icon */}
-                  <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center flex-shrink-0">
-                    {wallet.logo.startsWith("/") ? (
-                      <img
-                        src={wallet.logo || "/placeholder.svg"}
-                        alt={`${wallet.name} logo`}
-                        className="w-8 h-8 rounded object-contain"
-                      />
-                    ) : (
-                      <span className="text-2xl">{wallet.logo}</span>
-                    )}
+                  {/* Privy Icon */}
+                  <div className="w-10 h-10 rounded-lg overflow-hidden bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center flex-shrink-0">
+                    <span className="text-2xl">🔗</span>
                   </div>
 
                   {/* Wallet Info */}
                   <div className="text-left">
-                    <div className="font-semibold text-gray-900 text-base">{wallet.name}</div>
+                    <div className="font-semibold text-gray-900 text-base">Connect Wallet</div>
                     <div className="text-sm text-gray-500">
-                      {wallet.installed ? "Ready to connect" : "Not installed - Click to install"}
+                      Connect with any wallet or create a new one
                     </div>
                   </div>
                 </div>
 
                 {/* Status Icons */}
                 <div className="flex items-center space-x-2">
-                  {wallet.installed ? (
-                    <div className="flex items-center space-x-1">
-                      <CheckCircle className="h-5 w-5 text-green-500" />
-                      <span className="text-xs text-green-600 font-medium">Installed</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center space-x-1">
-                      <ExternalLink className="h-4 w-4 text-gray-400" />
-                      <span className="text-xs text-gray-500">Install</span>
-                    </div>
-                  )}
+                  <div className="flex items-center space-x-1">
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    <span className="text-xs text-green-600 font-medium">Ready</span>
+                  </div>
                   {isConnecting && (
                     <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
                   )}
                 </div>
               </button>
             </div>
-          ))}
+          ) : (
+            // Desktop: Show regular wallet options
+            availableWallets.map((wallet) => (
+              <div key={wallet.id} className="relative">
+                <button
+                  onClick={() =>
+                    wallet.installed ? handleWalletConnect(wallet.id) : window.open(getInstallUrl(wallet.id), "_blank")
+                  }
+                  disabled={isConnecting}
+                  className="w-full flex items-center justify-between px-4 py-4 hover:bg-gray-50 transition-colors disabled:opacity-50 border-b border-gray-50 last:border-b-0"
+                >
+                  <div className="flex items-center space-x-4">
+                    {/* Wallet Icon */}
+                    <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center flex-shrink-0">
+                      {wallet.logo.startsWith("/") ? (
+                        <img
+                          src={wallet.logo || "/placeholder.svg"}
+                          alt={`${wallet.name} logo`}
+                          className="w-8 h-8 rounded object-contain"
+                        />
+                      ) : (
+                        <span className="text-2xl">{wallet.logo}</span>
+                      )}
+                    </div>
+
+                    {/* Wallet Info */}
+                    <div className="text-left">
+                      <div className="font-semibold text-gray-900 text-base">{wallet.name}</div>
+                      <div className="text-sm text-gray-500">
+                        {wallet.installed ? "Ready to connect" : "Not installed - Click to install"}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Status Icons */}
+                  <div className="flex items-center space-x-2">
+                    {wallet.installed ? (
+                      <div className="flex items-center space-x-1">
+                        <CheckCircle className="h-5 w-5 text-green-500" />
+                        <span className="text-xs text-green-600 font-medium">Installed</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center space-x-1">
+                        <ExternalLink className="h-4 w-4 text-gray-400" />
+                        <span className="text-xs text-gray-500">Install</span>
+                      </div>
+                    )}
+                    {isConnecting && (
+                      <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                    )}
+                  </div>
+                </button>
+              </div>
+            ))
+          )}
         </div>
 
         <div className="px-4 py-3 border-t border-gray-100 bg-gray-50">
           <p className="text-xs text-gray-500 leading-relaxed">
-            New to crypto wallets?{" "}
-            <a
-              href="https://ethereum.org/en/wallets/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:underline font-medium"
-            >
-              Learn more about wallets
-            </a>
+            {isMobileDevice ? (
+              <>
+                Connect with any wallet or create a new embedded wallet.{" "}
+                <a
+                  href="https://ethereum.org/en/wallets/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline font-medium"
+                >
+                  Learn more about wallets
+                </a>
+              </>
+            ) : (
+              <>
+                New to crypto wallets?{" "}
+                <a
+                  href="https://ethereum.org/en/wallets/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline font-medium"
+                >
+                  Learn more about wallets
+                </a>
+              </>
+            )}
           </p>
         </div>
       </div>
