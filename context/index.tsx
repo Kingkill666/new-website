@@ -5,10 +5,13 @@ import type { ReactNode } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { WagmiProvider, cookieToInitialState, type Config } from 'wagmi'
 import { createAppKit } from '@reown/appkit/react'
+import { PrivyProvider } from '@privy-io/react-auth'
 // Import config, networks, projectId, and wagmiAdapter from your config file
 import { config, networks, projectId, wagmiAdapter } from '@/config'
 // Import the default network separately if needed
 import { base } from '@reown/appkit/networks'
+// Import Privy configuration
+import { privyConfig } from '@/lib/privy-config'
 
 const queryClient = new QueryClient()
 
@@ -52,9 +55,15 @@ export default function ContextProvider({
   const initialState = cookieToInitialState(config as Config, cookies)
 
   return (
-    // Cast config as Config for WagmiProvider
-    <WagmiProvider config={config as Config} initialState={initialState}>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    </WagmiProvider>
+    <PrivyProvider
+      appId={privyConfig.appId}
+      config={privyConfig.config}
+    >
+      <QueryClientProvider client={queryClient}>
+        <WagmiProvider config={config as Config} initialState={initialState}>
+          {children}
+        </WagmiProvider>
+      </QueryClientProvider>
+    </PrivyProvider>
   )
 }

@@ -35,6 +35,7 @@ import Footer from "@/components/footer"
 import TradingChart from "@/components/trading-chart"
 import SimpleTest from "@/components/simple-test"
 import MinimalTest from "@/components/minimal-test"
+import { PrivyDebug } from "@/components/privy-debug"
 
 const Index = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -219,6 +220,8 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
+      {/* Debug component - remove in production */}
+      <PrivyDebug />
       {/* Skip to main content link for screen readers */}
       <a
         href="#main-content"

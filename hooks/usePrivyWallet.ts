@@ -2,7 +2,7 @@
 
 import { usePrivy, useWallets } from '@privy-io/react-auth'
 import { useAccount, useDisconnect, useSwitchChain } from 'wagmi'
-import { base } from 'wagmi/chains'
+import { base } from '@reown/appkit/networks'
 import { useCallback, useEffect, useState } from "react"
 import { formatAddress } from "@/lib/wallet-config"
 

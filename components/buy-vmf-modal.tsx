@@ -136,6 +136,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
   
   // Detect mobile device and use appropriate wallet system
   const isMobileDevice = isMobile()
+  
   const privyWallet = usePrivyWallet()
   const wagmiAccount = useAccount()
   const { disconnect: wagmiDisconnect } = useDisconnect()
@@ -188,7 +189,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
           if (isMobileDevice) {
             await privyWallet.switchToBase()
           } else {
-            await forceBaseNetwork()
+          await forceBaseNetwork()
           }
         } catch (error) {
           console.warn('Could not auto-switch to Base network:', error)
@@ -260,7 +261,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
             if (isMobileDevice) {
               await privyWallet.switchToBase();
             } else {
-              await forceBaseNetwork();
+            await forceBaseNetwork();
             }
             // Retry with Base network
             const provider = new ethers.BrowserProvider(window.ethereum)
@@ -306,7 +307,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
         await privyWallet.switchToBase();
       } else {
         // Use Wagmi's network switching
-        await switchToBase();
+      await switchToBase();
       }
       alert("✅ Successfully switched to Base network! You can now use VMF features.");
     } catch (error: unknown) {
@@ -697,8 +698,8 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                     {isMobileDevice ? (
                       /* Mobile: Privy connection */
                       <div className="space-y-3">
-                        <div className="bg-blue-100 border border-blue-300 rounded-lg p-3 mb-3">
-                          <p className="text-xs text-blue-800 leading-relaxed">
+                       <div className="bg-blue-100 border border-blue-300 rounded-lg p-3 mb-3">
+                         <p className="text-xs text-blue-800 leading-relaxed">
                             <strong>📱 Seamless Experience:</strong> Connect with any wallet or create a new embedded wallet. 
                             No app switching required - works directly in your browser!
                           </p>
@@ -731,41 +732,41 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                         <div className="bg-blue-100 border border-blue-300 rounded-lg p-3 mb-3">
                           <p className="text-xs text-blue-800 leading-relaxed">
                             <strong>💻 Desktop Experience:</strong> Connect with your preferred wallet extension or use Coinbase Smart Wallet.
-                          </p>
-                        </div>
-                        <Button
-                          onClick={async () => {
-                            try {
-                              await connectCoinbaseSmartWallet();
-                              window.location.reload();
-                            } catch (error) {
-                              console.error('Failed to connect Coinbase Smart Wallet:', error);
-                              alert('Failed to connect to Coinbase Smart Wallet. Please try again or use another wallet option.');
-                            }
-                          }}
-                          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2"
-                          aria-label="Connect with Coinbase Smart Wallet"
-                        >
-                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <title>Coinbase Smart Wallet Logo</title>
-                            <rect width="24" height="24" rx="6" fill="white"/>
-                            <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" fill="#0052FF"/>
-                            <path d="M9.5 8.5H14.5C14.7761 8.5 15 8.72386 15 9V15C15 15.2761 14.7761 15.5 14.5 15.5H9.5C9.22386 15.5 9 15.2761 9 15V9C9 8.72386 9.22386 8.5 9.5 8.5Z" fill="white"/>
-                          </svg>
-                          Coinbase Smart Wallet
-                        </Button>
-                        <div className="relative">
-                          <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-gray-300"></div>
-                          </div>
-                          <div className="relative flex justify-center text-xs">
-                            <span className="px-2 bg-blue-50 text-gray-500">or connect other wallets</span>
-                          </div>
-                        </div>
-                        <div className="w-full">
-                          <appkit-button />
-                        </div>
-                      </div>
+                         </p>
+                       </div>
+                       <Button
+                         onClick={async () => {
+                           try {
+                             await connectCoinbaseSmartWallet();
+                             window.location.reload();
+                           } catch (error) {
+                             console.error('Failed to connect Coinbase Smart Wallet:', error);
+                             alert('Failed to connect to Coinbase Smart Wallet. Please try again or use another wallet option.');
+                           }
+                         }}
+                         className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2"
+                         aria-label="Connect with Coinbase Smart Wallet"
+                       >
+                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                           <title>Coinbase Smart Wallet Logo</title>
+                           <rect width="24" height="24" rx="6" fill="white"/>
+                           <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" fill="#0052FF"/>
+                           <path d="M9.5 8.5H14.5C14.7761 8.5 15 8.72386 15 9V15C15 15.2761 14.7761 15.5 14.5 15.5H9.5C9.22386 15.5 9 15.2761 9 15V9C9 8.72386 9.22386 8.5 9.5 8.5Z" fill="white"/>
+                         </svg>
+                         Coinbase Smart Wallet
+                       </Button>
+                       <div className="relative">
+                         <div className="absolute inset-0 flex items-center">
+                           <div className="w-full border-t border-gray-300"></div>
+                         </div>
+                         <div className="relative flex justify-center text-xs">
+                           <span className="px-2 bg-blue-50 text-gray-500">or connect other wallets</span>
+                         </div>
+                       </div>
+                       <div className="w-full">
+                         <appkit-button />
+                       </div>
+                     </div>
                     )}
                   </div>
               ) : (

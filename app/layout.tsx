@@ -3,10 +3,9 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
-import { WalletProvider } from "@/components/wallet-provider"
 import Head from "next/head"
 import { headers } from "next/headers" // Import headers function
-import ContextProvider from "@/context" // Import AppKit ContextProvider
+import ContextProvider from "@/context" // Import AppKit ContextProvider with Privy
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -32,13 +31,11 @@ export default async function RootLayout({
         <link rel="icon" href="/images/vmf-logo-new-patriotic.png" type="image/png" />
       </Head>
       <body className={inter.className}>
-        {/* Wrap children with ContextProvider, passing cookies */}
+        {/* Wrap children with ContextProvider (includes Privy), passing cookies */}
         <ContextProvider cookies={cookies}>
-          <WalletProvider>
-            <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
-              {children}
-            </ThemeProvider>
-          </WalletProvider>
+          <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+            {children}
+          </ThemeProvider>
         </ContextProvider>
       </body>
     </html>

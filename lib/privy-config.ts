@@ -1,21 +1,8 @@
 import { PrivyProvider } from '@privy-io/react-auth'
-import { WagmiProvider } from 'wagmi'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { createConfig, http } from 'wagmi'
-import { base } from 'wagmi/chains'
-import { privyWagmiConnector } from '@privy-io/wagmi'
 
 // Create a query client for React Query
 const queryClient = new QueryClient()
-
-// Create wagmi config with Privy connector
-export const wagmiConfig = createConfig({
-  chains: [base],
-  connectors: [privyWagmiConnector()],
-  transports: {
-    [base.id]: http(),
-  },
-})
 
 // Privy configuration
 export const privyConfig = {
@@ -55,4 +42,4 @@ export const privyConfig = {
 }
 
 // Export the providers for use in the app
-export { PrivyProvider, WagmiProvider, QueryClientProvider, queryClient }
+export { PrivyProvider, QueryClientProvider, queryClient }
