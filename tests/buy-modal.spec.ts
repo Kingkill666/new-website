@@ -198,4 +198,99 @@ test.describe('VMF Buy Modal', () => {
 
     expect(criticalErrors).toHaveLength(0);
   });
+
+  test('should open Coinbase Smart Wallet modal without extension errors', async ({ page }) => {
+    // Test that clicking Coinbase Smart Wallet opens AppKit modal
+    // and doesn't show extension detection errors
+
+    const consoleErrors: string[] = [];
+    const consoleLogs: string[] = [];
+
+    page.on('console', msg => {
+      if (msg.type() === 'error') {
+        consoleErrors.push(msg.text());
+      }
+      consoleLogs.push(`[${msg.type()}] ${msg.text()}`);
+    });
+
+    // First, open the buy modal
+    const buyButtonSelectors = [
+      'button:has-text("BUY VMF")',
+      'button:has-text("Buy VMF")',
+      '[data-testid="buy-vmf-button"]',
+      '.buy-vmf-button',
+      'button[class*="buy"]'
+    ];
+
+    let buyButton: Locator | undefined;
+    for (const selector of buyButtonSelectors) {
+      try {
+        buyButton = page.locator(selector).first();
+        if (await buyButton.isVisible({ timeout: 1000 })) {
+          break;
+        }
+      } catch (_e) {
+        continue;
+      }
+    }
+
+    if (!buyButton) {
+      console.log('Buy VMF button not found, skipping Smart Wallet test');
+      return;
+    }
+
+    // Click buy button to open modal
+    await buyButton.click();
+    await page.waitForTimeout(1000);
+
+    // Look for Coinbase Smart Wallet button in the modal
+    const coinbaseButton = page.locator('button:has-text("Coinbase Smart Wallet")').first();
+
+    // Verify the button exists
+    await expect(coinbaseButton).toBeVisible();
+
+    // Click the Coinbase Smart Wallet button
+    await coinbaseButton.click();
+
+    // Wait for AppKit modal to open
+    await page.waitForTimeout(2000);
+
+    // Check that no extension detection errors occurred
+    const extensionErrors = consoleErrors.filter(error =>
+      error.includes('No wallet detected') ||
+      error.includes('Please install Coinbase Smart Wallet') ||
+      error.includes('extension')
+    );
+
+    // Should have no extension detection errors
+    expect(extensionErrors).toHaveLength(0);
+
+    // Check that AppKit modal opened (look for modal elements)
+    const appKitModalSelectors = [
+      '[data-testid="appkit-modal"]',
+      '.appkit-modal',
+      '[role="dialog"]',
+      '.modal'
+    ];
+
+    let modalFound = false;
+    for (const selector of appKitModalSelectors) {
+      try {
+        const modal = page.locator(selector);
+        if (await modal.isVisible({ timeout: 1000 })) {
+          modalFound = true;
+          console.log(`✅ AppKit modal found with selector: ${selector}`);
+          break;
+        }
+      } catch (_e) {
+        continue;
+      }
+    }
+
+    // AppKit modal should have opened
+    expect(modalFound).toBe(true);
+
+    console.log('Console logs during Smart Wallet test:', consoleLogs);
+    console.log('Console errors during Smart Wallet test:', consoleErrors);
+  });
 });
