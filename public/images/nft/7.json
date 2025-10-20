@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #7",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/7.png",
+  "dna": "789f256e1f0dc9b4bf7700db6a04dd84da02be32",
+  "edition": 7,
+  "date": 1759205554974,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Gold"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Superhero"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Nothing"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

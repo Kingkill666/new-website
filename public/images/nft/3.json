@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #3",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/3.png",
+  "dna": "2cbbd4a76a663415417c1a04e17843dbfa082742",
+  "edition": 3,
+  "date": 1759205554898,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Soldier"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Presidential Hair"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

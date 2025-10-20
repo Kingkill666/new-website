@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #8",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/8.png",
+  "dna": "faa4f2d1debaa0d2d079838fd47c65ffbab12e8c",
+  "edition": 8,
+  "date": 1759205554991,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Black"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Superhero"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Presidential Hair"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

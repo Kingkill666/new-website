@@ -32,7 +32,7 @@ const ITEMS_PER_PAGE = 30
 
 export default function NFTGallery() {
   const [nfts, setNfts] = useState<NFTItem[]>([])
-  const [loading, setLoading] = useState(false) // Set to false for now
+  const [loading, setLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
   const [selectedNFT, setSelectedNFT] = useState<NFTItem | null>(null)
   const [showFilters, setShowFilters] = useState(false)
@@ -40,10 +40,69 @@ export default function NFTGallery() {
   const [availableTraits, setAvailableTraits] = useState<Record<string, string[]>>({})
   const [sortBy, setSortBy] = useState<'edition' | 'rarity'>('edition')
 
-  // NFT loading temporarily disabled for deployment
+  // Load NFT metadata and rarity data
   useEffect(() => {
-    // Placeholder for NFT loading - will be restored after deployment
-    setLoading(false)
+    const loadNFTs = async () => {
+      try {
+        const nftItems: NFTItem[] = []
+        const traitsMap: Record<string, Set<string>> = {}
+        let rarityData: any = {}
+
+        // Load rarity data if available
+        try {
+          const rarityResponse = await fetch('/nft-rarity-analysis.json')
+          if (rarityResponse.ok) {
+            const rarityJson = await rarityResponse.json()
+            rarityData = rarityJson.rarityData
+          }
+        } catch (error) {
+          console.warn("Rarity data not available:", error)
+        }
+
+        // Load all 333 NFTs
+        for (let i = 1; i <= 333; i++) {
+          try {
+            const response = await fetch(`/images/nft/${i}.json`)
+            if (response.ok) {
+              const metadata: NFTMetadata = await response.json()
+              const nftItem: NFTItem = {
+                id: i,
+                metadata,
+                imageUrl: `/images/nft/${i}.png`,
+                rarityScore: rarityData[i] ? parseFloat(rarityData[i].rarityScore) : undefined
+              }
+              nftItems.push(nftItem)
+
+              // Collect traits for filtering
+              metadata.attributes.forEach(attr => {
+                if (!traitsMap[attr.trait_type]) {
+                  traitsMap[attr.trait_type] = new Set()
+                }
+                traitsMap[attr.trait_type].add(attr.value)
+              })
+            }
+          } catch (error) {
+            console.warn(`Failed to load NFT ${i}:`, error)
+          }
+        }
+
+        setNfts(nftItems)
+        
+        // Convert sets to arrays for available traits
+        const traitsArray: Record<string, string[]> = {}
+        Object.keys(traitsMap).forEach(trait => {
+          traitsArray[trait] = Array.from(traitsMap[trait]).sort()
+        })
+        setAvailableTraits(traitsArray)
+        
+        setLoading(false)
+      } catch (error) {
+        console.error("Failed to load NFTs:", error)
+        setLoading(false)
+      }
+    }
+
+    loadNFTs()
   }, [])
 
   // Filter and sort NFTs
@@ -103,35 +162,6 @@ export default function NFTGallery() {
     )
   }
 
-  // Temporary placeholder while NFT images are being deployed
-  if (nfts.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center h-96 bg-white rounded-lg shadow-lg p-8">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Baldy NFT Collection</h2>
-          <p className="text-xl text-gray-600 mb-6">
-            Our exclusive collection of 333 Baldy NFTs is being deployed!
-          </p>
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 max-w-md">
-            <p className="text-blue-800 font-medium">
-              🚀 The NFT gallery is currently being deployed in batches to ensure optimal performance.
-            </p>
-            <p className="text-blue-700 mt-2">
-              Check back soon to explore our complete collection with rarity rankings and filtering!
-            </p>
-          </div>
-          <div className="mt-6">
-            <Button 
-              onClick={() => window.location.href = '/'}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3"
-            >
-              Return to Homepage
-            </Button>
-          </div>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="space-y-8">

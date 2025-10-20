@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #19",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/19.png",
+  "dna": "89e835e5a03482b05d8489dea8d56cc40791d2a0",
+  "edition": 19,
+  "date": 1759205555188,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Purple"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Navy"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Airforce"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Gold VMFC Chain"
+    }
+  ]
+}

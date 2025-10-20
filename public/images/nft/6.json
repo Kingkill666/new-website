@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #6",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/6.png",
+  "dna": "ac5a7018ea5718a89766253571c31e44df2768b1",
+  "edition": 6,
+  "date": 1759205554951,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Capitol Glow"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Academic Robes"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Airforce"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}
