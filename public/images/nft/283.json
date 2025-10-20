@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #283",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/283.png",
+  "dna": "77e2aa6d047acc868c66948c200d7513dd8c4bc3",
+  "edition": 283,
+  "date": 1759205560390,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Clouds"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Farmer"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Nothing"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #96",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/96.png",
+  "dna": "3bbde22079690290d8b3f8b3ac26c3c3a92c5565",
+  "edition": 96,
+  "date": 1759205556601,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Purple"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Denim Vest"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Presidential Hair"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

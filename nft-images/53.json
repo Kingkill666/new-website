@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #53",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/53.png",
+  "dna": "e0705711ad9967fe2190d6871b9fa5ae4e5c99f8",
+  "edition": 53,
+  "date": 1759205555785,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Palm Trees"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Soldier"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Nothing"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

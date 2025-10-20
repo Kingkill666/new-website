@@ -1,19 +1,16 @@
-"use client"
-import dynamic from "next/dynamic"
+import { Metadata } from "next"
+import StakingApp from "./staking-app"
 
-// Dynamic import to avoid SSR issues
-const StakingContent = dynamic(() => import("./staking-content"), {
-  ssr: false,
-  loading: () => (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-        <p className="text-gray-600">Loading staking page...</p>
-      </div>
-    </div>
-  )
-})
+export const metadata: Metadata = {
+  title: "VMF Staking - Veterans & Military Families",
+  description: "Stake your VMF tokens and earn rewards while supporting veterans and military families",
+  openGraph: {
+    title: "VMF Staking - Veterans & Military Families",
+    description: "Stake your VMF tokens and earn rewards while supporting veterans and military families",
+    images: ["/images/vmf-logo-new.png"],
+  },
+}
 
 export default function StakingPage() {
-  return <StakingContent />
+  return <StakingApp />
 }

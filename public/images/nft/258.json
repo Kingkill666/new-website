@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #258",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/258.png",
+  "dna": "1e6afb461b26c9855b5388574e7cce9d0734e419",
+  "edition": 258,
+  "date": 1759205559856,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Denim Vest"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Nothing"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

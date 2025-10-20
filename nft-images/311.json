@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #311",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/311.png",
+  "dna": "9603e6b13d92438d5cd459bd1140e5c2808e1582",
+  "edition": 311,
+  "date": 1759205560914,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Hot Pink"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Wrestler"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Nothing"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #250",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/250.png",
+  "dna": "5464ea52cb3195a670baff8e3a7282e5f6fb38cf",
+  "edition": 250,
+  "date": 1759205559690,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Red"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Park Ranger"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Revolutionary Tricorn"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Gold VMFC Chain"
+    }
+  ]
+}

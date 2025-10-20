@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #102",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/102.png",
+  "dna": "fd130fcc1047e062e43dace6965a9736bae83cb5",
+  "edition": 102,
+  "date": 1759205556702,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "American Flag"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Soldier"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Navy Cap"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

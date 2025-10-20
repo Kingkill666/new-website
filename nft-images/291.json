@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #291",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/291.png",
+  "dna": "6f7a409ad9f52c042cefc8b8f38dd48dff02ecc3",
+  "edition": 291,
+  "date": 1759205560551,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Purple"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Academic Robes"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Revolutionary Tricorn"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

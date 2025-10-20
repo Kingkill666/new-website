@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #187",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/187.png",
+  "dna": "c4d44f3b4731851a19c0bc8a8baa75ba2785e3ca",
+  "edition": 187,
+  "date": 1759205558292,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Mount Rushmore"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Soldier"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Park Ranger Hat"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

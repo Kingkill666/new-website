@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #305",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/305.png",
+  "dna": "0d73001f8e438e8a5f869a6612a79db5de6871b4",
+  "edition": 305,
+  "date": 1759205560798,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Red Starburst"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Soldier"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Rainbow Aviators"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

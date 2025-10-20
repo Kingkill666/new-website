@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #181",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/181.png",
+  "dna": "12eb6592b3dbb1c7cd3d5a3fa01f4eef9dd1b6a3",
+  "edition": 181,
+  "date": 1759205558163,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Red White Blue Star"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Medic"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Presidential Hair"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

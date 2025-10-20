@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #254",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/254.png",
+  "dna": "b10bbab724d6498947a452d50f3b3bffef76794c",
+  "edition": 254,
+  "date": 1759205559774,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "American Flag"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Police"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Revolutionary Tricorn"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

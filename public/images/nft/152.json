@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #152",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/152.png",
+  "dna": "a85f887b7480c274b61ffa7cb5fb89b32a1196a6",
+  "edition": 152,
+  "date": 1759205557614,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Fireworks"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Soldier"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Navy Cap"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

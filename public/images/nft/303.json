@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #303",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/303.png",
+  "dna": "6671b32ba3801cbb54332d4018f248bf057594ef",
+  "edition": 303,
+  "date": 1759205560763,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Mountain Dusk"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Football"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Academic Cap"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

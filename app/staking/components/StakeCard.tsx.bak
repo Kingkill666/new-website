@@ -1,0 +1,102 @@
+import { useState } from "react";
+import { Card, CardContent, Typography, Button, Box } from "@mui/material";
+import { useRealTimeYield } from "../hooks/useRealTimeYield";
+import { formatDuration } from "../utils/formatDuration";
+import { formatUnits } from "viem";
+
+interface StakeCardProps {
+  stakeId: number;
+  amount: bigint;
+  startTime: number;
+  initialLastYieldClaimAt: number;
+  stakingPeriod: number;
+  onWithdrawYield: (stakeId: number) => Promise<void>;
+  onWithdrawStake: (stakeId: number) => Promise<void>;
+}
+
+export const StakeCard: React.FC<StakeCardProps> = ({
+  stakeId,
+  amount,
+  startTime,
+  initialLastYieldClaimAt,
+  stakingPeriod,
+  onWithdrawYield,
+  onWithdrawStake,
+}) => {
+  const [isProcessingYield, setIsProcessingYield] = useState(false);
+  const [isProcessingStake, setIsProcessingStake] = useState(false);
+  const [lastYieldClaimAt, setLastYieldClaimAt] = useState(
+    initialLastYieldClaimAt
+  );
+
+  const currentYield = useRealTimeYield({
+    stakedAmount: amount,
+    lastYieldClaimAt,
+    startTime,
+  });
+
+  const handleWithdrawYield = async () => {
+    try {
+      setIsProcessingYield(true);
+      await onWithdrawYield(stakeId);
+      setLastYieldClaimAt(Math.floor(Date.now() / 1000));
+    } catch (error) {
+      console.error("Error withdrawing yield:", error);
+    } finally {
+      setIsProcessingYield(false);
+    }
+  };
+
+  const handleWithdrawStake = async () => {
+    try {
+      setIsProcessingStake(true);
+      await onWithdrawStake(stakeId);
+    } catch (error) {
+      console.error("Error withdrawing stake:", error);
+    } finally {
+      setIsProcessingStake(false);
+    }
+  };
+
+  const now = Math.floor(Date.now() / 1000);
+  const timeRemaining = Math.max(0, startTime + stakingPeriod - now);
+  const canWithdrawStake = timeRemaining === 0;
+
+  return (
+    <Card sx={{ mb: 2 }}>
+      <CardContent>
+        <Typography variant="h6" gutterBottom>
+          Stake #{stakeId}
+        </Typography>
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="body1">
+            Amount: {Number(formatUnits(amount, 18)).toLocaleString()} VMF
+          </Typography>
+          <Typography variant="body1">
+            Current Yield: {currentYield} VMF
+          </Typography>
+          <Typography variant="body1">
+            Time Remaining: {formatDuration(timeRemaining)}
+          </Typography>
+        </Box>
+        <Box sx={{ display: "flex", gap: 2 }}>
+          <Button
+            variant="contained"
+            onClick={handleWithdrawYield}
+            disabled={isProcessingYield || Number(currentYield) === 0}
+          >
+            {isProcessingYield ? "Processing..." : "Withdraw Yield"}
+          </Button>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={handleWithdrawStake}
+            disabled={isProcessingStake || !canWithdrawStake}
+          >
+            {isProcessingStake ? "Processing..." : "Withdraw Stake"}
+          </Button>
+        </Box>
+      </CardContent>
+    </Card>
+  );
+};

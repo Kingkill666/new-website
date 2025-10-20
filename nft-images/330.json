@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #330",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/330.png",
+  "dna": "ad7bedb847e5cbd1cbb855e10a9efd5770c31567",
+  "edition": 330,
+  "date": 1759205561286,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Capitol Glow"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Soldier"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Presidential Hair"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

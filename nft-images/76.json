@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #76",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/76.png",
+  "dna": "7314e521bb88937af65734bcbeb529af45f3849c",
+  "edition": 76,
+  "date": 1759205556218,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Coast Guard"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Nothing"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

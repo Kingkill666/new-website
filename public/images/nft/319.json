@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #319",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/319.png",
+  "dna": "0d4e71d0407aaf7e8dfeca383dcdb4ae1c67bfb0",
+  "edition": 319,
+  "date": 1759205561075,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Capitol Glow"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Revolutionary"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Airforce"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

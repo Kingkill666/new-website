@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #59",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/59.png",
+  "dna": "ab5300d1fe987a9d8d207a2a7b72d7abe0d3f045",
+  "edition": 59,
+  "date": 1759205555889,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Red Starburst"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Farmer"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Airforce"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

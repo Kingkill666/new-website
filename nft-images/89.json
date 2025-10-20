@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #89",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/89.png",
+  "dna": "616204d9743bc7f75a979fd48ed87c965fc92efc",
+  "edition": 89,
+  "date": 1759205556479,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Mountain Dusk"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Colonial"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Rainbow Aviators"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

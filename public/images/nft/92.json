@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #92",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/92.png",
+  "dna": "d8f33aceb75620b5da015b6b5a5883d4c181b35c",
+  "edition": 92,
+  "date": 1759205556533,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Red Starburst"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Park Ranger"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Airforce"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

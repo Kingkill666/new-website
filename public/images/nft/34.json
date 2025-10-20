@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #34",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/34.png",
+  "dna": "4fbb73fd3b530a27db29cc754a2b5da0f874c207",
+  "edition": 34,
+  "date": 1759205555462,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Clouds"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Presidential"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Academic Cap"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #106",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/106.png",
+  "dna": "4a555daf85368cf307b220a8178ad27a0a9609ef",
+  "edition": 106,
+  "date": 1759205556768,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Academic Robes"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Nothing"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #238",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/238.png",
+  "dna": "0fe54f2be2b2e772adb3623d8ac715c921eeddf0",
+  "edition": 238,
+  "date": 1759205559419,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Black"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Aviator"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Aviators"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

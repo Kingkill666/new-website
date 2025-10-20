@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #236",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/236.png",
+  "dna": "c45c33c475023166e5d09ff28d23a51cb4755326",
+  "edition": 236,
+  "date": 1759205559376,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Neon Green"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Park Ranger"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Airforce"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

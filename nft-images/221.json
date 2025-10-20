@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #221",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/221.png",
+  "dna": "fdbbdc29ea68e51460f1746b52054eadceaead5a",
+  "edition": 221,
+  "date": 1759205559048,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "American Flag"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Wrestler"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Nothing"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

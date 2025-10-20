@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #66",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/66.png",
+  "dna": "dd9e11a212472c17df99cfe923783d6d0abf2d8c",
+  "edition": 66,
+  "date": 1759205556024,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Sunset Sky"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Soldier"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Presidential Hair"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

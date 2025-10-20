@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #247",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/247.png",
+  "dna": "3f8ecf7b25b4cf36c743e3ca7eb9d9aae78a096e",
+  "edition": 247,
+  "date": 1759205559617,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Fireworks"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Football"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Rainbow Aviators"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

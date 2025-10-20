@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #270",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/270.png",
+  "dna": "94544091fb85d3fadfeec53591f5bae06ea52a0f",
+  "edition": 270,
+  "date": 1759205560139,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Hot Pink"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Academic Robes"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Revolutionary Tricorn"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #309",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/309.png",
+  "dna": "f1dbee30f7c079de58be0351c2cbb670e458fe7a",
+  "edition": 309,
+  "date": 1759205560876,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Hot Pink"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Farmer"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Nothing"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

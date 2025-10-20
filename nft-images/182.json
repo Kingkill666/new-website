@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #182",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/182.png",
+  "dna": "f277dbd6bd78af53bb3210cee19f2e3fa13bec18",
+  "edition": 182,
+  "date": 1759205558186,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Gold"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Soldier"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Academic Cap"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

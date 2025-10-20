@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #212",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/212.png",
+  "dna": "dd51f285a76ca07f8a3f66907b66452bbbea1839",
+  "edition": 212,
+  "date": 1759205558847,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Red White Blue Star"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Park Ranger"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Academic Cap"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

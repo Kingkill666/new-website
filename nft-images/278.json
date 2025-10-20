@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #278",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/278.png",
+  "dna": "c88c5cba888030ef663e1572cb0781ba9d196231",
+  "edition": 278,
+  "date": 1759205560296,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Fireworks"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Park Ranger"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Nothing"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Gold VMFC Chain"
+    }
+  ]
+}

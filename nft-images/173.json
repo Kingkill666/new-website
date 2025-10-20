@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #173",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/173.png",
+  "dna": "43dd9929c6bcef4bb3107711d3f46ea6dc5b001c",
+  "edition": 173,
+  "date": 1759205557993,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Red Starburst"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Soldier"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Park Ranger Hat"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #322",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/322.png",
+  "dna": "d761ef93a765c2a36ffbc912230cf936ad625549",
+  "edition": 322,
+  "date": 1759205561121,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Red"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Coast Guard"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Nothing"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #268",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/268.png",
+  "dna": "eab6050dea7b37903d008e37e26a9601ff847083",
+  "edition": 268,
+  "date": 1759205560091,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Stars and Stripes"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Medic"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Academic Cap"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

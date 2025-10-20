@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #310",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/310.png",
+  "dna": "4f459a482ae1427674a72e8871c5388599f25ee5",
+  "edition": 310,
+  "date": 1759205560896,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Black"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Soldier"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Rainbow Aviators"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Gold VMFC Chain"
+    }
+  ]
+}

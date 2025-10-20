@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #328",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/328.png",
+  "dna": "19fedc38e5a505a502b9e05131fed9f3896c19f7",
+  "edition": 328,
+  "date": 1759205561241,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Neon Green"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Revolutionary"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Nothing"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

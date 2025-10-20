@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #4",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/4.png",
+  "dna": "cdfbf8e3f8c232a589abc44db7a63633515f00ff",
+  "edition": 4,
+  "date": 1759205554914,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Red White Blue Star"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Coast Guard"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Nothing"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

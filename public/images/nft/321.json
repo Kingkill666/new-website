@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #321",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/321.png",
+  "dna": "05bbb39b72095c211a0246936fb5a96292f75801",
+  "edition": 321,
+  "date": 1759205561106,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "White"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Football"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Nothing"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

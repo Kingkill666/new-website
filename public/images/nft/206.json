@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #206",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/206.png",
+  "dna": "bb485b48afffe5fd71f1ee78a84250a957feaeb5",
+  "edition": 206,
+  "date": 1759205558707,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Hot Pink"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Aviator"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Nothing"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

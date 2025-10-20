@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #52",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/52.png",
+  "dna": "59a329f51e899adb9a50c3a090d91239ae91f79b",
+  "edition": 52,
+  "date": 1759205555770,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Clouds"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Park Ranger"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Nothing"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

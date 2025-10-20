@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #78",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/78.png",
+  "dna": "d3fa5f609ab22b4fd1ec8f8865982a61eaffe714",
+  "edition": 78,
+  "date": 1759205556258,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Clouds"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Football"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Airforce"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

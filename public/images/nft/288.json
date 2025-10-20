@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #288",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/288.png",
+  "dna": "35d509757d7d50e8e24bddfaa2d1eed6637a020d",
+  "edition": 288,
+  "date": 1759205560495,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Mount Rushmore"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Farmer"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Academic Cap"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

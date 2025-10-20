@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #267",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/267.png",
+  "dna": "319c84c707489c60a77719dbb6605c67661fe47d",
+  "edition": 267,
+  "date": 1759205560068,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Mount Rushmore"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Wrestler"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Airforce"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

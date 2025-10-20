@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #2",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/2.png",
+  "dna": "14b348cb86191f8a917e9b069c99fb4e9402c4eb",
+  "edition": 2,
+  "date": 1759205554878,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "American Flag"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Wrestler"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Park Ranger Hat"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

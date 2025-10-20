@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #112",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/112.png",
+  "dna": "b5153d45d79a2e4b9027a37ef389256b0dd10df9",
+  "edition": 112,
+  "date": 1759205556871,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Purple"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Farmer"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Nothing"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

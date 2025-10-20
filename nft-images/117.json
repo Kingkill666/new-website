@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #117",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/117.png",
+  "dna": "d391a9fc2180090c9cc72dbd08d45b7962067449",
+  "edition": 117,
+  "date": 1759205556962,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Black"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Presidential"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Park Ranger Hat"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

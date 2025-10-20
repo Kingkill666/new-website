@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #133",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/133.png",
+  "dna": "e65c8ddce179f8177ecba6ca9ae33fd9cacebd8f",
+  "edition": 133,
+  "date": 1759205557233,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Red"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Farmer"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Airforce"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

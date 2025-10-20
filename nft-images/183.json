@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #183",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/183.png",
+  "dna": "95214f8c772919417f3377714f158a9536ac84a4",
+  "edition": 183,
+  "date": 1759205558206,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Sunset Sky"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Denim Vest"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Nothing"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

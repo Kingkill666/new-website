@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #46",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/46.png",
+  "dna": "cc927247437ab892a0c2589bcdf522ce36433dca",
+  "edition": 46,
+  "date": 1759205555666,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Hot Pink"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Soldier"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Airforce"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Gold VMFC Chain"
+    }
+  ]
+}

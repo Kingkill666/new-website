@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #22",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/22.png",
+  "dna": "d6fb23805d9b9d97ca36c83eb83633a33769e2eb",
+  "edition": 22,
+  "date": 1759205555246,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Neon Green"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Navy"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Academic Cap"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

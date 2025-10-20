@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #170",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/170.png",
+  "dna": "80bfcbcce81149d117c6453466099a69531a101e",
+  "edition": 170,
+  "date": 1759205557936,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Purple"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Superhero"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Nothing"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

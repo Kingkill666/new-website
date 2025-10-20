@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #290",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/290.png",
+  "dna": "a0530ea24e14e30d81dcf8553889fa72d277473b",
+  "edition": 290,
+  "date": 1759205560534,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Clouds"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Revolutionary"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Rainbow Aviators"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

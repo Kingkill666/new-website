@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #144",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/144.png",
+  "dna": "c8a0e066b8f9799e5e30099e4a6396e7eb236571",
+  "edition": 144,
+  "date": 1759205557476,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Fireworks"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Park Ranger"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Nothing"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

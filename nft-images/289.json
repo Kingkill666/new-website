@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #289",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/289.png",
+  "dna": "498e84b5f7832007e1e9f9fdc475c958721f1e48",
+  "edition": 289,
+  "date": 1759205560517,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Neon Green"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Firefighter"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Presidential Hair"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

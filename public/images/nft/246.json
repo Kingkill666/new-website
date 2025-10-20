@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #246",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/246.png",
+  "dna": "6b912e3cc43f6b828919f296a798db7c674a420d",
+  "edition": 246,
+  "date": 1759205559594,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Mount Rushmore"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Superhero"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Academic Cap"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

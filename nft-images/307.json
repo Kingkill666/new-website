@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #307",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/307.png",
+  "dna": "4dc580da882914b176b34fdf1f4df3a965d75316",
+  "edition": 307,
+  "date": 1759205560841,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "American Flag"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Farmer"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Presidential Hair"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

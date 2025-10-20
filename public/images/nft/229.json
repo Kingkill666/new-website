@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #229",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/229.png",
+  "dna": "92ca17fb664ceea5db907949308cf2a60f45763f",
+  "edition": 229,
+  "date": 1759205559212,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Farmer"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Academic Cap"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

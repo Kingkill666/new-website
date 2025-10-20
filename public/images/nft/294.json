@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #294",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/294.png",
+  "dna": "d12708a37a8be0c72d8bc19e0c3a68edbba649c8",
+  "edition": 294,
+  "date": 1759205560604,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Dark Blue with Stars"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Soldier"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Park Ranger Hat"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

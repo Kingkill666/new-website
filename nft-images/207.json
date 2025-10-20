@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #207",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/207.png",
+  "dna": "6a22981be73275cdbdb772a7b0d8de2407a68e18",
+  "edition": 207,
+  "date": 1759205558729,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Fireworks"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Medic"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Nothing"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

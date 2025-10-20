@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #140",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/140.png",
+  "dna": "007ab331dcb6f773a45b177f7b7bd92f4587c378",
+  "edition": 140,
+  "date": 1759205557383,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Farmer"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Academic Cap"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Silver Chain"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #271",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/271.png",
+  "dna": "38831e57351c6974a749a3a3ee599a3c7f3d5da2",
+  "edition": 271,
+  "date": 1759205560159,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Red Starburst"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Superhero"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Airforce"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

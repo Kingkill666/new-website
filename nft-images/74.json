@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #74",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/74.png",
+  "dna": "dc6b797e2756fcb5cf966ca21eea1e98abf5c01c",
+  "edition": 74,
+  "date": 1759205556182,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Red White Blue Star"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Soldier"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Nothing"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

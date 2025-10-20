@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #50",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/50.png",
+  "dna": "f40f10143866e179a3b28bfc7085c52da5f956d0",
+  "edition": 50,
+  "date": 1759205555738,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Red with Yellow Gradient"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Park Ranger"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Presidential Hair"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

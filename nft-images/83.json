@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #83",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/83.png",
+  "dna": "54cc44c1b2e6f0fc204c4171ea19654dd24dab22",
+  "edition": 83,
+  "date": 1759205556347,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Dark Blue with Stars"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Aviator"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Academic Cap"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

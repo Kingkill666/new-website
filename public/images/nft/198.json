@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #198",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/198.png",
+  "dna": "f9a852e19fbdac134f14e36fe1cf8ec59ea46950",
+  "edition": 198,
+  "date": 1759205558531,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Sunset Sky"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Park Ranger"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Presidential Hair"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

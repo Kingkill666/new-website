@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #33",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/33.png",
+  "dna": "a36f0c875529124337703614d87b80815afa68cc",
+  "edition": 33,
+  "date": 1759205555445,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Red with Yellow Gradient"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Soldier"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Revolutionary Tricorn"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #156",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/156.png",
+  "dna": "442ecb60a1976f8dfc72b5ca45bab087938999b0",
+  "edition": 156,
+  "date": 1759205557684,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Red Starburst"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Firefighter"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Nothing"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

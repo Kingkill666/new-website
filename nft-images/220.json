@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #220",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/220.png",
+  "dna": "2d7ed4daa3b2a2cd36aef7599417b6531766b15e",
+  "edition": 220,
+  "date": 1759205559028,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Red White Blue Star"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Wrestler"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Nothing"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #111",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/111.png",
+  "dna": "4cc7f1e6a9c0acdabb2bc4a981bd3fdc1a40c64f",
+  "edition": 111,
+  "date": 1759205556855,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "American Flag"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Farmer"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Rainbow Aviators"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

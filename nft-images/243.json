@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #243",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/243.png",
+  "dna": "12476aded20b0ba39a42f323a5a46594f46640b2",
+  "edition": 243,
+  "date": 1759205559526,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Red Starburst"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Soldier"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Academic Cap"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

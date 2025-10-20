@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #227",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/227.png",
+  "dna": "e97f3a6f49c8910bce22b09a25c321c228dbe9a1",
+  "edition": 227,
+  "date": 1759205559169,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Gold"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Soldier"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Park Ranger Hat"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Silver Chain"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #231",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/231.png",
+  "dna": "f4c9afd2e37c0e401796caf4bab99fd86698f4ff",
+  "edition": 231,
+  "date": 1759205559257,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Hot Pink"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Park Ranger"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Nothing"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

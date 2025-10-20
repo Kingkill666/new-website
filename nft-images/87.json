@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #87",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/87.png",
+  "dna": "8c926f6d566c34ce813b2c614f234a11a7bbdce2",
+  "edition": 87,
+  "date": 1759205556442,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Purple"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Presidential"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Airforce"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

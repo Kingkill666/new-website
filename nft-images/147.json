@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #147",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/147.png",
+  "dna": "e7144e25313949d2d53b3b1754841dac896dfb95",
+  "edition": 147,
+  "date": 1759205557528,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Red with Yellow Gradient"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Soldier"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Presidential Hair"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

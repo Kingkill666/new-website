@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #5",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/5.png",
+  "dna": "ecfeaf775782a5e64ed64cc9590aef2fa8e83181",
+  "edition": 5,
+  "date": 1759205554933,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Neon Green"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Police"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Academic Cap"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Silver Chain"
+    }
+  ]
+}

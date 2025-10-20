@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #191",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/191.png",
+  "dna": "fdc23fd0df64e4063496f1ca7da07e3efb737cbe",
+  "edition": 191,
+  "date": 1759205558386,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Dark Blue with Stars"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Farmer"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Nothing"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}
