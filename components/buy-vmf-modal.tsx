@@ -1,25 +1,17 @@
 "use client"
 
-import React from "react"
+import type React from "react"
 
 import { ethers } from "ethers"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { X, ChevronDown, ChevronUp, CheckCircle, Copy, Check, AlertCircle } from "lucide-react"
-import { useAccount, useDisconnect, useSwitchChain } from "wagmi"
-import { calculateVMFAmount, getPriceInfo, getPriceInfoNoProvider } from "@/lib/oracle-utils"
-import { isBaseNetwork, switchToBaseNetwork as switchToBase, getNetworkName, forceBaseNetwork } from "@/lib/network-utils"
-import { connectCoinbaseSmartWallet, isCoinbaseSmartWalletAvailable } from "@/lib/coinbase-smart-wallet"
-import { usePrivyWallet } from "@/hooks/usePrivyWallet"
-import { isMobile } from "@/lib/wallet-config"
+import { X, ChevronDown, ChevronUp, CheckCircle, Copy, Check, Minus, Plus, AlertCircle } from "lucide-react"
+import { useWallet } from "@/hooks/useWallet"
+import { formatAddress } from "@/lib/wallet-config"
+import { DialogFooter } from "@/components/ui/dialog"
+import { calculateVMFAmount, getPriceInfo, getPriceInfoNoProvider, testContractOracle } from "@/lib/oracle-utils"
 import axios from "axios"
-
-// Helper function to format address (since we're not importing from wallet-config anymore)
-function formatAddress(address: string): string {
-  if (!address) return ''
-  return `${address.slice(0, 6)}...${address.slice(-4)}`
-}
 
 interface BuyVMFModalProps {
   isOpen: boolean
@@ -133,19 +125,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
   const [charityDistributions, setCharityDistributions] = useState<CharityDistribution[]>([])
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false)
   const [isCharityDropdownOpen, setIsCharityDropdownOpen] = useState(false)
-  
-  // Detect mobile device and use appropriate wallet system
-  const isMobileDevice = isMobile()
-  
-  const privyWallet = usePrivyWallet()
-  const wagmiAccount = useAccount()
-  const { disconnect: wagmiDisconnect } = useDisconnect()
-  
-  // Use Privy for mobile, Wagmi for desktop
-  const wallet = isMobileDevice ? privyWallet : wagmiAccount
-  const { address, isConnected, chain } = wallet
-  const disconnect = isMobileDevice ? privyWallet.disconnectWallet : wagmiDisconnect
-  
+  const { connection, isConnected, connectWallet, disconnect, formattedAddress } = useWallet()
   const [transactionHash, setTransactionHash] = useState("")
   const [vmfAmount, setVmfAmount] = useState("")
   const [fees, setFees] = useState<string | null>(null)
@@ -157,12 +137,6 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
   const [isOnBaseNetwork, setIsOnBaseNetwork] = useState(false)
   const [priceInfo, setPriceInfo] = useState<{price: number, source: string} | null>(null)
   const [isLoadingPrice, setIsLoadingPrice] = useState(false)
-  
-  // Format address for display
-  const formattedAddress = address ? formatAddress(address) : null
-
-  // Generate unique id for modal description
-  const modalDescriptionId = React.useId()
 
   // Focus management for accessibility
   useEffect(() => {
@@ -175,25 +149,15 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     }
   }, [isOpen])
 
-  // Check network status and force Base network
+  // Check network status
   useEffect(() => {
-    async function checkNetworkStatus() {
-      if (isConnected && chain && isBaseNetwork(chain.id)) {
+    const checkNetworkStatus = () => {
+      if (isConnected && connection?.chainId === 8453) {
         setIsOnBaseNetwork(true)
         setNeedsNetworkSwitch(false)
-      } else if (isConnected && chain && !isBaseNetwork(chain.id)) {
+      } else if (isConnected && connection?.chainId !== 8453) {
         setIsOnBaseNetwork(false)
         setNeedsNetworkSwitch(true)
-        // Automatically try to switch to Base network
-        try {
-          if (isMobileDevice) {
-            await privyWallet.switchToBase()
-          } else {
-          await forceBaseNetwork()
-          }
-        } catch (error) {
-          console.warn('Could not auto-switch to Base network:', error)
-        }
       } else {
         setIsOnBaseNetwork(false)
         setNeedsNetworkSwitch(false)
@@ -201,7 +165,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     }
 
     checkNetworkStatus()
-  }, [isConnected, chain, isMobileDevice, privyWallet])
+  }, [isConnected, connection?.chainId])
 
   // Trap focus within modal
   useEffect(() => {
@@ -248,27 +212,23 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
       console.log("🔄 Loading price info...");
       setIsLoadingPrice(true)
       try {
-        let info: {price: number, source: string};
-        if (isConnected && chain && isBaseNetwork(chain.id)) {
+        let info;
+        if (isConnected && connection?.chainId === 8453) {
           // Use provider-based pricing (prioritizes contract oracle)
           const provider = new ethers.BrowserProvider(window.ethereum)
           info = await getPriceInfo(provider)
           console.log("✅ Got price from provider:", info);
-        } else if (isConnected && chain && !isBaseNetwork(chain.id)) {
+        } else if (isConnected && connection?.chainId !== 8453) {
           // Wrong network - try to switch to Base
           console.log("⚠️ Wrong network detected, attempting to switch to Base...");
           try {
-            if (isMobileDevice) {
-              await privyWallet.switchToBase();
-            } else {
-            await forceBaseNetwork();
-            }
+            await switchToBaseNetwork();
             // Retry with Base network
             const provider = new ethers.BrowserProvider(window.ethereum)
             info = await getPriceInfo(provider)
-            console.log("✅ VMF: Got price after automatic network switch:", info);
+            console.log("✅ Got price after network switch:", info);
           } catch (switchError) {
-            console.warn("⚠️ VMF: Automatic network switch failed, using external sources:", switchError);
+            console.warn("⚠️ Network switch failed, using external sources:", switchError);
             info = await getPriceInfoNoProvider()
           }
         } else {
@@ -277,7 +237,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
           console.log("✅ Got price from external sources:", info);
         }
         setPriceInfo(info)
-      } catch (error: unknown) {
+      } catch (error) {
         console.error("❌ Failed to load price info:", error)
         setPriceInfo({ price: 1, source: "Fallback" })
       } finally {
@@ -297,22 +257,54 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
         clearInterval(intervalId)
       }
     }
-  }, [isConnected, chain])
+  }, [isConnected, connection?.chainId])
 
   // Function to switch to Base network
   const switchToBaseNetwork = async () => {
+    if (!window.ethereum) {
+      alert("❌ No wallet detected! Please install a Web3 wallet like MetaMask or Coinbase Wallet.");
+      return;
+    }
+
     try {
-      if (isMobileDevice) {
-        // Use Privy's network switching
-        await privyWallet.switchToBase();
-      } else {
-        // Use Wagmi's network switching
-      await switchToBase();
-      }
+      console.log("🔄 Attempting to switch to Base network...");
+      
+      // Try to switch to Base network
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: "0x2105" }], // Base mainnet
+      });
+      console.log("✅ Successfully switched to Base network");
+      
+      // Show success message
       alert("✅ Successfully switched to Base network! You can now use VMF features.");
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      alert(`❌ Failed to switch to Base network: ${errorMessage}`);
+      
+    } catch (switchError: any) {
+      console.log("⚠️ Switch failed, trying to add Base network...");
+      
+      if (switchError.code === 4902) {
+        // Chain not added, try to add Base Mainnet
+        try {
+          await window.ethereum.request({
+            method: "wallet_addEthereumChain",
+            params: [{
+              chainId: "0x2105",
+              chainName: "Base Mainnet",
+              nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+              rpcUrls: ["https://mainnet.base.org"],
+              blockExplorerUrls: ["https://basescan.org"],
+            }],
+          });
+          console.log("✅ Successfully added Base network");
+          alert("✅ Successfully added Base network! You can now use VMF features.");
+        } catch (addError) {
+          console.error("❌ Failed to add Base network:", addError);
+          alert("❌ Failed to add Base network. Please manually add Base network to your wallet:\n\nNetwork Name: Base Mainnet\nRPC URL: https://mainnet.base.org\nChain ID: 8453\nCurrency Symbol: ETH\nBlock Explorer: https://basescan.org");
+        }
+      } else {
+        console.error("❌ Failed to switch to Base network:", switchError);
+        alert("❌ Failed to switch to Base network. Please manually switch to Base network in your wallet to use VMF features.");
+      }
     }
   }
 
@@ -321,13 +313,13 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     async function calculateVMF() {
       if (amount && priceInfo) {
         try {
-          if (isConnected && chain && isBaseNetwork(chain.id)) {
+          if (isConnected && connection?.chainId === 8453) {
             // Use provider-based calculation (tries Uniswap first, then oracle)
             const provider = new ethers.BrowserProvider(window.ethereum)
             const vmfAmount = await calculateVMFAmount(Number(amount), provider)
             setVmfAmount(vmfAmount.toFixed(4))
           } else {
-            // Use price info directly when not connected or on wrong network
+            // Use price info directly when not connected
             const vmfAmount = Number(amount) / priceInfo.price
             setVmfAmount(vmfAmount.toFixed(4))
           }
@@ -347,13 +339,13 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
       }
     }
     calculateVMF()
-  }, [amount, isConnected, chain, priceInfo])
+  }, [amount, isConnected, connection?.chainId, priceInfo])
 
   useEffect(() => {
-    if (isConnected && chain) {
-      setNeedsNetworkSwitch(!isBaseNetwork(chain.id))
+    if (isConnected && connection) {
+      setNeedsNetworkSwitch(connection.chainId !== 8453)
     }
-  }, [chain, isConnected])
+  }, [connection?.chainId, isConnected])
 
   useEffect(() => {
     if (selectedCharities.length > 0) {
@@ -412,9 +404,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
           setIsEstimatingGas(false)
           return
         }
-        // Type-safe gas estimation
-        const contractWithEstimate = contract as unknown as { estimateGas: { handleUSDCBatch: (amounts: bigint[], recipients: string[]) => Promise<bigint> } }
-        const gasEstimate = await contractWithEstimate.estimateGas.handleUSDCBatch(amounts, recipients as string[])
+        const gasEstimate = await (contract as any).estimateGas.handleUSDCBatch(amounts, recipients)
         // Fetch Base gas price from official API
         const { data: gasData } = await axios.get("https://gas.api.base.org")
         const baseGasPriceWei = gasData.recommended.maxFeePerGas // in wei
@@ -477,12 +467,12 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
       }
       
       // CRITICAL: Verify we're on Base mainnet before proceeding
-      console.log("🔍 Initial network check - wallet chainId:", chain?.id)
+      console.log("🔍 Initial network check - wallet chainId:", connection?.chainId)
       
-      if (!chain || !isBaseNetwork(chain.id)) {
-        const currentNetwork = getNetworkName(chain?.id)
-        console.error("❌ Wrong network detected:", chain?.id)
-        alert(`❌ WRONG NETWORK! You are on ${currentNetwork}. Please switch to Base network to continue.`)
+      if (!connection || connection.chainId !== 8453) {
+        const currentChain = connection?.chainId || 'unknown'
+        console.error("❌ Wrong network detected:", currentChain)
+        alert(`❌ WRONG NETWORK! You are on chain ${currentChain}. Please switch to Base mainnet (chainId 8453) to continue.`)
         return
       }
       
@@ -503,12 +493,12 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
       setIsProcessing(true)
       
       // CRITICAL: Verify we're on Base mainnet before any transaction
-      console.log("🔍 Transaction network check - wallet chainId:", chain?.id)
+      console.log("🔍 Transaction network check - wallet chainId:", connection?.chainId)
       
-      if (!chain || !isBaseNetwork(chain.id)) {
-        const currentNetwork = getNetworkName(chain?.id)
-        console.error("❌ Wrong network detected:", chain?.id)
-        alert(`❌ WRONG NETWORK! You are on ${currentNetwork}. Please switch to Base network before making any transactions.`)
+      if (!connection || connection.chainId !== 8453) {
+        const currentChain = connection?.chainId || 'unknown'
+        console.error("❌ Wrong network detected:", currentChain)
+        alert(`❌ WRONG NETWORK! You are on chain ${currentChain}. Please switch to Base mainnet (chainId 8453) before making any transactions.`)
         setIsProcessing(false)
         return false
       }
@@ -562,10 +552,9 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
       await tx.wait()
       await new Promise((resolve) => setTimeout(resolve, 2000))
       return true
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error"
+    } catch (error: any) {
       console.error("Smart contract execution failed:", error)
-      alert(`Transaction failed: ${errorMessage}`)
+      alert(`Transaction failed: ${error.message || "Unknown error"}`)
       return false
     } finally {
       setIsProcessing(false)
@@ -579,13 +568,13 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     }
 
     // CRITICAL: Double-check network before final transaction
-    console.log("🔍 Checking network - wallet chainId:", chain?.id)
+    console.log("🔍 Checking network - wallet chainId:", connection?.chainId)
     
     // Use wallet connection state instead of creating new provider
-    if (!chain || !isBaseNetwork(chain.id)) {
-      const currentNetwork = getNetworkName(chain?.id)
-      console.error("❌ Wrong network detected:", chain?.id)
-      alert(`❌ WRONG NETWORK! You are on ${currentNetwork}. Please switch to Base network before confirming the transaction.`)
+    if (!connection || connection.chainId !== 8453) {
+      const currentChain = connection?.chainId || 'unknown'
+      console.error("❌ Wrong network detected:", currentChain)
+      alert(`❌ WRONG NETWORK! You are on chain ${currentChain}. Please switch to Base mainnet (chainId 8453) before confirming the transaction.`)
       return
     }
     
@@ -623,8 +612,11 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
 
   return (
     <div
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
       aria-labelledby="modal-title"
-      aria-describedby={modalDescriptionId}
+      aria-describedby="modal-description"
     >
       <div
         className="bg-white rounded-3xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto focus:outline-none"
@@ -650,9 +642,6 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
               </Button>
             </CardHeader>
             <CardContent className="space-y-6 relative">
-              <div id={modalDescriptionId} className="sr-only">
-                Purchase VMF coins and select charities to support veterans and military families
-              </div>
               <div id="modal-description" className="sr-only">
                 Purchase VMF coins and select charities to support veterans and military families
               </div>
@@ -665,11 +654,11 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                       <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-2" />
                       <h3 className="text-lg font-bold text-red-800 mb-2">Wrong Network!</h3>
                       <p className="text-sm text-red-700 mb-4">
-                        VMF automatically switches to Base network.
+                        VMF requires Base network to function properly.
                         <br />
-                        Current network: {getNetworkName(chain?.id)}
+                        Current network: ChainId {connection?.chainId}
                         <br />
-                        Switching to: Base Network
+                        Required: Base Mainnet (ChainId 8453)
                       </p>
                     </div>
                     <Button
@@ -678,104 +667,66 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                     >
                       🔄 Switch to Base Network
                     </Button>
-                      <p className="text-xs text-red-600 mt-2">
-                        VMF automatically switches to Base network when you connect your wallet.
-                      </p>
+                    <p className="text-xs text-red-600 mt-2">
+                      This will automatically add Base network to your wallet if needed.
+                    </p>
                   </div>
                 </div>
               )}
 
                               {!isConnected ? (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4" role="alert">
+                <>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4" role="alert">
                     <div className="flex items-center space-x-2 mb-2">
                       <AlertCircle className="h-4 w-4 text-blue-600" aria-hidden="true" />
                       <span className="font-medium text-blue-800">Connect Your Wallet</span>
                     </div>
                     <p className="text-sm text-blue-700 mb-3">
-                      Please connect your wallet to continue with the purchase.
+                      Please select a wallet to connect and continue with the purchase.
                     </p>
-                    
-                    {isMobileDevice ? (
-                      /* Mobile: Privy connection */
-                      <div className="space-y-3">
-                       <div className="bg-blue-100 border border-blue-300 rounded-lg p-3 mb-3">
-                         <p className="text-xs text-blue-800 leading-relaxed">
-                            <strong>📱 Seamless Experience:</strong> Connect with any wallet or create a new embedded wallet. 
-                            No app switching required - works directly in your browser!
-                          </p>
-                        </div>
-                        <Button
-                          onClick={async () => {
-                            try {
-                              await privyWallet.connectWallet();
-                            } catch (error) {
-                              console.error('Failed to connect with Privy:', error);
-                              alert('Failed to connect wallet. Please try again.');
-                            }
-                          }}
-                          disabled={privyWallet.isConnecting}
-                          className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2"
-                          aria-label="Connect with Privy"
-                        >
-                          <span className="text-2xl">🔗</span>
-                          {privyWallet.isConnecting ? "Connecting..." : "Connect Wallet"}
-                        </Button>
-                        <div className="text-center">
-                          <p className="text-xs text-blue-600">
-                            Connect with MetaMask, Coinbase, email, or create a new wallet
-                          </p>
-                        </div>
-                      </div>
-                    ) : (
-                      /* Desktop: Coinbase Smart Wallet + AppKit */
-                      <div className="space-y-3">
-                        <div className="bg-blue-100 border border-blue-300 rounded-lg p-3 mb-3">
-                          <p className="text-xs text-blue-800 leading-relaxed">
-                            <strong>💻 Desktop Experience:</strong> Connect with your preferred wallet extension or use Coinbase Smart Wallet.
-                         </p>
-                       </div>
-                       <Button
-                         onClick={async () => {
-                           try {
-                             await connectCoinbaseSmartWallet();
-                             window.location.reload();
-                           } catch (error) {
-                             console.error('Failed to connect Coinbase Smart Wallet:', error);
-                             alert('Failed to connect to Coinbase Smart Wallet. Please try again or use another wallet option.');
-                           }
-                         }}
-                         className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2"
-                         aria-label="Connect with Coinbase Smart Wallet"
-                       >
-                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                           <title>Coinbase Smart Wallet Logo</title>
-                           <rect width="24" height="24" rx="6" fill="white"/>
-                           <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" fill="#0052FF"/>
-                           <path d="M9.5 8.5H14.5C14.7761 8.5 15 8.72386 15 9V15C15 15.2761 14.7761 15.5 14.5 15.5H9.5C9.22386 15.5 9 15.2761 9 15V9C9 8.72386 9.22386 8.5 9.5 8.5Z" fill="white"/>
-                         </svg>
-                         Coinbase Smart Wallet
-                       </Button>
-                       <div className="relative">
-                         <div className="absolute inset-0 flex items-center">
-                           <div className="w-full border-t border-gray-300"></div>
-                         </div>
-                         <div className="relative flex justify-center text-xs">
-                           <span className="px-2 bg-blue-50 text-gray-500">or connect other wallets</span>
-                         </div>
-                       </div>
-                       <div className="w-full">
-                         <appkit-button />
-                       </div>
-                     </div>
-                    )}
+                    <div className="grid grid-cols-1 gap-3">
+                      <Button
+                        onClick={() => connectWallet("coinbaseSmart")}
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2"
+                        aria-label="Connect Coinbase Smart Wallet"
+                      >
+                        <img src="/images/coinbase-logo.png" alt="Coinbase" className="h-6 w-6" />
+                        Coinbase Smart Wallet
+                      </Button>
+                      <Button
+                        onClick={() => connectWallet("metamask")}
+                        className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2"
+                        aria-label="Connect MetaMask"
+                      >
+                        <span className="text-2xl">🦊</span>
+                        MetaMask
+                      </Button>
+                      <Button
+                        onClick={() => connectWallet("rainbow")}
+                        className="w-full bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 hover:from-pink-500 hover:to-blue-500 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2"
+                        aria-label="Connect Rainbow Wallet"
+                      >
+                        <span className="text-2xl">🌈</span>
+                        Rainbow Wallet
+                      </Button>
+                      <Button
+                        onClick={() => connectWallet("farcaster")}
+                        className="w-full bg-[#8C6DFD] hover:bg-[#7a5be6] text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2"
+                        aria-label="Connect Farcaster Wallet"
+                      >
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" rx="6" fill="#8C6DFD"/><path d="M7 18V10.5C7 8.01472 9.01472 6 11.5 6H12.5C14.9853 6 17 8.01472 17 10.5V18H15V12C15 10.8954 14.1046 10 13 10H11C9.89543 10 9 10.8954 9 12V18H7Z" fill="white"/></svg>
+                        Farcaster Wallet
+                      </Button>
+                    </div>
                   </div>
+                </>
               ) : (
                 <>
                   {/* Connected Wallet Display */}
                   <div className="bg-green-50 border border-green-200 rounded-lg p-4 relative" role="status" aria-live="polite">
                     {/* Disconnect X button (for all wallets) */}
                     <button
-                      onClick={() => disconnect()}
+                      onClick={disconnect}
                       className="absolute top-3 right-3 rounded-full p-1 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-400"
                       aria-label="Disconnect wallet"
                     >
@@ -787,17 +738,12 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                     <div className="flex items-center space-x-2">
                       <CheckCircle className="h-4 w-4 text-green-600" aria-hidden="true" />
                       <span className="font-medium text-green-800">
-                        {isMobileDevice ? privyWallet.walletState.walletType : 'Wallet'}: {formattedAddress}
+                        {connection?.walletName}: {formattedAddress}
                       </span>
                     </div>
                     <p className="text-sm text-green-700 mt-1">
                       USDC Balance: Check your wallet
                     </p>
-                    {isMobileDevice && privyWallet.primaryWallet && (
-                      <p className="text-xs text-green-600 mt-1">
-                        Connected via Privy • {privyWallet.primaryWallet.walletClientType}
-                      </p>
-                    )}
                   </div>
 
                   {/* USDC Balance Warning */}
@@ -1167,7 +1113,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                       </div>
                       <div className="flex justify-between" role="listitem">
                         <span>Chain ID:</span>
-                        <span className="font-mono">{chain?.id || "Unknown"}</span>
+                        <span className="font-mono">{connection?.chainId || "Unknown"}</span>
                       </div>
                       <div className="flex justify-between" role="listitem">
                         <span>Gas Fees (Est.):</span>
