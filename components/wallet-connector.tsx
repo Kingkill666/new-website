@@ -88,7 +88,7 @@ export const WalletConnector = ({
         {error && (
           <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-600">
             {error}
-          </div>
+      </div>
         )}
 
         {isConnected ? (
@@ -114,7 +114,7 @@ export const WalletConnector = ({
             <Button
               variant="destructive"
               className="w-full"
-              onClick={() => {
+                onClick={() => {
                 disconnect()
                 setOpen(false)
               }}
@@ -163,8 +163,8 @@ export const WalletConnector = ({
               Don&apos;t see your wallet? Make sure the extension or mobile app
               is installed and unlocked, then try again.
             </p>
-          </div>
-        )}
+        </div>
+      )}
       </DialogContent>
     </Dialog>
   )
