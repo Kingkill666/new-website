@@ -4,11 +4,10 @@ import { WalletConnect } from "./WalletConnect";
 import { NetworkSelector } from "./NetworkSelector";
 import { StakingForm } from "./StakingForm";
 import { LayoutDashboard, Activity, Layers } from "lucide-react";
-import { config } from "../wagmi";
-import { getAccount } from "@wagmi/core";
+import { useAccount } from "wagmi";
 
 export const Dashboard: React.FC = () => {
-  const account = getAccount(config);
+  const { address } = useAccount();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -51,7 +50,7 @@ export const Dashboard: React.FC = () => {
                   </h1>
                 </div>
                 <div className="flex items-center space-x-4">
-                  {account.address && <NetworkSelector />}
+                  {address && <NetworkSelector />}
                   <WalletConnect />
                 </div>
               </div>
@@ -60,7 +59,7 @@ export const Dashboard: React.FC = () => {
 
           {/* Content */}
           <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            {account.address ? (
+            {address ? (
               <div className="grid grid-cols-1 gap-6">
                 <StakingForm />
               </div>

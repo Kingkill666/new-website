@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { simulateContract, writeContract, getAccount } from "@wagmi/core";
+import { simulateContract, writeContract } from "@wagmi/core";
+import { useAccount } from "wagmi";
 import { STAKING_CONTRACT_ADDRESS } from "../contracts/addresses";
 import { STAKING_ABI } from "../contracts/abis";
 import { config } from "../wagmi";
@@ -9,10 +10,10 @@ import { StakeCard } from "./StakeCard";
 export const StakesList: React.FC = () => {
   const [activeStakeId, setActiveStakeId] = useState<number | null>(null);
   const { stakes, isLoading, error } = useUserStakes();
-  const account = getAccount(config);
+  const { address } = useAccount();
 
   const handleWithdrawYield = async (stakeId: number) => {
-    if (!account.address || activeStakeId !== null) return;
+    if (!address || activeStakeId !== null) return;
     setActiveStakeId(stakeId);
     try {
       const { request } = await simulateContract(config, {
@@ -35,7 +36,7 @@ export const StakesList: React.FC = () => {
   };
 
   const handleWithdrawStake = async (stakeId: number) => {
-    if (!account.address || activeStakeId !== null) return;
+    if (!address || activeStakeId !== null) return;
     setActiveStakeId(stakeId);
     try {
       const stake = stakes.find((s) => Number(s.internal_id) === stakeId);

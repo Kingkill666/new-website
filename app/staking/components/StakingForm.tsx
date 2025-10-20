@@ -3,8 +3,8 @@ import {
   readContract,
   simulateContract,
   writeContract,
-  getAccount,
 } from "@wagmi/core";
+import { useAccount } from "wagmi";
 import { parseUnits } from "viem";
 import {
   MOCK_TOKEN_ADDRESS,
@@ -96,20 +96,20 @@ export const StakingForm: React.FC = () => {
     action: "mint" | "stake";
   }>({ isOpen: false, txHash: "", action: "mint" });
 
-  const account = getAccount(config);
+  const { address } = useAccount();
   const [currentAPR, setCurrentAPR] = useState<number>(7); // Start with base APR
   const BASE_APR = 7; // 7% base APR
   const APR_INCREMENT_PER_SECOND = 2.219685e-9;
 
   useEffect(() => {
     const fetchBalance = async () => {
-      if (!account.address) return;
+      if (!address) return;
       try {
         const data = await readContract(config, {
           abi: MOCK_TOKEN_ABI,
           address: MOCK_TOKEN_ADDRESS,
           functionName: "balanceOf",
-          args: [account.address],
+          args: [address],
         });
         setTokenBalance((Number(data) / 1e18).toString());
       } catch (err) {
@@ -121,7 +121,7 @@ export const StakingForm: React.FC = () => {
     fetchBalance();
     const interval = setInterval(fetchBalance, 10000);
     return () => clearInterval(interval);
-  }, [account.address]);
+  }, [address]);
 
   // Update APR every second
   useEffect(() => {
@@ -138,13 +138,13 @@ export const StakingForm: React.FC = () => {
   }, []);
 
   const checkAllowance = async (): Promise<boolean> => {
-    if (!account.address) return false;
+    if (!address) return false;
     try {
       const currentAllowance = await readContract(config, {
         address: MOCK_TOKEN_ADDRESS,
         abi: MOCK_TOKEN_ABI,
         functionName: "allowance",
-        args: [account.address, STAKING_CONTRACT_ADDRESS],
+        args: [address, STAKING_CONTRACT_ADDRESS],
       });
       return BigInt(currentAllowance) >= parseUnits(stakeAmount, 18);
     } catch (err) {
@@ -154,14 +154,14 @@ export const StakingForm: React.FC = () => {
   };
 
   const handleMint = async () => {
-    if (!mintAmount || !account.address) return;
+    if (!mintAmount || !address) return;
     setIsMinting(true);
     try {
       const { request } = await simulateContract(config, {
         address: MOCK_TOKEN_ADDRESS,
         abi: MOCK_TOKEN_ABI,
         functionName: "mint",
-        args: [account.address, parseUnits(mintAmount, 18)],
+        args: [address, parseUnits(mintAmount, 18)],
       });
 
       const tx = await writeContract(config, request);
@@ -204,7 +204,7 @@ export const StakingForm: React.FC = () => {
   };
 
   const handleStake = async () => {
-    if (!stakeAmount || !account.address) return;
+    if (!stakeAmount || !address) return;
     setIsStaking(true);
 
     try {

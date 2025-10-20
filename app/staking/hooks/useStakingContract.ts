@@ -1,9 +1,9 @@
 import {
-  getAccount,
   readContract,
   simulateContract,
   writeContract,
 } from "@wagmi/core";
+import { useAccount } from "wagmi";
 import {
   STAKING_CONTRACT_ADDRESS,
   MOCK_TOKEN_ADDRESS,
@@ -12,7 +12,7 @@ import { STAKING_ABI, MOCK_TOKEN_ABI } from "../contracts/abis";
 import { config } from "../wagmi";
 
 export function useStakingContract() {
-  const account = getAccount(config);
+  const { address } = useAccount();
 
   // Read functions
   const getMinimumStakeCap = async () => {
@@ -42,13 +42,13 @@ export function useStakingContract() {
   };
 
   const getTokenBalance = async () => {
-    if (!account.address) return BigInt(0);
+    if (!address) return BigInt(0);
     try {
       return await readContract(config, {
         address: MOCK_TOKEN_ADDRESS,
         abi: MOCK_TOKEN_ABI,
         functionName: "balanceOf",
-        args: [account.address],
+        args: [address],
       });
     } catch (error) {
       console.error("Error fetching token balance:", error);
@@ -58,7 +58,7 @@ export function useStakingContract() {
 
   // Write functions
   const stake = async (amount: bigint, stakingPeriod: number) => {
-    if (!account.address) throw new Error("No account connected");
+    if (!address) throw new Error("No account connected");
     try {
       const { request } = await simulateContract(config, {
         address: STAKING_CONTRACT_ADDRESS,
@@ -79,7 +79,7 @@ export function useStakingContract() {
   };
 
   const stakeBatch = async (amounts: bigint[], stakingPeriods: number[]) => {
-    if (!account.address) throw new Error("No account connected");
+    if (!address) throw new Error("No account connected");
     try {
       const { request } = await simulateContract(config, {
         address: STAKING_CONTRACT_ADDRESS,
@@ -95,7 +95,7 @@ export function useStakingContract() {
   };
 
   const withdraw = async (stakeId: number, amount: bigint) => {
-    if (!account.address) throw new Error("No account connected");
+    if (!address) throw new Error("No account connected");
     try {
       const { request } = await simulateContract(config, {
         address: STAKING_CONTRACT_ADDRESS,
@@ -111,7 +111,7 @@ export function useStakingContract() {
   };
 
   const withdrawAll = async (stakeId: number) => {
-    if (!account.address) throw new Error("No account connected");
+    if (!address) throw new Error("No account connected");
     try {
       const { request } = await simulateContract(config, {
         address: STAKING_CONTRACT_ADDRESS,
@@ -127,7 +127,7 @@ export function useStakingContract() {
   };
 
   const withdrawYield = async (stakeId: number) => {
-    if (!account.address) throw new Error("No account connected");
+    if (!address) throw new Error("No account connected");
     try {
       const { request } = await simulateContract(config, {
         address: STAKING_CONTRACT_ADDRESS,
@@ -143,13 +143,13 @@ export function useStakingContract() {
   };
 
   const mintTokens = async (amount: bigint) => {
-    if (!account.address) throw new Error("No account connected");
+    if (!address) throw new Error("No account connected");
     try {
       const { request } = await simulateContract(config, {
         address: MOCK_TOKEN_ADDRESS,
         abi: MOCK_TOKEN_ABI,
         functionName: "mint",
-        args: [account.address, amount],
+        args: [address, amount],
       });
       return await writeContract(config, request);
     } catch (error) {
@@ -159,7 +159,7 @@ export function useStakingContract() {
   };
 
   const approveTokens = async (amount: bigint) => {
-    if (!account.address) throw new Error("No account connected");
+    if (!address) throw new Error("No account connected");
     try {
       const { request } = await simulateContract(config, {
         address: MOCK_TOKEN_ADDRESS,

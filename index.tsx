@@ -320,7 +320,7 @@ const Index = () => {
                   BUY VMF
                 </Button>
 
-                {/* Compact Officers Club Button */}
+                {/* Pizza Party Mini-app Button */}
                 <a href="https://farcaster.xyz/miniapps/28-g7Plt7iqO/pizza-party" target="_blank" rel="noopener noreferrer">
                   <Button
                     className="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-1.5 text-xs shadow-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
@@ -443,7 +443,7 @@ const Index = () => {
                     Buy VMF
                   </Button>
 
-                  {/* Mobile Officers Club Button */}
+                  {/* Mobile Pizza Party Button */}
                   <a href="https://farcaster.xyz/miniapps/28-g7Plt7iqO/pizza-party" target="_blank" rel="noopener noreferrer">
                     <Button
                       className="w-full bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-3 shadow-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"

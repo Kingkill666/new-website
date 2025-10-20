@@ -1,11 +1,10 @@
 import React from "react";
 import { WalletConnect } from "./WalletConnect";
 import { NetworkSelector } from "./NetworkSelector";
-import { getAccount } from "@wagmi/core";
-import { config } from "../wagmi";
+import { useAccount } from "wagmi";
 
 export const Header: React.FC = () => {
-  const account = getAccount(config);
+  const { address } = useAccount();
 
   return (
     <header className="bg-white shadow-sm">
@@ -15,7 +14,7 @@ export const Header: React.FC = () => {
             <h1 className="text-xl font-bold text-gray-900">VMF Staking</h1>
           </div>
           <div className="flex items-center space-x-4">
-            {account.address && <NetworkSelector />}
+            {address && <NetworkSelector />}
             <WalletConnect />
           </div>
         </div>
