@@ -6,9 +6,12 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { headers } from "next/headers" // Import headers function
 import ContextProvider from "@/context" // Import AppKit ContextProvider
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://vmfcoin.com"
+
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "VMF - Veterans & Military Families",
   description: "Supporting those who served through blockchain technology",
   generator: "v0.dev",

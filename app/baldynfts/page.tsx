@@ -2,13 +2,17 @@ import { Metadata } from "next"
 import NFTGallery from "./nft-gallery"
 import { Header } from "@/components/header"
 
+const NFT_IMAGE_BASE_URL =
+  process.env.NEXT_PUBLIC_NFT_IMAGE_BASE_URL ||
+  "https://vmfcoin.com/images/nft"
+
 export const metadata: Metadata = {
   title: "Baldy NFTs - VMF Veterans & Military Families",
   description: "Explore the exclusive Baldy NFT collection supporting Veterans & Military Families through blockchain technology",
   openGraph: {
     title: "Baldy NFTs - VMF Veterans & Military Families",
     description: "Explore the exclusive Baldy NFT collection supporting Veterans & Military Families through blockchain technology",
-    images: ["/images/nft/1.png"],
+    images: [`${NFT_IMAGE_BASE_URL}/1.png`],
   },
 }
 

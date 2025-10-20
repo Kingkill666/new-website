@@ -30,6 +30,14 @@ interface NFTItem {
 
 const ITEMS_PER_PAGE = 30
 
+const METADATA_BASE_URL =
+  process.env.NEXT_PUBLIC_NFT_METADATA_BASE_URL ||
+  "https://vmfcoin.com/images/nft"
+
+const IMAGE_BASE_URL =
+  process.env.NEXT_PUBLIC_NFT_IMAGE_BASE_URL ||
+  "https://vmfcoin.com/images/nft"
+
 export default function NFTGallery() {
   const [nfts, setNfts] = useState<NFTItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -62,13 +70,13 @@ export default function NFTGallery() {
         // Load all 333 NFTs
         for (let i = 1; i <= 333; i++) {
           try {
-            const response = await fetch(`/images/nft/${i}.json`)
+            const response = await fetch(`${METADATA_BASE_URL}/${i}.json`)
             if (response.ok) {
               const metadata: NFTMetadata = await response.json()
               const nftItem: NFTItem = {
                 id: i,
                 metadata,
-                imageUrl: `/images/nft/${i}.png`,
+                imageUrl: `${IMAGE_BASE_URL}/${i}.png`,
                 rarityScore: rarityData[i] ? parseFloat(rarityData[i].rarityScore) : undefined
               }
               nftItems.push(nftItem)
