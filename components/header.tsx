@@ -32,8 +32,8 @@ export function Header({ onBuyVMFClick }: HeaderProps) {
 
   return (
     <nav
-      className={`border-b backdrop-blur-md fixed top-0 left-0 right-0 z-50 shadow-lg transition-all duration-300 ${
-        scrolled ? "bg-white/98 border-gray-200 shadow-md" : "bg-white/95 border-border/20"
+      className={`border-b bg-white fixed top-0 left-0 right-0 z-50 shadow-lg transition-all duration-300 ${
+        scrolled ? "border-gray-200 shadow-md" : "border-border/20"
       }`}
       role="navigation"
       aria-label="Main navigation"
@@ -157,7 +157,7 @@ export function Header({ onBuyVMFClick }: HeaderProps) {
         {isMenuOpen && (
           <div
             id="mobile-menu"
-            className="lg:hidden mt-4 py-4 border-t border-gray-200 bg-white/98 backdrop-blur-md rounded-lg shadow-lg"
+            className="lg:hidden mt-4 py-4 border-t border-gray-200 bg-white rounded-lg shadow-lg"
             role="menu"
             aria-label="Mobile navigation menu"
           >

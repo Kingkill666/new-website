@@ -2,6 +2,8 @@
 
 # dependencies
 /node_modules
+/nft-images
+/public/images/nft
 
 # next.js
 /.next/

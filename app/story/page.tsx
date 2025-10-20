@@ -196,8 +196,8 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
       {/* Header Navigation (copied from index.tsx, Our Story link removed, Socials link added) - DISABLED */}
       {/* 
       <nav
-        className={`border-b backdrop-blur-md fixed top-0 left-0 right-0 z-50 shadow-lg transition-all duration-300 ${
-          scrolled ? "bg-white/98 border-gray-200 shadow-md" : "bg-white/95 border-border/20"
+        className={`border-b bg-white fixed top-0 left-0 right-0 z-50 shadow-lg transition-all duration-300 ${
+          scrolled ? "border-gray-200 shadow-md" : "border-border/20"
         }`}
         role="navigation"
         aria-label="Main navigation"

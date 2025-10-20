@@ -497,10 +497,10 @@ const Index = () => {
                       With VMF, your purchase supports Veterans.
                     </p>
 
-                    <div className="flex flex-col items-center gap-4 mb-8">
+                    <div className="flex flex-col sm:flex-row items-center sm:justify-center lg:justify-start gap-3 sm:gap-3 lg:gap-4 mb-8 w-full">
                       <Button
                         size="sm"
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-14 py-2 sm:px-16 sm:py-4 text-base sm:text-lg font-semibold shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-[160px] sm:w-[180px]"
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 sm:px-8 sm:py-3 text-base sm:text-lg font-semibold shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-[160px] sm:w-[140px]"
                         onClick={() => setIsBuyModalOpen(true)}
                         aria-label="Buy VMF coins to support veterans"
                       >
@@ -508,7 +508,7 @@ const Index = () => {
                       </Button>
                       <Button
                         size="sm"
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-14 py-2 sm:px-16 sm:py-4 text-base sm:text-lg font-semibold shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-[160px] sm:w-[180px]"
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 sm:px-8 sm:py-3 text-base sm:text-lg font-semibold shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-[160px] sm:w-[140px]"
                         onClick={() => window.location.href = '/staking'}
                         aria-label="Stake VMF tokens"
                       >
@@ -516,7 +516,7 @@ const Index = () => {
                       </Button>
                       <Button
                         size="sm"
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-14 py-2 sm:px-16 sm:py-4 text-base sm:text-lg font-semibold shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-[160px] sm:w-[180px]"
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 sm:px-8 sm:py-3 text-base sm:text-lg font-semibold shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-[160px] sm:w-[140px]"
                         onClick={() => window.location.href = '/baldynfts'}
                         aria-label="View Baldy NFT collection"
                       >
