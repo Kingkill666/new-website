@@ -85,16 +85,26 @@ BASE_RPC_URL=https://mainnet.base.org
 BASESCAN_API_KEY=your_basescan_api_key
 ```
 
-## Web App Deployment
+## Wallet Integration
 
-Your project is live at:
+This project supports multiple wallet connection methods for optimal user experience:
 
-**[https://vercel.com/vmf-coin/v0-show-code-in-ui](https://vercel.com/vmf-coin/v0-show-code-in-ui)**
+### Coinbase Smart Wallet (Recommended)
+- **No app installation required** - Works directly in mobile browsers
+- **Passkey authentication** - Secure, biometric login
+- **Cross-device synchronization** - Access wallet from any device
+- **Gasless transactions** - Sponsored transactions where supported
+- **Seamless UX** - Native browser experience without app switching
 
-To run locally:
-```bash
-npm run dev
-```
+### Other Wallets
+- MetaMask, Trust Wallet, Rainbow, and other WalletConnect-compatible wallets
+- Automatic network switching to Base
+- Mobile-optimized connection flows
+
+### Technical Implementation
+- Uses `@wagmi/connectors` with `coinbaseWallet` connector
+- Configured with `preference: 'smartWalletOnly'` for embedded experience
+- Integrated with Reown AppKit for unified wallet management
 
 ## Testing
 

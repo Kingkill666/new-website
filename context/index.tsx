@@ -33,11 +33,13 @@ if (!projectId) {
     networks: networks,
     defaultNetwork: base, // Base network for VMF - REQUIRED
     metadata,
-    features: { 
+    features: {
       analytics: true,
       email: false, // Disable email features
       socials: [], // Disable social login features
+      emailShowWallets: false, // Disable email wallet options
     },
+    coinbasePreference: 'smartWalletOnly', // Enable Coinbase Smart Wallet
   })
 }
 
