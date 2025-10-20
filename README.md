@@ -143,4 +143,3 @@ For detailed operational procedures, see `contracts/AGENT_README.md`:
 - Contract configuration and parameters
 - Oracle integration
 - Tax and donation pool management
-# staking

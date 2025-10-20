@@ -1,5 +1,7 @@
 {
-  "type": "module",
+  "name": "vmf-landing",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -17,8 +19,6 @@
     "@coinbase/wallet-sdk": "^4.3.7",
     "@hookform/resolvers": "^3.9.1",
     "@mui/material": "^7.3.4",
-    "@privy-io/react-auth": "^3.3.0",
-    "@privy-io/wagmi": "^2.0.1",
     "@radix-ui/react-accordion": "1.2.2",
     "@radix-ui/react-alert-dialog": "1.1.4",
     "@radix-ui/react-aspect-ratio": "1.1.1",
