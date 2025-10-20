@@ -193,8 +193,7 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
       {/* Navigation Header */}
       <Header onBuyVMFClick={() => setIsBuyModalOpen(true)} />
 
-      {/* Header Navigation (copied from index.tsx, Our Story link removed, Socials link added) - DISABLED */}
-      {/* 
+      {/* Header Navigation (copied from index.tsx, Our Story link removed, Socials link added) */}
       <nav
         className={`border-b backdrop-blur-md fixed top-0 left-0 right-0 z-50 shadow-lg transition-all duration-300 ${
           scrolled ? "bg-white/98 border-gray-200 shadow-md" : "bg-white/95 border-border/20"
@@ -372,8 +371,7 @@ When I'm not working, you'll find me camping with my family in our rooftop tent,
             </div>
           )}
         </div>
-      </nav> 
-      */}
+      </nav>
       <BuyVMFModal isOpen={isBuyModalOpen} onClose={() => setIsBuyModalOpen(false)} />
       <main className="pt-24">
         {/* Hero Section with Parallax Effect */}

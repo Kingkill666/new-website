@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Crown, Menu, X } from "lucide-react"
 import { BuyVMFModal } from "@/components/buy-vmf-modal"
 import Footer from "@/components/footer"
+import { Header } from "@/components/header"
 
 const YOUTUBE_VIDEOS = [
   {
@@ -123,16 +124,11 @@ export default function SocialsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-red-50">
-      {/* Header Navigation (copied from index.tsx, Socials link removed) */}
-      <nav
-        className={`border-b backdrop-blur-md fixed top-0 left-0 right-0 z-50 shadow-lg transition-all duration-300 ${
-          scrolled ? "bg-white/98 border-gray-200 shadow-md" : "bg-white/95 border-border/20"
-        }`}
-        role="navigation"
-        aria-label="Main navigation"
-        style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 50 }}
-      >
-        <div className="container mx-auto px-2 sm:px-4 py-2 overflow-x-hidden">
+      {/* Navigation Header */}
+      <Header onBuyVMFClick={() => setIsBuyModalOpen(true)} />
+      
+      <BuyVMFModal isOpen={isBuyModalOpen} onClose={() => setIsBuyModalOpen(false)} />
+      <main className="pt-24">
           <div className="flex items-center justify-between min-w-0">
             {/* Logo Section */}
             <Link href="/" aria-label="Go to home page">
