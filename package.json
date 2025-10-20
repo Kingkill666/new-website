@@ -45,6 +45,7 @@
     "@reown/appkit": "^1.8.8",
     "@reown/appkit-adapter-wagmi": "^1.8.8",
     "@tanstack/react-query": "^5.90.2",
+    "@wagmi/core": "^2.22.1",
     "@walletconnect/client": "^1.8.0",
     "@walletconnect/qrcode-modal": "^1.8.0",
     "@walletconnect/web3-provider": "^1.8.0",
