@@ -129,7 +129,8 @@ export default function SocialsPage() {
       
       <BuyVMFModal isOpen={isBuyModalOpen} onClose={() => setIsBuyModalOpen(false)} />
       <main className="pt-24">
-          <div className="flex items-center justify-between min-w-0">
+        {/* American flag banner */}
+        <section className="relative py-20 sm:py-28 overflow-hidden">
             {/* Logo Section */}
             <Link href="/" aria-label="Go to home page">
               <div className="flex items-center space-x-3 cursor-pointer">
