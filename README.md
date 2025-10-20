@@ -4,6 +4,8 @@
 
 [![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/vmf-coin/v0-show-code-in-ui)
 [![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/SbHYLh7hsIH)
+[![E2E Tests](https://github.com/Kingkill666/new-website/actions/workflows/e2e-tests.yml/badge.svg)](https://github.com/Kingkill666/new-website/actions/workflows/e2e-tests.yml)
+[![Lint](https://github.com/Kingkill666/new-website/actions/workflows/lint.yml/badge.svg)](https://github.com/Kingkill666/new-website/actions/workflows/lint.yml)
 
 ## Overview
 
@@ -93,6 +95,36 @@ To run locally:
 ```bash
 npm run dev
 ```
+
+## Testing
+
+This project includes comprehensive end-to-end tests using Playwright to ensure the buy modal and wallet functionality work correctly.
+
+### Running Tests Locally
+
+```bash
+# Run all tests (requires dev server to be running)
+npm run test
+
+# Run end-to-end tests (starts dev server automatically)
+npm run test:e2e
+
+# Run tests with visual UI
+npm run test:ui
+
+# Run tests in browser (headed mode)
+npm run test:headed
+```
+
+### CI/CD
+
+Tests automatically run on GitHub Actions for:
+- All pushes to `main` and `prod` branches
+- All pull requests targeting these branches
+
+Test results and failure artifacts are automatically uploaded for review.
+
+For detailed testing documentation, see [`TESTING.md`](./TESTING.md).
 
 ## Agent Operations
 

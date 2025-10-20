@@ -12,6 +12,8 @@ import { formatAddress } from "@/lib/wallet-config"
 import { DialogFooter } from "@/components/ui/dialog"
 import { calculateVMFAmount, getPriceInfo, getPriceInfoNoProvider, testContractOracle } from "@/lib/oracle-utils"
 import axios from "axios"
+import { useAppKit } from "@reown/appkit/react"
+// Porto SDK will be imported dynamically when needed to avoid SSR/bundler issues
 
 interface BuyVMFModalProps {
   isOpen: boolean
@@ -126,6 +128,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false)
   const [isCharityDropdownOpen, setIsCharityDropdownOpen] = useState(false)
   const { connection, isConnected, connectWallet, disconnect, formattedAddress } = useWallet()
+  const { open: openAppKit } = useAppKit()
   const [transactionHash, setTransactionHash] = useState("")
   const [vmfAmount, setVmfAmount] = useState("")
   const [fees, setFees] = useState<string | null>(null)
@@ -459,6 +462,34 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     setNeedsNetworkSwitch(false)
   }
 
+  // Porto demo connector (dynamically imported)
+  const connectPorto = async () => {
+    try {
+      console.log("🔵 Initializing Porto demo connector...")
+      const mod = await import('porto')
+      const Porto = mod?.Porto ?? mod.default ?? null
+      if (!Porto) {
+        throw new Error('Porto SDK not available. Please install the `porto` package.')
+      }
+
+      // Create a Porto instance and request a wallet connect (demo flow)
+      const porto = Porto.create()
+      console.log('🔵 Porto instance created, requesting wallet_connect...')
+
+      // The RPC method used in Porto's vanilla example is 'wallet_connect'
+      const response = await porto.provider.request({ method: 'wallet_connect' })
+      console.log('🔵 Porto response:', response)
+
+      // Provide user feedback - the actual app-level connection flow should
+      // reconcile this with the existing useWallet hook (future improvement).
+      alert('Porto demo connected: ' + JSON.stringify(response))
+    } catch (err: any) {
+      console.error('❌ Porto connection failed', err)
+      const msg = err?.message ?? String(err)
+      alert('Porto connection failed: ' + msg)
+    }
+  }
+
   const handleBuyNext = async () => {
     if (amount && selectedCharities.length > 0 && isConnected && getTotalPercentage() === 100) {
       if (needsNetworkSwitch) {
@@ -686,7 +717,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                     </p>
                     <div className="grid grid-cols-1 gap-3">
                       <Button
-                        onClick={() => connectWallet("coinbaseSmart")}
+                        onClick={() => openAppKit()}
                         className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2"
                         aria-label="Connect Coinbase Smart Wallet"
                       >
