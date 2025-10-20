@@ -1,5 +1,6 @@
 import { Metadata } from "next"
 import NFTGallery from "./nft-gallery"
+import { Header } from "@/components/header"
 
 export const metadata: Metadata = {
   title: "Baldy NFTs - VMF Veterans & Military Families",
@@ -14,8 +15,11 @@ export const metadata: Metadata = {
 export default function BaldyNFTsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-blue-50">
+      {/* Navigation Header */}
+      <Header />
+      
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-red-600 to-blue-600 text-white py-16">
+      <div className="bg-gradient-to-r from-red-600 to-blue-600 text-white py-16 pt-24">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-5xl font-bold mb-4">Baldy NFTs</h1>
           <p className="text-xl mb-6 max-w-3xl mx-auto">

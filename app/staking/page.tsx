@@ -1,5 +1,6 @@
 import { Metadata } from "next"
 import StakingApp from "./staking-app"
+import { Header } from "@/components/header"
 
 export const metadata: Metadata = {
   title: "VMF Staking - Veterans & Military Families",
@@ -12,5 +13,15 @@ export const metadata: Metadata = {
 }
 
 export default function StakingPage() {
-  return <StakingApp />
+  return (
+    <div className="min-h-screen">
+      {/* Navigation Header */}
+      <Header />
+      
+      {/* Staking App with top padding to account for fixed header */}
+      <div className="pt-20">
+        <StakingApp />
+      </div>
+    </div>
+  )
 }
