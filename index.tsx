@@ -514,6 +514,14 @@ const Index = () => {
                       >
                         Stake VMF
                       </Button>
+                      <Button
+                        size="sm"
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-14 py-2 sm:px-16 sm:py-4 text-base sm:text-lg font-semibold shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-[160px] sm:w-[180px]"
+                        onClick={() => window.location.href = '/baldynfts'}
+                        aria-label="View Baldy NFT collection"
+                      >
+                        Baldy NFTs
+                      </Button>
                     </div>
 
                     {/* Trust Indicators */}
