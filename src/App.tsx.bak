@@ -1,0 +1,15 @@
+import React from "react";
+import { AppProviders } from "./providers/AppProviders";
+import { StakingDashboard } from "./components/StakingDashboard";
+
+function App() {
+  return (
+    <AppProviders>
+      <div className="min-h-screen bg-gray-50">
+        <StakingDashboard />
+      </div>
+    </AppProviders>
+  );
+}
+
+export default App;
