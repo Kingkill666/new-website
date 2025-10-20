@@ -5,7 +5,7 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import Head from "next/head"
 import { headers } from "next/headers" // Import headers function
-import ContextProvider from "@/context" // Import AppKit ContextProvider with Privy
+import ContextProvider from "@/context" // Import AppKit ContextProvider
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -31,7 +31,7 @@ export default async function RootLayout({
         <link rel="icon" href="/images/vmf-logo-new-patriotic.png" type="image/png" />
       </Head>
       <body className={inter.className}>
-        {/* Wrap children with ContextProvider (includes Privy), passing cookies */}
+        {/* Wrap children with ContextProvider, passing cookies */}
         <ContextProvider cookies={cookies}>
           <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
             {children}
