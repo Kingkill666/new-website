@@ -32,11 +32,11 @@ const ITEMS_PER_PAGE = 30
 
 const METADATA_BASE_URL =
   process.env.NEXT_PUBLIC_NFT_METADATA_BASE_URL ||
-  "https://vmfcoin.com/images/nft"
+  "/images/nft"
 
 const IMAGE_BASE_URL =
   process.env.NEXT_PUBLIC_NFT_IMAGE_BASE_URL ||
-  "https://vmfcoin.com/images/nft"
+  "/images/nft"
 
 export default function NFTGallery() {
   const [nfts, setNfts] = useState<NFTItem[]>([])
@@ -165,6 +165,36 @@ export default function NFTGallery() {
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-red-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-lg text-gray-600">Loading Baldy NFTs...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Show fallback message if no NFTs are loaded
+  if (nfts.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-96 bg-white rounded-lg shadow-lg p-8">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">Baldy NFT Collection</h2>
+          <p className="text-xl text-gray-600 mb-6">
+            Our exclusive collection of 333 Baldy NFTs is being deployed!
+          </p>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 max-w-md">
+            <p className="text-blue-800 font-medium">
+              🚀 The NFT gallery is currently being deployed in batches to ensure optimal performance.
+            </p>
+            <p className="text-blue-700 mt-2">
+              Check back soon to explore our complete collection with rarity rankings and filtering!
+            </p>
+          </div>
+          <div className="mt-6">
+            <Button 
+              onClick={() => window.location.href = '/'}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3"
+            >
+              Return to Homepage
+            </Button>
+          </div>
         </div>
       </div>
     )
