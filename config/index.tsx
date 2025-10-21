@@ -5,12 +5,16 @@ import { base } from '@reown/appkit/networks'
 import { coinbaseWallet } from '@wagmi/connectors'
 import type { Chain } from 'viem' // Import Chain type for explicit typing
 
-// Read Project ID from environment variables
-export const projectId = process.env.NEXT_PUBLIC_PROJECT_ID
+// WalletConnect / Reown project id used across the app. The value is public by design,so provide a
+// safe default to keep the site functional even if the env var is missing in a new environment.
+const DEFAULT_PROJECT_ID = '298f0ec5e03b7dd2a082de73a5e226b7'
 
-// Ensure Project ID is defined at build time
-if (!projectId) {
-  throw new Error('NEXT_PUBLIC_PROJECT_ID is not defined. Please set it in .env.local')
+// Read Project ID from environment variables with a fallback
+export const projectId = process.env.NEXT_PUBLIC_PROJECT_ID || DEFAULT_PROJECT_ID
+
+// Log once in development if the fallback is being used, so we remember to wire envs later.
+if (process.env.NODE_ENV !== 'production' && projectId === DEFAULT_PROJECT_ID) {
+  console.warn('Using default NEXT_PUBLIC_PROJECT_ID fallback. Set it in .env.local to override.')
 }
 
 // Define supported networks - Base only for VMF
