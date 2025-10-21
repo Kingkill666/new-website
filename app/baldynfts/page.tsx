@@ -3,7 +3,7 @@ import BaldyNFTsPageContent from "./page-content"
 
 const NFT_IMAGE_BASE_URL =
   process.env.NEXT_PUBLIC_NFT_IMAGE_BASE_URL ||
-  "https://vmfcoin.com/images/nft"
+  "https://vmfcoin.com/images/nfts"
 
 export const metadata: Metadata = {
   title: "Baldy NFTs - VMF Veterans & Military Families",

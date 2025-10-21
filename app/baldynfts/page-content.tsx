@@ -32,7 +32,7 @@ export default function BaldyNFTsPageContent() {
           </p>
           <div className="flex justify-center space-x-8 text-lg">
             <div className="text-center">
-              <div className="text-3xl font-bold">333</div>
+              <div className="text-3xl font-bold">30</div>
               <div className="text-sm opacity-90">Total NFTs</div>
             </div>
             <div className="text-center">

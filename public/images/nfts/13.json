@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #13",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/13.png",
+  "dna": "e6e292163176f5ec36f4bf0e392b6ea5e882fdde",
+  "edition": 13,
+  "date": 1759205555075,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Neon Green"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Park Ranger"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Revolutionary Tricorn"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

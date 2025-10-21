@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ChevronLeft, ChevronRight, Filter, X, Eye, ExternalLink, Star } from "lucide-react"
+import { ChevronLeft, ChevronRight, Filter, X, Eye, Star } from "lucide-react"
 import Image from "next/image"
 import { RarityScale, RarityScaleInfo } from "./rarity-scale"
 
@@ -30,13 +30,16 @@ interface NFTItem {
 
 const ITEMS_PER_PAGE = 30
 
+const TOTAL_NFTS =
+  Number(process.env.NEXT_PUBLIC_BALDY_NFT_COUNT || process.env.NEXT_PUBLIC_NFT_TOTAL) || 30
+
 const METADATA_BASE_URL =
   process.env.NEXT_PUBLIC_NFT_METADATA_BASE_URL ||
-  "/images/nft"
+  "/images/nfts"
 
 const IMAGE_BASE_URL =
   process.env.NEXT_PUBLIC_NFT_IMAGE_BASE_URL ||
-  "/images/nft"
+  "/images/nfts"
 
 export default function NFTGallery() {
   const [nfts, setNfts] = useState<NFTItem[]>([])
@@ -67,17 +70,20 @@ export default function NFTGallery() {
           console.warn("Rarity data not available:", error)
         }
 
-        // Load all 333 NFTs
-        for (let i = 1; i <= 333; i++) {
+        // Load available NFTs
+        for (let i = 1; i <= TOTAL_NFTS; i++) {
           try {
             const response = await fetch(`${METADATA_BASE_URL}/${i}.json`)
             if (response.ok) {
               const metadata: NFTMetadata = await response.json()
+              const rarityKey = String(i)
+              const rarityInfo = rarityData?.[rarityKey]
+
               const nftItem: NFTItem = {
                 id: i,
                 metadata,
                 imageUrl: `${IMAGE_BASE_URL}/${i}.png`,
-                rarityScore: rarityData[i] ? parseFloat(rarityData[i].rarityScore) : undefined
+                rarityScore: rarityInfo ? parseFloat(rarityInfo.rarityScore) : undefined
               }
               nftItems.push(nftItem)
 
@@ -139,10 +145,17 @@ export default function NFTGallery() {
   }, [nfts, filters, sortBy])
 
   // Pagination
-  const totalPages = Math.ceil(filteredNFTs.length / ITEMS_PER_PAGE)
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
+  const totalPages = Math.max(1, Math.ceil(filteredNFTs.length / ITEMS_PER_PAGE))
+  const safeCurrentPage = Math.min(currentPage, totalPages)
+  const startIndex = (safeCurrentPage - 1) * ITEMS_PER_PAGE
   const endIndex = startIndex + ITEMS_PER_PAGE
   const currentNFTs = filteredNFTs.slice(startIndex, endIndex)
+
+  useEffect(() => {
+    if (currentPage !== safeCurrentPage) {
+      setCurrentPage(safeCurrentPage)
+    }
+  }, [currentPage, safeCurrentPage])
 
   const handleFilterChange = (traitType: string, value: string) => {
     setFilters(prev => ({
@@ -169,37 +182,6 @@ export default function NFTGallery() {
       </div>
     )
   }
-
-  // Show fallback message if no NFTs are loaded
-  if (nfts.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center h-96 bg-white rounded-lg shadow-lg p-8">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Baldy NFT Collection</h2>
-          <p className="text-xl text-gray-600 mb-6">
-            Our exclusive collection of 333 Baldy NFTs is being deployed!
-          </p>
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 max-w-md">
-            <p className="text-blue-800 font-medium">
-              🚀 The NFT gallery is currently being deployed in batches to ensure optimal performance.
-            </p>
-            <p className="text-blue-700 mt-2">
-              Check back soon to explore our complete collection with rarity rankings and filtering!
-            </p>
-          </div>
-          <div className="mt-6">
-            <Button 
-              onClick={() => window.location.href = '/'}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3"
-            >
-              Return to Homepage
-            </Button>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
 
   return (
     <div className="space-y-8">
@@ -279,7 +261,7 @@ export default function NFTGallery() {
             </select>
           </div>
           <div className="text-sm text-gray-500">
-            Page {currentPage} of {totalPages}
+            Page {safeCurrentPage} of {totalPages}
           </div>
         </div>
       </div>
@@ -345,7 +327,7 @@ export default function NFTGallery() {
             variant="outline"
             size="sm"
             onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-            disabled={currentPage === 1}
+            disabled={safeCurrentPage === 1}
           >
             <ChevronLeft className="w-4 h-4" />
             Previous
@@ -353,16 +335,16 @@ export default function NFTGallery() {
           
           <div className="flex space-x-1">
             {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-              const pageNum = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i
+              const pageNum = Math.max(1, Math.min(totalPages - 4, safeCurrentPage - 2)) + i
               if (pageNum > totalPages) return null
               
               return (
                 <Button
                   key={pageNum}
-                  variant={pageNum === currentPage ? "default" : "outline"}
+                  variant={pageNum === safeCurrentPage ? "default" : "outline"}
                   size="sm"
                   onClick={() => setCurrentPage(pageNum)}
-                  className={pageNum === currentPage ? "bg-red-600 hover:bg-red-700" : ""}
+                  className={pageNum === safeCurrentPage ? "bg-red-600 hover:bg-red-700" : ""}
                 >
                   {pageNum}
                 </Button>
@@ -374,7 +356,7 @@ export default function NFTGallery() {
             variant="outline"
             size="sm"
             onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-            disabled={currentPage === totalPages}
+            disabled={safeCurrentPage === totalPages}
           >
             Next
             <ChevronRight className="w-4 h-4" />

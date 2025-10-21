@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #30",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/30.png",
+  "dna": "8d705d4ba040a9078115ed50652f37b6b6efec9d",
+  "edition": 30,
+  "date": 1759205555396,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Hot Pink"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Soldier"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Academic Cap"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

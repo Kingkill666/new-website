@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #21",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/21.png",
+  "dna": "7e1584ee0fbbc1f66496392bde3c5c588758b322",
+  "edition": 21,
+  "date": 1759205555228,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Capitol Glow"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Denim Vest"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Presidential Hair"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}
