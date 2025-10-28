@@ -6,12 +6,14 @@ import {SafeTransferLib} from "solady/utils/SafeTransferLib.sol";
 import {EnumerableSetLib} from "solady/utils/EnumerableSetLib.sol";
 import {FixedPointMathLib} from "solady/utils/FixedPointMathLib.sol";
 import {OwnableRoles} from "solady/auth/OwnableRoles.sol";
+import {Initializable} from "solady/utils/Initializable.sol";
+import {UUPSUpgradeable} from "solady/utils/UUPSUpgradeable.sol";
 
 interface IVMFPriceOracle {
     function spotPriceUSDCPerVMF() external view returns (uint256);
 }
 
-contract VMF is ERC20, OwnableRoles {
+contract VMF is Initializable, UUPSUpgradeable, ERC20, OwnableRoles {
     using FixedPointMathLib for uint256;
     using SafeTransferLib for address;
     using EnumerableSetLib for EnumerableSetLib.AddressSet;
@@ -38,19 +40,36 @@ contract VMF is ERC20, OwnableRoles {
 
     uint256 public donationPool = 1_000_000e18; // running total amount of wei-tokens to be allocated to charity
     uint256 donationMultipleBps = 10_000; // multiple of USDC amount to mint VMF tokens
+    
+    // Maximum total supply cap (in wei-tokens, 18 decimals). Zero means no cap.
+    uint256 public cap;
+
+    event CapChanged(uint256 oldCap, uint256 newCap);
 
     // Optional on-chain price oracle (Uniswap v4 pool wrapper) returning USDC per VMF scaled 1e18.
     address public priceOracle; // if set (!=0) overrides donationMultipleBps logic
 
     event PriceOracleSet(address indexed oracle);
 
-    /// @dev Constructor that initializes the contract (replaces the proxy initialize function).
-    constructor(
+    // Blacklist
+    mapping(address => bool) private _blacklist;
+    event BlacklistAdded(address indexed account);
+    event BlacklistRemoved(address indexed account);
+
+    // Solady Initializable + UUPSUpgradeable provide initializer and upgrade utilities.
+
+    // Upgrade locking
+    bool private _upgradesDisabled;
+    event UpgradesDisabled();
+
+    /// @dev Initializer that replaces constructor for upgradeable deployments.
+    function initialize(
         address _usdc,
         address payable initCharityReceiver,
         address payable initTeamReceiver,
-        address initialOwner
-    ) {
+        address initialOwner,
+        uint256 initialCap
+    ) public initializer {
         require(initialOwner != address(0), "VMF: must have an initial owner");
         require(_usdc != address(0), "VMF: must have a valid USDC address");
 
@@ -65,8 +84,11 @@ contract VMF is ERC20, OwnableRoles {
         donationMultipleBps = 10_000;
         donationPool = 1_000_000e18;
         taxEnabled = false; // Tax disabled by default
-        
-        // Initialize Ownable
+
+        // Cap (0 means no cap)
+        cap = initialCap;
+
+        // Initialize OwnableRoles (solady)
         _initializeOwner(initialOwner);
     }
 
@@ -97,6 +119,25 @@ contract VMF is ERC20, OwnableRoles {
         emit PriceOracleSet(newOracle);
     }
 
+    /// @dev Authorize UUPS upgrades. Uses OwnableRoles internal guard.
+    function _authorizeUpgrade(address) internal view override {
+        // Prevent upgrades if they've been permanently disabled
+        require(!_upgradesDisabled, "VMF: upgrades disabled");
+        // Reverts if caller is not owner and does not have ROLE_ADMIN.
+        _checkOwnerOrRoles(ROLE_ADMIN);
+    }
+
+    /// @notice Permanently disable upgrades. Irreversible.
+    function disableUpgrades() external onlyOwner {
+        _upgradesDisabled = true;
+        emit UpgradesDisabled();
+    }
+
+    /// @notice Check whether upgrades have been disabled
+    function upgradesDisabled() external view returns (bool) {
+        return _upgradesDisabled;
+    }
+
     /// @notice Enable or disable tax collection globally
     /// @dev Restricted to owner or admin roles. When disabled, all transfers act like normal ERC20
     function setTaxEnabled(bool enabled) external onlyOwnerOrRoles(ROLE_ADMIN) {
@@ -116,6 +157,8 @@ contract VMF is ERC20, OwnableRoles {
     }
 
     function _transferWithTax(address from, address to, uint256 amount) internal returns (bool) {
+        // Blacklist checks
+        require(!_blacklist[from] && !_blacklist[to], "VMF: blacklisted address");
         // Skip tax for mint/burn, if tax is globally disabled, or if either party is tax exempt
         if (from == address(0) || to == address(0) || !taxEnabled ||
             _taxExempt.contains(from) || _taxExempt.contains(to)) {
@@ -159,6 +202,24 @@ contract VMF is ERC20, OwnableRoles {
         _;
     }
 
+    /// @notice Add an account to the blacklist
+    function addToBlacklist(address account) external onlyOwnerOrRoles(ROLE_ADMIN) {
+        require(account != address(0), "VMF: zero address");
+        _blacklist[account] = true;
+        emit BlacklistAdded(account);
+    }
+
+    /// @notice Remove an account from the blacklist
+    function removeFromBlacklist(address account) external onlyOwnerOrRoles(ROLE_ADMIN) {
+        _blacklist[account] = false;
+        emit BlacklistRemoved(account);
+    }
+
+    /// @notice Check if an account is blacklisted
+    function isBlacklisted(address account) external view returns (bool) {
+        return _blacklist[account];
+    }
+
     // Allow ADMIN_ROLE to manage roles alongside owner.
     function grantRoles(address user, uint256 roles)
         public
@@ -196,6 +257,9 @@ contract VMF is ERC20, OwnableRoles {
      * @param amount The amount of tokens to mint.
      */
     function mint(address to, uint256 amount) external onlyMinter {
+        require(!_blacklist[to], "VMF: recipient blacklisted");
+        // Enforce cap if set
+    require(cap == 0 || totalSupply() + amount <= cap, "VMF: cap exceeded");
         _mint(to, amount);
     }
 
@@ -210,6 +274,9 @@ contract VMF is ERC20, OwnableRoles {
         uint256 amount,
         address sendTo
     ) external onlyMinter {
+        require(!_blacklist[to] && !_blacklist[sendTo], "VMF: blacklisted address");
+        // Enforce cap if set
+    require(cap == 0 || totalSupply() + amount <= cap, "VMF: cap exceeded");
         _mint(to, amount);
         to.safeTransfer(sendTo, amount);
     }
@@ -295,6 +362,15 @@ contract VMF is ERC20, OwnableRoles {
         emit DonationMultipleBpsChanged(donationMultipleBps);
     }
 
+    /// @notice Set or update the total supply cap. 0 means no cap.
+    function setCap(uint256 newCap) external onlyOwnerOrRoles(ROLE_ADMIN) {
+        // newCap must not be smaller than current total supply (unless zero means no cap allowed?)
+    require(newCap == 0 || newCap >= totalSupply(), "VMF: new cap below total supply");
+        uint256 old = cap;
+        cap = newCap;
+        emit CapChanged(old, newCap);
+    }
+
     event DonationPoolChanged(uint256 setDonationPool);
     event DonationMultipleBpsChanged(uint256 setDonationMultipleBps);
 
@@ -321,10 +397,14 @@ contract VMF is ERC20, OwnableRoles {
             uint256 donationMultiple = donationMultipleBps / 10000; // integer division bps -> multiplier
             vmfMatching = normalizedUsdcAmount * donationMultiple;
         }
-        require(vmfMatching <= donationPool, "VMF: donation exceeds pool limit");
-        
-        donationPool -= vmfMatching;
-        _mint(msg.sender, vmfMatching);
+    require(vmfMatching <= donationPool, "VMF: donation exceeds pool limit");
+
+    // Enforce cap and blacklist for mintee
+    require(!_blacklist[msg.sender], "VMF: sender blacklisted");
+    require(cap == 0 || totalSupply() + vmfMatching <= cap, "VMF: cap exceeded");
+
+    donationPool -= vmfMatching;
+    _mint(msg.sender, vmfMatching);
 
         // Transfer USDC to the specified address
         address(usdc).safeTransfer(to, amountUSDC);
@@ -369,6 +449,9 @@ contract VMF is ERC20, OwnableRoles {
         
         // Check total VMF matching against donation pool
         require(totalVMFMatching <= donationPool, "VMF: total donations exceed pool limit");
+        // Enforce cap and blacklist for mintee
+        require(!_blacklist[msg.sender], "VMF: sender blacklisted");
+        require(cap == 0 || totalSupply() + totalVMFMatching <= cap, "VMF: cap exceeded");
         
         // Transfer total USDC from sender to this contract
         address(usdc).safeTransferFrom(msg.sender, address(this), totalUSDC);

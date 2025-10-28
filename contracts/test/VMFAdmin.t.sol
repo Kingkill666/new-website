@@ -22,8 +22,8 @@ contract VMFAdminTest is Test {
     uint256 constant ROLE_MINTER = 1 << 2;       // _ROLE_2
 
     function setUp() public {
-        vmf = new VMF();
-        vmf.initialize(usdc, payable(charity), payable(team), owner);
+    vmf = new VMF();
+    vmf.initialize(usdc, payable(charity), payable(team), owner, 0);
         admin = makeAddr("admin");
         user1 = makeAddr("user1");
         user2 = makeAddr("user2");

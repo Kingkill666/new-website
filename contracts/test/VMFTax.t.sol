@@ -19,8 +19,8 @@ contract VMFTaxTest is Test {
     uint256 constant INITIAL_MINT = 1_000_000 ether;
 
     function setUp() public {
-        vmf = new VMF();
-        vmf.initialize(usdc, payable(charity), payable(team), owner);
+    vmf = new VMF();
+    vmf.initialize(usdc, payable(charity), payable(team), owner, 0);
         // Make sure owner is allowed to mint (owner == minter after initialize)
         vmf.mint(alice, INITIAL_MINT);
     }

@@ -66,7 +66,8 @@ contract VmfCoinBatchTest is Test {
             address(usdc),
             payable(charityReceiver),
             payable(teamReceiver),
-            owner // initial owner
+            owner, // initial owner
+            0
         );
         
         // Deploy the ERC1967 proxy pointing to the implementation (just like in deploy script)
@@ -78,7 +79,8 @@ contract VmfCoinBatchTest is Test {
             address(usdc),
             payable(charityReceiver),
             payable(teamReceiver),
-            owner
+            owner,
+            0
         ) {
             // Initialize succeeded
         } catch {
