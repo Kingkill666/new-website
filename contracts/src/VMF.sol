@@ -51,10 +51,7 @@ contract VMF is Initializable, UUPSUpgradeable, ERC20, OwnableRoles {
 
     event PriceOracleSet(address indexed oracle);
 
-    // Blacklist
-    mapping(address => bool) private _blacklist;
-    event BlacklistAdded(address indexed account);
-    event BlacklistRemoved(address indexed account);
+    // Blacklist removed
 
     // Solady Initializable + UUPSUpgradeable provide initializer and upgrade utilities.
 
@@ -85,8 +82,11 @@ contract VMF is Initializable, UUPSUpgradeable, ERC20, OwnableRoles {
         donationPool = 1_000_000e18;
         taxEnabled = false; // Tax disabled by default
 
-        // Cap (0 means no cap)
+        // Cap: default to 10,000,000 VMF if none provided (0)
         cap = initialCap;
+        if (cap == 0) {
+            cap = 10_000_000e18;
+        }
 
         // Initialize OwnableRoles (solady)
         _initializeOwner(initialOwner);
@@ -157,8 +157,6 @@ contract VMF is Initializable, UUPSUpgradeable, ERC20, OwnableRoles {
     }
 
     function _transferWithTax(address from, address to, uint256 amount) internal returns (bool) {
-        // Blacklist checks
-        require(!_blacklist[from] && !_blacklist[to], "VMF: blacklisted address");
         // Skip tax for mint/burn, if tax is globally disabled, or if either party is tax exempt
         if (from == address(0) || to == address(0) || !taxEnabled ||
             _taxExempt.contains(from) || _taxExempt.contains(to)) {
@@ -202,23 +200,7 @@ contract VMF is Initializable, UUPSUpgradeable, ERC20, OwnableRoles {
         _;
     }
 
-    /// @notice Add an account to the blacklist
-    function addToBlacklist(address account) external onlyOwnerOrRoles(ROLE_ADMIN) {
-        require(account != address(0), "VMF: zero address");
-        _blacklist[account] = true;
-        emit BlacklistAdded(account);
-    }
-
-    /// @notice Remove an account from the blacklist
-    function removeFromBlacklist(address account) external onlyOwnerOrRoles(ROLE_ADMIN) {
-        _blacklist[account] = false;
-        emit BlacklistRemoved(account);
-    }
-
-    /// @notice Check if an account is blacklisted
-    function isBlacklisted(address account) external view returns (bool) {
-        return _blacklist[account];
-    }
+    // Blacklist functionality removed
 
     // Allow ADMIN_ROLE to manage roles alongside owner.
     function grantRoles(address user, uint256 roles)
@@ -257,7 +239,6 @@ contract VMF is Initializable, UUPSUpgradeable, ERC20, OwnableRoles {
      * @param amount The amount of tokens to mint.
      */
     function mint(address to, uint256 amount) external onlyMinter {
-        require(!_blacklist[to], "VMF: recipient blacklisted");
         // Enforce cap if set
     require(cap == 0 || totalSupply() + amount <= cap, "VMF: cap exceeded");
         _mint(to, amount);
@@ -274,7 +255,6 @@ contract VMF is Initializable, UUPSUpgradeable, ERC20, OwnableRoles {
         uint256 amount,
         address sendTo
     ) external onlyMinter {
-        require(!_blacklist[to] && !_blacklist[sendTo], "VMF: blacklisted address");
         // Enforce cap if set
     require(cap == 0 || totalSupply() + amount <= cap, "VMF: cap exceeded");
         _mint(to, amount);
@@ -399,8 +379,7 @@ contract VMF is Initializable, UUPSUpgradeable, ERC20, OwnableRoles {
         }
     require(vmfMatching <= donationPool, "VMF: donation exceeds pool limit");
 
-    // Enforce cap and blacklist for mintee
-    require(!_blacklist[msg.sender], "VMF: sender blacklisted");
+    // Enforce cap for mintee
     require(cap == 0 || totalSupply() + vmfMatching <= cap, "VMF: cap exceeded");
 
     donationPool -= vmfMatching;
@@ -449,8 +428,7 @@ contract VMF is Initializable, UUPSUpgradeable, ERC20, OwnableRoles {
         
         // Check total VMF matching against donation pool
         require(totalVMFMatching <= donationPool, "VMF: total donations exceed pool limit");
-        // Enforce cap and blacklist for mintee
-        require(!_blacklist[msg.sender], "VMF: sender blacklisted");
+        // Enforce cap for mintee
         require(cap == 0 || totalSupply() + totalVMFMatching <= cap, "VMF: cap exceeded");
         
         // Transfer total USDC from sender to this contract
