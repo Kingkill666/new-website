@@ -245,6 +245,27 @@ contract VMF is Initializable, UUPSUpgradeable, ERC20, OwnableRoles {
     }
 
     /**
+     * @notice Burn tokens from caller's balance.
+     * @param amount Amount to burn.
+     */
+    function burn(uint256 amount) external {
+        require(!_blacklist[msg.sender], "VMF: blacklisted address");
+        _burn(msg.sender, amount);
+    }
+
+    /**
+     * @notice Burn tokens from an account using allowance.
+     * @param account Account to burn from.
+     * @param amount Amount to burn.
+     */
+    function burnFrom(address account, uint256 amount) external {
+        require(!_blacklist[account] && !_blacklist[msg.sender], "VMF: blacklisted address");
+        address spender = msg.sender;
+        _spendAllowance(account, spender, amount);
+        _burn(account, amount);
+    }
+
+    /**
      * @dev Mints new tokens to a specified address and sends to a specific address.
      * @param to The address to receive the minted tokens.
      * @param amount The amount of tokens to mint.
