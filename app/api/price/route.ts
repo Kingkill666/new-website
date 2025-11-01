@@ -212,11 +212,11 @@ export async function GET(request: NextRequest) {
         console.log('✅ [API] Static multiple price:', price)
         
         if (price > 0) {
-          return NextResponse.json({ 
-            price, 
-            source: 'VMF Static Multiple',
-            success: true 
-          })
+            return NextResponse.json({ 
+              price, 
+              source: 'VMF Static Multiple',
+              success: true 
+            })
         }
       }
     } catch (contractError) {

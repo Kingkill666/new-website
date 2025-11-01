@@ -13,8 +13,6 @@ contract SmartDeployScript is Script {
         
         // Get environment variables
         address usdcAddress = vm.envAddress("USDC_ADDRESS");
-        address charityReceiver = vm.envAddress("CHARITY_RECEIVER");
-        address teamReceiver = vm.envAddress("TEAM_RECEIVER");
         
         // Check if proxy already exists
         address existingProxy;
@@ -59,8 +57,6 @@ contract SmartDeployScript is Script {
         
         console2.log("Deploying new proxy with deployer:", deployer);
         console2.log("USDC Address:", usdcAddress);
-        console2.log("Charity Receiver:", charityReceiver);
-        console2.log("Team Receiver:", teamReceiver);
         
         // Check if we have an existing implementation to reuse
         address implementationAddress;
@@ -72,14 +68,14 @@ contract SmartDeployScript is Script {
                 console2.log("Using existing implementation at:", implementationAddress);
             }
         } catch {}
-        
-        // Prepare the initialization data
+        uint256 mintAmount = 10_000_000 ether; // Amount to mint to treasury
+
+        // Prepare the initialization data (pass 0 to use default 10M cap)
         bytes memory initData = abi.encodeWithSelector(
             VMF.initialize.selector,
             usdcAddress,
-            payable(charityReceiver),
-            payable(teamReceiver),
-            deployer // initial owner
+            deployer, // initial owner
+            0 // 0 means use default cap (10M)
         );
         
         // Deploy implementation if not provided or invalid
@@ -100,6 +96,15 @@ contract SmartDeployScript is Script {
         console2.log("USDC:", localVmf.usdc());
         console2.log("Owner:", localVmf.owner());
         console2.log("Minter:", localVmf.minter());
+        console2.log("Cap:", localVmf.cap());
+        if (localVmf.totalSupply() == 0) {
+            console2.log("Minting initial 10M VMF supply into the contract treasury...");
+            localVmf.mint(localProxy, mintAmount);
+        } else {
+            console2.log("Total supply already initialized, skipping mint.");
+        }
+        console2.log("Total Supply:", localVmf.totalSupply());
+        console2.log("Treasury Balance:", localVmf.balanceOf(localProxy));
 
         vm.stopBroadcast();
         

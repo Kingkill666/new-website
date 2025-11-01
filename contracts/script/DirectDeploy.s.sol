@@ -15,9 +15,6 @@ contract DirectDeployScript is Script {
         
         // Get environment variables
         address usdcAddress = vm.envAddress("USDC_ADDRESS");
-        address charityReceiver = vm.envAddress("CHARITY_RECEIVER");
-        address teamReceiver = vm.envAddress("TEAM_RECEIVER");
-        
         // Get old contract address if migrating
         address oldContract;
         bool shouldMigrate = false;
@@ -28,21 +25,26 @@ contract DirectDeployScript is Script {
         } catch {
             console2.log("No migration - deploying fresh contract");
         }
-        
+        uint256 mintAmount = 10_000_000 ether; // Amount to mint to treasury
+
         vm.startBroadcast(deployerPrivateKey);
         
         console2.log("Deploying VMF directly (no proxy) with deployer:", deployer);
         console2.log("USDC Address:", usdcAddress);
-        console2.log("Charity Receiver:", charityReceiver);
-        console2.log("Team Receiver:", teamReceiver);
         
         // Deploy VMF contract directly (implementation uses initialize)
         VMF vmf = new VMF();
-        // Initialize implementation for direct deployments (no proxy)
-        vmf.initialize(usdcAddress, payable(charityReceiver), payable(teamReceiver), deployer, 0);
+        // Initialize implementation for direct deployments (no proxy) - pass 0 to use default 10M cap
+        vmf.initialize(usdcAddress, deployer, 0);
         
         address vmfAddress = address(vmf);
         console2.log("VMF deployed at:", vmfAddress);
+        console2.log("Cap (default 10M):", vmf.cap());
+        
+        if (!shouldMigrate) {
+            console2.log("Minting initial 10M VMF supply into the contract treasury...");
+            vmf.mint(vmfAddress, mintAmount);
+        }
         
         // Migrate holders if old contract specified
         if (shouldMigrate) {
@@ -56,7 +58,9 @@ contract DirectDeployScript is Script {
         console2.log("USDC:", vmf.usdc());
         console2.log("Owner:", vmf.owner());
         console2.log("Minter:", vmf.minter());
+        console2.log("Cap:", vmf.cap());
         console2.log("Total Supply:", vmf.totalSupply());
+        console2.log("Treasury Balance:", vmf.balanceOf(vmfAddress));
 
         vm.stopBroadcast();
         

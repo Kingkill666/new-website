@@ -1,6 +1,6 @@
 # VMF Coin
 
-*ERC-20 token with donation mechanics and tax features*
+*ERC-20 token with donation mechanics and role-based controls*
 
 [![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/vmf-coin/v0-show-code-in-ui)
 [![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/SbHYLh7hsIH)
@@ -9,7 +9,7 @@
 
 ## Overview
 
-VMF is an ERC-20 token with built-in donation mechanics, optional transfer taxes, and role-based administration.
+VMF is an ERC-20 token with built-in donation mechanics and role-based administration.
 
 ## Smart Contract Deployment
 
@@ -71,7 +71,6 @@ This uses the UUPS proxy pattern with upgrade capabilities.
 
 - **ERC-20 Token**: Standard token with name "VMF" and symbol "VMF"
 - **Donation Mechanics**: Accept USDC donations and mint VMF tokens
-- **Optional Transfer Tax**: Configurable tax on transfers (disabled by default)
 - **Role-based Access**: Admin roles for operational management
 - **Price Oracle Integration**: Optional on-chain price oracle support
 
@@ -142,4 +141,4 @@ For detailed operational procedures, see `contracts/AGENT_README.md`:
 - Role management and admin operations
 - Contract configuration and parameters
 - Oracle integration
-- Tax and donation pool management
+- Donation pool management

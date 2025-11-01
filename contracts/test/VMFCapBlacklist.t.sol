@@ -28,15 +28,12 @@ contract VMFCapBlacklistTest is Test {
 
     address public owner;
     address public charityReceiver;
-    address public teamReceiver;
 
     address public alice;
     address public donor;
-
     function setUp() public {
         owner = address(this);
         charityReceiver = makeAddr("charityReceiver");
-        teamReceiver = makeAddr("teamReceiver");
         alice = makeAddr("alice");
         donor = makeAddr("donor");
 
@@ -50,8 +47,6 @@ contract VMFCapBlacklistTest is Test {
         bytes memory initData = abi.encodeWithSelector(
             VMF.initialize.selector,
             address(usdc),
-            payable(charityReceiver),
-            payable(teamReceiver),
             owner,
             initialCap
         );
@@ -60,7 +55,7 @@ contract VMFCapBlacklistTest is Test {
         vmf = VMF(proxy);
 
         // Ensure initialization (safe in case deployERC1967 didn't call it)
-        try vmf.initialize(address(usdc), payable(charityReceiver), payable(teamReceiver), owner, initialCap) {
+        try vmf.initialize(address(usdc), owner, initialCap) {
         } catch {}
 
         // Mint some VMF to owner so transfers can be made
@@ -75,8 +70,6 @@ contract VMFCapBlacklistTest is Test {
         bytes memory initData = abi.encodeWithSelector(
             VMF.initialize.selector,
             address(usdc),
-            payable(charityReceiver),
-            payable(teamReceiver),
             owner,
             smallCap
         );
@@ -84,7 +77,7 @@ contract VMFCapBlacklistTest is Test {
         VMF v = VMF(proxy);
 
     // Ensure initialization was applied to proxy (safe-guard)
-    try v.initialize(address(usdc), payable(charityReceiver), payable(teamReceiver), owner, smallCap) {} catch {}
+    try v.initialize(address(usdc), owner, smallCap) {} catch {}
 
         // Owner (this) is minter. Mint within cap
         v.mint(alice, 900 ether);
@@ -102,8 +95,6 @@ contract VMFCapBlacklistTest is Test {
         bytes memory initData = abi.encodeWithSelector(
             VMF.initialize.selector,
             address(usdc),
-            payable(charityReceiver),
-            payable(teamReceiver),
             owner,
             capAmount
         );
@@ -111,7 +102,8 @@ contract VMFCapBlacklistTest is Test {
         VMF v = VMF(proxy);
 
         // Make sure v is initialized
-        try v.initialize(address(usdc), payable(charityReceiver), payable(teamReceiver), owner, capAmount) {} catch {}
+        try v.initialize(address(usdc), owner, capAmount) {} catch {}
+
 
         // Mint donor USDC and approve
         usdc.mint(donor, 1_000_000e6);
@@ -128,43 +120,4 @@ contract VMFCapBlacklistTest is Test {
         v.handleUSDC(200e6, charityReceiver);
     }
 
-    function test_blacklist_blocks_mint_transfer_and_handleUSDC() public {
-        // Blacklist recipient for mint
-        vm.prank(owner);
-        vmf.addToBlacklist(alice);
-
-        vm.expectRevert(bytes("VMF: recipient blacklisted"));
-        vmf.mint(alice, 1 ether);
-
-        // Unblacklist and mint to alice
-        vm.prank(owner);
-        vmf.removeFromBlacklist(alice);
-        vmf.mint(alice, 10 ether);
-
-        // Blacklist alice to block transfers
-        vm.prank(owner);
-        vmf.addToBlacklist(alice);
-
-        vm.prank(alice);
-        vm.expectRevert(bytes("VMF: blacklisted address"));
-        vmf.transfer(makeAddr("bob"), 1 ether);
-
-        // Test sender blacklist for handleUSDC
-        // Prepare donor and mint USDC
-        usdc.mint(donor, 1_000_000e6);
-        vm.prank(donor);
-        usdc.approve(address(vmf), type(uint256).max);
-
-        // Add allowed receiver
-        vm.prank(owner);
-        vmf.addAllowedReceivers(payable(charityReceiver));
-
-        // Blacklist donor
-        vm.prank(owner);
-        vmf.addToBlacklist(donor);
-
-        vm.prank(donor);
-        vm.expectRevert(bytes("VMF: sender blacklisted"));
-        vmf.handleUSDC(1e6, charityReceiver);
-    }
 }

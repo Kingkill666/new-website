@@ -3,8 +3,8 @@
 This document explains how to deploy, upgrade, and operate the VMF contract in this repository. It's written for future maintainers or automated agents that will perform deployments and maintenance tasks using Foundry (forge) and the in-repo Solady utilities.
 
 ## Quick summary
-- Contract: `contracts/src/VMF.sol` — Solady `ERC20` with UUPS upgradeability (`Initializable`, `UUPSUpgradeable`) and extra features: supply `cap`, `blacklist`, tax settings, donation handling via `handleUSDC`/`handleUSDCBatch`.
-- Initializer: `initialize(address _usdc, address payable initCharityReceiver, address payable initTeamReceiver, address initialOwner, uint256 initialCap)`
+- Contract: `contracts/src/VMF.sol` — Solady `ERC20` with UUPS upgradeability (`Initializable`, `UUPSUpgradeable`) and extra features: supply `cap`, donation handling via `handleUSDC`/`handleUSDCBatch`.
+- Initializer: `initialize(address _usdc, address initialOwner, uint256 initialCap)`
 - Access control: Solady `OwnableRoles` with role constants exposed in the contract (e.g. `ADMIN_ROLE()` returns the ROLE_ADMIN constant).
 
 ## Pre-flight checks
@@ -21,8 +21,6 @@ forge test -v
 ## Environment variables used by repository scripts
 - `PRIVATE_KEY` - EOA private key used for broadcast (foundry `vm` usage in scripts)
 - `USDC_ADDRESS` - USDC token contract address used by VMF
-- `CHARITY_RECEIVER` - default payable charity receiver
-- `TEAM_RECEIVER` - default payable team receiver
 - `OLD_VMF_ADDRESS` - optional old contract used by migration scripts
 
 ## Deploy options
@@ -46,7 +44,7 @@ B) Deploy upgradeable (recommended if you want to support later upgrades)
 
 - The repo includes usage of `LibClone.deployERC1967` (Solady) in tests and scripts to create an ERC-1967 proxy pointing to an implementation. The pattern is:
   1. Deploy implementation contract (VMF implementation).
-  2. Build initializer calldata: `abi.encodeWithSelector(VMF.initialize.selector, usdc, payable(charity), payable(team), owner, initialCap)`.
+  2. Build initializer calldata: `abi.encodeWithSelector(VMF.initialize.selector, usdc, owner, initialCap)`.
   3. Use `LibClone.deployERC1967(implementationAddress, initData)` to deploy a proxy that will call the initializer during deployment.
 
 Example (foundry-style script or off-chain):
@@ -57,8 +55,6 @@ VMF impl = new VMF();
 bytes memory initData = abi.encodeWithSelector(
     VMF.initialize.selector,
     address(usdc),
-    payable(charityReceiver),
-    payable(teamReceiver),
     owner,
     initialCap
 );
@@ -66,13 +62,11 @@ address proxy = LibClone.deployERC1967(address(impl), initData);
 VMF vmf = VMF(proxy);
 
 // If the deploy helper didn't call initialize for some reason, it's safe to try again:
-try vmf.initialize(address(usdc), payable(charityReceiver), payable(teamReceiver), owner, initialCap) { } catch { }
+try vmf.initialize(address(usdc), owner, initialCap) { } catch { }
 ```
 
 ## Initializer arguments explained
 - `_usdc` (address): ERC20 USDC address used to accept donations.
-- `initCharityReceiver` (address payable): where the contract will forward the charity portion of taxes and donation receipts.
-- `initTeamReceiver` (address payable): where the contract will forward the team portion of taxes.
 - `initialOwner` (address): owner (and initial `minter`) for the contract.
 - `initialCap` (uint256): initial total supply cap in 18 decimals; set `0` to disable cap.
 
@@ -85,15 +79,13 @@ All calls below are executed as the admin/owner unless noted.
 - Set supply cap: `vmf.setCap(uint256 newCap)` — `newCap == 0 || newCap >= totalSupply()`
 - Mint: `vmf.mint(address to, uint256 amount)` (only minter or owner)
 - Mint and send: `vmf.mintAndSend(address to, uint256 amount, address sendTo)`
-- Add/remove blacklist: `vmf.addToBlacklist(address)` / `vmf.removeFromBlacklist(address)` (ROLE_ADMIN)
 - Add/remove allowed receivers (charities): `vmf.addAllowedReceivers(payable addr)` / `vmf.removeAllowedReceivers(payable addr)` (ROLE_SET_CHARITY | ROLE_ADMIN)
-- Add/remove tax exemptions: `vmf.addAllowedTaxExempt(payable addr)` / `vmf.removeAllowedTaxExempt(payable addr)` (ROLE_SET_TAX | ROLE_ADMIN)
-- Toggle tax: `vmf.setTaxEnabled(bool)` (ROLE_ADMIN)
-- Set rates: `vmf.setTeamRateBps(uint8)` / `vmf.setCharityRateBps(uint8)` (ROLE_SET_TAX)
 - Update donation pool: `vmf.updateDonationPool(uint256)` and `vmf.updateDonationMultipleBps(uint256)`
+- Treasury payouts: `vmf.pay(address to, uint256 amount)` (ROLE_ADMIN)
 - Set price oracle: `vmf.setPriceOracle(address)` (ROLE_ADMIN)
 
 Important: role-restricted functions use Solady `OwnableRoles` semantics. Use `vmf.ADMIN_ROLE()` (or the constants in the contract) when granting roles.
+
 
 ## Upgrade process (UUPS)
 
@@ -117,11 +109,7 @@ Notes:
 - `vmf.disableUpgrades()` permanently prevents future upgrades; the function emits `UpgradesDisabled()` and sets an internal flag.
 - Only the owner can call this function (not ROLE_ADMIN). Use with extreme caution.
 
-## Blacklist & cap behavior notes
-- Blacklisted addresses are blocked from receiving minted tokens, from transferring, and (for senders) from calling donation functions. Revert messages used in code are:
-  - `VMF: recipient blacklisted` (mint)
-  - `VMF: blacklisted address` (transfers)
-  - `VMF: sender blacklisted` (handleUSDC)
+## Cap behavior notes
 - Cap enforcement revert message: `VMF: cap exceeded`.
 
 ## Scripts and holder lists maintenance note
@@ -161,8 +149,6 @@ forge test --match-test test_mint_respects_cap -vv
 export PRIVATE_KEY="..."
 export RPC_URL="https://..."
 export USDC_ADDRESS="0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"  # example
-export CHARITY_RECEIVER="0x..."
-export TEAM_RECEIVER="0x..."
 
 # Deploy using the provided script (DirectDeploy) which calls initialize on the implementation
 cd contracts

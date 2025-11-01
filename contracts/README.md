@@ -4,11 +4,11 @@ This repository contains the VMF (Very Much Fun) token smart contract and deploy
 
 ## Overview
 
-VMF is a tax-enabled ERC20 token with donation mechanics and role-based access control. This version has been updated to use **direct deployment** instead of proxy patterns for cleaner deployments and better honeypot scanner compatibility.
+VMF is a donation-focused ERC20 token with role-based access control. This version uses **direct deployment** instead of proxy patterns for cleaner deployments and better honeypot scanner compatibility.
 
 ### Key Features
-- ERC20 token with tax mechanism
-- Role-based permissions (Admin, Tax Setter, Charity Setter, Minter)
+- Straightforward ERC20 token with role-based controls
+- Role-based permissions (Admin, Charity Setter, Minter)
 - Charity donation system
 - Direct deployment (no proxies)
 - Token holder migration from previous deployments
@@ -111,7 +111,7 @@ cast logs --from-block 16000000 --to-block latest \
 - **Inheritance:** ERC20, SafeTransferLib, OwnableRoles
 - **Removed:** UUPSUpgradeable, proxy patterns
 - **Constructor:** Direct initialization with all parameters
-- **Roles:** Admin (8), Tax Setter (1), Charity Setter (2), Minter (4)
+- **Roles:** Admin (4), Charity Setter (1), Minter (2)
 
 ### Deployment Process
 1. Deploy VMF contract with constructor parameters
@@ -172,12 +172,4 @@ cast tx $TX_HASH --rpc-url $BASE_RPC_URL
 ```bash
 # Add new charity (requires ROLE_SET_CHARITY)
 ./add_charity.sh
-```
-
-### Tax Configuration  
-```bash
-# Update tax rates (requires ROLE_SET_TAX)
-cast send $VMF_ADDRESS "setTaxRate(uint256)" $NEW_RATE \
-  --private-key $PRIVATE_KEY \
-  --rpc-url $BASE_RPC_URL
 ```
