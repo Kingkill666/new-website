@@ -26,6 +26,17 @@ Notes:
 - `PROXY_ADDRESS` in `.env` is only used by `upgrade.sh`.
 - `deploy.sh` always deploys a fresh proxy and ignores `PROXY_ADDRESS`.
 
+## Vanity Address Generation
+
+Generate CREATE2 proxy addresses containing "1776" (e.g., `0x1776...` or `...1776`):
+
+```bash
+./generate_vanity_1776.sh mainnet start   # Address starting with 0x1776
+./generate_vanity_1776.sh mainnet end     # Address ending with ...1776
+```
+
+For full documentation, see `VANITY_ADDRESS_GENERATION.md`.
+
 ## Other scripts
 
 Operational scripts like `add_charity.sh`, `grant_roles.sh`, and holder utilities remain unchanged. See inline comments in each script for usage.
