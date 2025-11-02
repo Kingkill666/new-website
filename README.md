@@ -13,59 +13,21 @@ VMF is an ERC-20 token with built-in donation mechanics and role-based administr
 
 ## Smart Contract Deployment
 
-### Direct Deployment (Recommended)
+Contracts and scripts live in the `contracts/` folder. Start with these docs:
 
-For a clean, immutable deployment that passes honeypot scanners:
+- Fresh deployment (UUPS proxy + implementation): `contracts/DEPLOY_README.md`
+- Upgrade existing proxy: `contracts/UPGRADE_README.md`
 
-```bash
-cd contracts
-./deploy-direct.sh
-```
-
-This deploys the VMF contract without proxy functionality:
-- ✅ No upgrade capability (immutable)
-- ✅ Clean for honeypot scanners
-- ✅ Direct ERC-20 deployment
-- ✅ Role-based administration
-
-### Token Migration
-
-To migrate existing holders from an old contract to a new one:
-
-1. **Deploy New Contract**: First deploy the new contract:
-   ```bash
-   cd contracts
-   ./deploy-direct.sh
-   ```
-
-2. **Set Migration Variables**: Update the migration script with addresses:
-   ```bash
-   # Edit migrate-holders.sh
-   export OLD_VMF_ADDRESS="0x2213414893259b0c48066acd1763e7fba97859e5"  # existing contract
-   export NEW_VMF_ADDRESS="0x..."  # newly deployed contract
-   ```
-
-3. **Run Migration**: Copy all token balances to new contract:
-   ```bash
-   ./migrate-holders.sh
-   ```
-
-The migration process:
-- Reads all known holder addresses from `holders.json`
-- Checks balances in the old contract
-- Mints equivalent tokens in the new contract
-- Preserves all existing balances and ownership
-
-### Legacy Proxy Deployment
-
-For upgradeable contracts (may trigger honeypot flags):
+Quick commands:
 
 ```bash
+# Fresh deploy to Base Sepolia
 cd contracts
-./deploy.sh
-```
+./deploy.sh sepolia
 
-This uses the UUPS proxy pattern with upgrade capabilities.
+# Upgrade existing proxy on Base Sepolia
+./upgrade.sh sepolia
+```
 
 ## Contract Features
 

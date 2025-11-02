@@ -1,0 +1,98 @@
+===============================================
+BaseScan Manual Verification Instructions
+===============================================
+Network: Base Sepolia
+Date: Sun Nov  2 01:30:51 PM PST 2025
+
+IMPORTANT: BaseScan API v1 is deprecated, so automatic verification fails.
+You must verify manually through their web interface.
+
+===============================================
+CONTRACT ADDRESSES
+===============================================
+Proxy Address:          0x8157B303A10609C50e332717D70e53B09EbDb045
+Implementation Address: 0xb728e46f776859e35fd8f58a2731dd86ba24c923
+
+===============================================
+VERIFICATION STEPS FOR IMPLEMENTATION
+===============================================
+
+1. Go to BaseScan verification page:
+   https://sepolia.basescan.org/verifyContract
+
+2. Enter the Implementation Address:
+   0xb728e46f776859e35fd8f58a2731dd86ba24c923
+
+3. Select Compiler Type:
+   - Choose "Solidity (Standard-Json-Input)"
+
+4. Upload the file:
+   - File: vmf-standard-json-sepolia.json
+   - This file has been generated in the current directory
+
+5. Contract Name:
+   - Enter: src/VMF.sol:VMF
+
+6. Click "Verify and Publish"
+
+===============================================
+ALTERNATIVE: USE FLATTENED SOURCE
+===============================================
+
+If Standard JSON doesn't work, try flattened source:
+
+1. Go to: https://sepolia.basescan.org/verifyContract
+
+2. Enter Implementation Address: 0xb728e46f776859e35fd8f58a2731dd86ba24c923
+
+3. Select "Solidity (Single file)"
+
+4. Compiler Version: v0.8.23+commit.f704f362
+
+5. Optimization: Yes, with 200 runs
+
+6. Paste contents of: vmf-flattened-sepolia.sol
+
+7. Constructor Arguments: (none - this is the implementation, not proxy)
+
+8. Click "Verify and Publish"
+
+===============================================
+VERIFICATION STATUS LINKS
+===============================================
+
+Blockscout (Already Verified):
+https://base-sepolia.blockscout.com/address/0xb728e46f776859e35fd8f58a2731dd86ba24c923
+
+BaseScan (Verify Here):
+https://sepolia.basescan.org/address/0xb728e46f776859e35fd8f58a2731dd86ba24c923
+
+===============================================
+PROXY VERIFICATION
+===============================================
+
+The proxy contract is a minimal ERC1967 proxy deployed by Solady's LibClone.
+It does NOT need separate verification because:
+
+1. Blockscout automatically detects the proxy and shows the implementation ABI
+2. The proxy is just a standard delegate pattern with no custom logic
+3. Users interact with the proxy address using the implementation's ABI
+
+You can verify the proxy points to the implementation by reading storage slot:
+0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc
+
+View proxy on Blockscout:
+https://base-sepolia.blockscout.com/address/0x8157B303A10609C50e332717D70e53B09EbDb045
+
+View proxy on BaseScan:
+https://sepolia.basescan.org/address/0x8157B303A10609C50e332717D70e53B09EbDb045
+
+===============================================
+VERIFICATION COMPLETE WHEN:
+===============================================
+✅ Implementation verified on Blockscout (DONE)
+✅ Implementation verified on BaseScan (MANUAL - follow steps above)
+✅ Proxy detected by Blockscout (automatic)
+✅ Both explorers show correct source code and ABI
+
+===============================================

@@ -88,7 +88,15 @@ contract SmartDeployScript is Script {
         // Deploy the ERC1967 proxy pointing to the implementation
         address localProxy = LibClone.deployERC1967(implementationAddress, initData);
         console2.log("Proxy deployed at:", localProxy);
-        
+
+        // Ensure initialization (in case deployERC1967 did not call it)
+        // This is safe due to the `initializer` modifier reverting on second call.
+        try VMF(localProxy).initialize(usdcAddress, deployer, 0) {
+            // initialized explicitly
+        } catch {
+            // already initialized via initData or other means
+        }
+
         // Verify the proxy is working
         VMF localVmf = VMF(localProxy);
         console2.log("Token name:", localVmf.name());
