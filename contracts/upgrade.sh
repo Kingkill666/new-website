@@ -3,7 +3,8 @@ set -ex
 
 # Set the proxy address that you want to upgrade
 # You'll need to set this after initial deployment
-export PROXY_ADDRESS="0x2213414893259b0C48066Acd1763e7fbA97859E5"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/vmf-addresses.sh"
 
 source .env
 

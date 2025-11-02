@@ -4,7 +4,9 @@ set -e
 # Script to update charity and team receiver addresses
 # Replace the compromised wallet with new secure addresses
 
-VMF_CONTRACT="0x2213414893259b0C48066Acd1763e7fbA97859E5"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/vmf-addresses.sh"
+VMF_CONTRACT="$VMF_ADDRESS"
 
 # NEW ADDRESSES - REPLACE THESE WITH YOUR SECURE ADDRESSES
 NEW_CHARITY_RECEIVER="0x0000000000000000000000000000000000000000"  # REPLACE WITH NEW CHARITY ADDRESS

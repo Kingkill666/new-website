@@ -5,13 +5,13 @@ set -ex
 # This verifies already deployed contracts without redeploying them
 
 source .env
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/vmf-addresses.sh"
 
 # Set the addresses of contracts you want to verify
-export PROXY_ADDRESS="0x2213414893259b0C48066Acd1763e7fbA97859E5"
-
 # You'll need to set the implementation address after upgrade
 # Check the upgrade transaction or logs to get this address
-export IMPLEMENTATION_ADDRESS=0x7857F9C0dDCc07bBf52E96B8A3BeB14ECCff56BE
+export IMPLEMENTATION_ADDRESS="${IMPLEMENTATION_ADDRESS:-$VMF_IMPLEMENTATION_ADDRESS}"
 
 echo "=== Contract Verification Script ==="
 echo "This script verifies already deployed contracts on Base"

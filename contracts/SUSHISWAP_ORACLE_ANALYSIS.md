@@ -5,7 +5,7 @@ This document summarizes the comprehensive analysis of the SushiSwap V3 Price Or
 
 ## Pool Information
 - **Pool Address**: `0x9C83A203133B65982F35D1B00E8283C9fb518cb1`
-- **Token0**: VMF (`0x2213414893259b0C48066Acd1763e7fbA97859E5`)
+- **Token0**: VMF (`0x8157B303a10609C50e332717D70E53B09ebdb045`)
 - **Token1**: USDC (`0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913`)
 - **Fee**: 10000 (1%)
 - **Network**: Base Mainnet (Chain ID: 8453)

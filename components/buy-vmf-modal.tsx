@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { X, ChevronDown, ChevronUp, CheckCircle, Copy, Check, Minus, Plus, AlertCircle } from "lucide-react"
 import { useWallet } from "@/hooks/useWallet"
 import { formatAddress } from "@/lib/wallet-config"
+import { VMF_CONTRACT_ADDRESS } from "@/lib/vmf-contract"
 import { DialogFooter } from "@/components/ui/dialog"
 import { calculateVMFAmount, getPriceInfo, getPriceInfoNoProvider, testContractOracle } from "@/lib/oracle-utils"
 import axios from "axios"
@@ -78,7 +79,7 @@ const charities: Charity[] = [
   },
 ]
 
-const CONTRACT_ADDRESS = "0x2213414893259b0C48066Acd1763e7fbA97859E5"
+const CONTRACT_ADDRESS = VMF_CONTRACT_ADDRESS
 
 
 // Add the 4 extra charities for the DONATE modal

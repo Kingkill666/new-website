@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { useWallet } from "@/hooks/useWallet"
 import { WalletConnector } from "@/components/wallet-connector"
 import { AlertCircle, CheckCircle, TrendingUp, Lock } from "lucide-react"
+import { VMF_CONTRACT_ADDRESS } from "@/lib/vmf-contract"
 
 export default function StakingContent() {
   const [stakeAmount, setStakeAmount] = useState("")
@@ -20,7 +21,7 @@ export default function StakingContent() {
   const wallet = useWallet()
 
   // VMF Token Contract Address on Base
-  const VMF_TOKEN_ADDRESS = "0x2213414893259b0C48066Acd1763e7fbA97859E5"
+  const VMF_TOKEN_ADDRESS = VMF_CONTRACT_ADDRESS
 
   // Check VMF balance
   const checkVMFBalance = async () => {

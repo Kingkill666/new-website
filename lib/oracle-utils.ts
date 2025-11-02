@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
+import { VMF_CONTRACT_ADDRESS } from "./vmf-contract";
 
 // Contract addresses
-const VMF_CONTRACT_ADDRESS = "0x2213414893259b0C48066Acd1763e7fbA97859E5";
 const FIXED_PRICE_ORACLE_ADDRESS = "0x9444b5Cf6f89ab72C6173bF0dd13c7F7bec809D2";
 const SUSHISWAP_ORACLE_ADDRESS = "0xB660c01d6502091555731cD1B3E04fdfDBF83944"; // Accurate SushiSwap oracle
 

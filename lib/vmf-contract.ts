@@ -1,0 +1,6 @@
+export const VMF_CONTRACT_ADDRESS = "0x8157B303a10609C50e332717D70E53B09ebdb045";
+
+export const VMF_IMPLEMENTATION_ADDRESS = "0x1dbd09aFf3A79463f1f02b0004965F4039fB87F0";
+
+export const VMF_BASESCAN_URL = `https://sepolia.basescan.org/address/${VMF_CONTRACT_ADDRESS}`;
+

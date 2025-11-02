@@ -3,12 +3,13 @@ pragma solidity ^0.8.23;
 
 import "forge-std/Script.sol";
 import "../src/SushiSwapV3PriceOracleFinal.sol";
+import "../src/addresses/VMFAddresses.sol";
 
 /// @title DeploySushiSwapOracleFinal
 /// @notice Deployment script for the final corrected SushiSwap V3 Price Oracle
 contract DeploySushiSwapOracleFinal is Script {
     // Base mainnet addresses
-    address constant VMF_ADDRESS = 0x2213414893259b0C48066Acd1763e7fbA97859E5;
+    address constant VMF_ADDRESS = VMFAddresses.PROXY;
     address constant USDC_ADDRESS = 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913;
     address constant SUSHISWAP_POOL = 0x9C83A203133B65982F35D1B00E8283C9fb518cb1;
     

@@ -1,7 +1,7 @@
 const { ethers } = require('ethers');
+const { VMF_CONTRACT_ADDRESS } = require('./vmf-addresses');
 
 // Contract addresses
-const VMF_CONTRACT_ADDRESS = "0x2213414893259b0C48066Acd1763e7fbA97859E5";
 const FIXED_PRICE_ORACLE_ADDRESS = "0x9444b5Cf6f89ab72C6173bF0dd13c7F7bec809D2";
 
 // Oracle ABI
