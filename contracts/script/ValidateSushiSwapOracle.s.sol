@@ -8,7 +8,7 @@ import "../src/addresses/VMFAddresses.sol";
 /// @title ValidateSushiSwapOracle
 /// @notice Validation script for existing SushiSwap V3 Price Oracle
 contract ValidateSushiSwapOracle is Script {
-    // Base mainnet addresses
+    // Base Sepolia addresses
     address constant VMF_ADDRESS = VMFAddresses.PROXY;
     address constant USDC_ADDRESS = 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913;
     address constant SUSHISWAP_POOL = 0x9C83A203133B65982F35D1B00E8283C9fb518cb1;
@@ -24,8 +24,8 @@ contract ValidateSushiSwapOracle is Script {
         console.log("USDC Address:", USDC_ADDRESS);
         console.log("SushiSwap Pool:", SUSHISWAP_POOL);
         
-        // Validate we're on Base mainnet
-        require(block.chainid == 8453, "Must be on Base mainnet (chainId 8453)");
+        // Validate we're on Base Sepolia
+        require(block.chainid == 84532, "Must be on Base Sepolia (chainId 84532)");
         
         // Get oracle address from environment or use a default
         address oracleAddress = vm.envOr("ORACLE_ADDRESS", address(0));

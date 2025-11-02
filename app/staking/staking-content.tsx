@@ -20,7 +20,7 @@ export default function StakingContent() {
   
   const wallet = useWallet()
 
-  // VMF Token Contract Address on Base
+  // VMF Token Contract Address on Base Sepolia
   const VMF_TOKEN_ADDRESS = VMF_CONTRACT_ADDRESS
 
   // Check VMF balance
@@ -34,8 +34,8 @@ export default function StakingContent() {
       setIsCheckingBalance(true)
       console.log("🔍 Checking VMF balance for staking page...")
       
-      // Direct RPC call to Base mainnet
-      const rpcResponse = await fetch("https://mainnet.base.org", {
+      // Direct RPC call to Base Sepolia
+      const rpcResponse = await fetch("https://sepolia.base.org", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

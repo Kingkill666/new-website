@@ -125,12 +125,12 @@ export async function GET(request: NextRequest) {
       console.warn('⚠️ CoinGecko failed:', cgError)
     }
     
-    // Try Uniswap V4 on Base directly
+    // Try Uniswap V4 on Base Sepolia directly
     try {
-      console.log('📡 [API] Trying Uniswap V4 on Base...')
+      console.log('📡 [API] Trying Uniswap V4 on Base Sepolia...')
       const VMF_CONTRACT = VMF_CONTRACT_ADDRESS
-      const USDC_CONTRACT = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' // USDC on Base
-      const UNISWAP_V3_QUOTER = '0x3d4e44Eb1374240CE5F1B871ab261CD16335B76a' // Quoter V2 on Base
+      const USDC_CONTRACT = '0x036CbD53842c5426634e7929541eC2318f3dCF7e' // USDC on Base Sepolia
+      const UNISWAP_V3_QUOTER = '0x3d4e44Eb1374240CE5F1B871ab261CD16335B76a' // Quoter V2 (may not exist on Sepolia)
       
       // Uniswap V3 uses a quoter contract to get price quotes
       // We'll quote swapping 1 USDC for VMF to get the price
@@ -146,7 +146,7 @@ export async function GET(request: NextRequest) {
         parseInt(oneUSDC).toString(16).padStart(64, '0') + // amountIn
         '0'.padStart(64, '0') // sqrtPriceLimitX96 (0 = no limit)
       
-      const quoteResponse = await fetch('https://mainnet.base.org', {
+      const quoteResponse = await fetch('https://sepolia.base.org', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -175,7 +175,7 @@ export async function GET(request: NextRequest) {
         if (price > 0 && price < 1000000) { // Sanity check
           return NextResponse.json({ 
             price, 
-            source: 'Uniswap V3 (Base)',
+            source: 'Uniswap V3 (Base Sepolia)',
             success: true 
           })
         }
@@ -192,7 +192,7 @@ export async function GET(request: NextRequest) {
       const VMF_CONTRACT = VMF_CONTRACT_ADDRESS
       
       // Get donationMultipleBps
-      const multipleResponse = await fetch('https://mainnet.base.org', {
+      const multipleResponse = await fetch('https://sepolia.base.org', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

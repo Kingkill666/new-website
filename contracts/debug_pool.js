@@ -94,8 +94,8 @@ const POOL_ABI = [
 
 async function debugPool() {
   try {
-    // Connect to Base mainnet
-    const provider = new ethers.JsonRpcProvider('https://mainnet.base.org');
+    // Connect to Base Sepolia
+    const provider = new ethers.JsonRpcProvider('https://sepolia.base.org');
     
     console.log('Debugging SushiSwap V3 Pool...');
     console.log('Pool Address:', SUSHISWAP_V3_POOL);

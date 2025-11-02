@@ -14,7 +14,7 @@ source "$SCRIPT_DIR/vmf-addresses.sh"
 export IMPLEMENTATION_ADDRESS="${IMPLEMENTATION_ADDRESS:-$VMF_IMPLEMENTATION_ADDRESS}"
 
 echo "=== Contract Verification Script ==="
-echo "This script verifies already deployed contracts on Base"
+echo "This script verifies already deployed contracts on Base Sepolia"
 echo ""
 
 # Validate API key
@@ -26,7 +26,7 @@ fi
 
 # Test with Etherscan v2 multi-chain API
 echo "Testing Etherscan v2 multi-chain API..."
-API_TEST_V2=$(curl -s "https://api.etherscan.io/v2/api?chainid=8453&module=account&action=balance&address=0x0000000000000000000000000000000000000000&tag=latest&apikey=$BASESCAN_API_KEY")
+API_TEST_V2=$(curl -s "https://api.etherscan.io/v2/api?chainid=84532&module=account&action=balance&address=0x0000000000000000000000000000000000000000&tag=latest&apikey=$BASESCAN_API_KEY")
 if echo "$API_TEST_V2" | grep -q '"status":"1"'; then
     echo "✓ Etherscan v2 multi-chain API key is valid"
 elif echo "$API_TEST_V2" | grep -q "Invalid API Key"; then
@@ -55,8 +55,8 @@ forge verify-contract \
     $IMPLEMENTATION_ADDRESS \
     src/VMF.sol:VMF \
     --verifier etherscan \
-    --chain-id 8453 \
-    --verifier-url "https://api.etherscan.io/api" \
+    --chain-id 84532 \
+    --verifier-url "https://api-sepolia.basescan.org/api" \
     --etherscan-api-key "$BASESCAN_API_KEY" \
     --watch
 
@@ -66,5 +66,5 @@ echo "Implementation verified at: $IMPLEMENTATION_ADDRESS"
 echo "Proxy address: $PROXY_ADDRESS"
 echo ""
 echo "You can view the verified contract at:"
-echo "https://basescan.org/address/$IMPLEMENTATION_ADDRESS"
-echo "https://basescan.org/address/$PROXY_ADDRESS"
+echo "https://sepolia.basescan.org/address/$IMPLEMENTATION_ADDRESS"
+echo "https://sepolia.basescan.org/address/$PROXY_ADDRESS"

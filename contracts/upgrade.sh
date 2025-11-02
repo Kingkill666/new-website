@@ -26,7 +26,7 @@ forge script script/Upgrade.s.sol:UpgradeScript \
     --private-key "$PRIVATE_KEY" \
     --broadcast \
     --verify \
-    --chain-id 8453 \
+    --chain-id 84532 \
     --etherscan-api-key "$BASESCAN_API_KEY"
 
 echo ""
@@ -34,4 +34,4 @@ echo "=== Upgrade and Verification Complete ==="
 echo "Proxy address: $PROXY_ADDRESS"
 echo ""
 echo "Check the transaction logs above for the new implementation address."
-echo "You can view the verified contracts at: https://basescan.org/"
+echo "You can view the verified contracts at: https://sepolia.basescan.org/"

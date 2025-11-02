@@ -80,7 +80,7 @@ Create `.env` file in the `contracts/` directory:
 
 ```bash
 PRIVATE_KEY=your_private_key
-BASE_RPC_URL=https://mainnet.base.org
+BASE_RPC_URL=https://sepolia.base.org
 BASESCAN_API_KEY=your_basescan_api_key
 ```
 

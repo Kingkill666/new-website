@@ -8,7 +8,7 @@ This document summarizes the comprehensive analysis of the SushiSwap V3 Price Or
 - **Token0**: VMF (`0x8157B303a10609C50e332717D70E53B09ebdb045`)
 - **Token1**: USDC (`0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913`)
 - **Fee**: 10000 (1%)
-- **Network**: Base Mainnet (Chain ID: 8453)
+- **Network**: Base Sepolia (Chain ID: 84532)
 
 ## Test Results Summary
 
@@ -66,7 +66,7 @@ We are using the **FixedPriceOracle** contract instead:
 ### Analysis Tools
 - All scripts include price range validation (0.001 - 0.01 USDC per VMF)
 - Comprehensive error handling and logging
-- Network verification (Base mainnet only)
+- Network verification (Base Sepolia only)
 
 ## Recommendations
 
@@ -99,16 +99,16 @@ The comprehensive test suite and validation tools created during this analysis c
 
 ```bash
 # Run tests only
-export BASE_RPC_URL="https://mainnet.base.org"
+export BASE_RPC_URL="https://sepolia.base.org"
 ./test_sushiswap_oracle.sh
 
 # Full validation (deploy + test)
-export BASE_RPC_URL="https://mainnet.base.org"
+export BASE_RPC_URL="https://sepolia.base.org"
 export PRIVATE_KEY="your_private_key"
 ./validate_sushiswap_oracle.sh
 
 # Validate existing oracle
-export BASE_RPC_URL="https://mainnet.base.org"
+export BASE_RPC_URL="https://sepolia.base.org"
 export ORACLE_ADDRESS="0x9444b5Cf6f89ab72C6173bF0dd13c7F7bec809D2"
 forge script script/ValidateSushiSwapOracle.s.sol --fork-url "$BASE_RPC_URL" -vvv
 ```

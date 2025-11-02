@@ -17,7 +17,7 @@ echo ""
 # Check if we have the required environment variables
 if [ -z "$BASE_RPC_URL" ]; then
     echo "❌ ERROR: Missing BASE_RPC_URL environment variable!"
-    echo "Please set: export BASE_RPC_URL=\"https://mainnet.base.org\""
+    echo "Please set: export BASE_RPC_URL=\"https://sepolia.base.org\""
     exit 1
 fi
 

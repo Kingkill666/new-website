@@ -10,6 +10,7 @@ import { X, ChevronDown, ChevronUp, CheckCircle, Copy, Check, Minus, Plus, Alert
 import { useWallet } from "@/hooks/useWallet"
 import { formatAddress } from "@/lib/wallet-config"
 import { VMF_CONTRACT_ADDRESS } from "@/lib/vmf-contract"
+import { BASE_CHAIN_ID } from "@/lib/network-utils"
 import { DialogFooter } from "@/components/ui/dialog"
 import { calculateVMFAmount, getPriceInfo, getPriceInfoNoProvider, testContractOracle } from "@/lib/oracle-utils"
 import axios from "axios"
@@ -156,10 +157,10 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
   // Check network status
   useEffect(() => {
     const checkNetworkStatus = () => {
-      if (isConnected && connection?.chainId === 8453) {
+      if (isConnected && connection?.chainId === BASE_CHAIN_ID) {
         setIsOnBaseNetwork(true)
         setNeedsNetworkSwitch(false)
-      } else if (isConnected && connection?.chainId !== 8453) {
+      } else if (isConnected && connection?.chainId !== BASE_CHAIN_ID) {
         setIsOnBaseNetwork(false)
         setNeedsNetworkSwitch(true)
       } else {
@@ -217,17 +218,17 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
       setIsLoadingPrice(true)
       try {
         let info;
-        if (isConnected && connection?.chainId === 8453) {
+        if (isConnected && connection?.chainId === BASE_CHAIN_ID) {
           // Use provider-based pricing (prioritizes contract oracle)
           const provider = new ethers.BrowserProvider(window.ethereum)
           info = await getPriceInfo(provider)
           console.log("✅ Got price from provider:", info);
-        } else if (isConnected && connection?.chainId !== 8453) {
-          // Wrong network - try to switch to Base
-          console.log("⚠️ Wrong network detected, attempting to switch to Base...");
+        } else if (isConnected && connection?.chainId !== BASE_CHAIN_ID) {
+          // Wrong network - try to switch to Base Sepolia
+          console.log("⚠️ Wrong network detected, attempting to switch to Base Sepolia...");
           try {
             await switchToBaseNetwork();
-            // Retry with Base network
+            // Retry with Base Sepolia network
             const provider = new ethers.BrowserProvider(window.ethereum)
             info = await getPriceInfo(provider)
             console.log("✅ Got price after network switch:", info);
@@ -263,7 +264,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     }
   }, [isConnected, connection?.chainId])
 
-  // Function to switch to Base network
+  // Function to switch to Base Sepolia network
   const switchToBaseNetwork = async () => {
     if (!window.ethereum) {
       alert("❌ No wallet detected! Please install a Web3 wallet like MetaMask or Coinbase Wallet.");
@@ -271,43 +272,43 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     }
 
     try {
-      console.log("🔄 Attempting to switch to Base network...");
+      console.log("🔄 Attempting to switch to Base Sepolia network...");
       
-      // Try to switch to Base network
+      // Try to switch to Base Sepolia network
       await window.ethereum.request({
         method: "wallet_switchEthereumChain",
-        params: [{ chainId: "0x2105" }], // Base mainnet
+        params: [{ chainId: "0x14a34" }], // Base Sepolia
       });
-      console.log("✅ Successfully switched to Base network");
+      console.log("✅ Successfully switched to Base Sepolia network");
       
       // Show success message
-      alert("✅ Successfully switched to Base network! You can now use VMF features.");
+      alert("✅ Successfully switched to Base Sepolia network! You can now use VMF features.");
       
     } catch (switchError: any) {
-      console.log("⚠️ Switch failed, trying to add Base network...");
+      console.log("⚠️ Switch failed, trying to add Base Sepolia network...");
       
       if (switchError.code === 4902) {
-        // Chain not added, try to add Base Mainnet
+        // Chain not added, try to add Base Sepolia
         try {
           await window.ethereum.request({
             method: "wallet_addEthereumChain",
             params: [{
-              chainId: "0x2105",
-              chainName: "Base Mainnet",
+              chainId: "0x14a34",
+              chainName: "Base Sepolia",
               nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
-              rpcUrls: ["https://mainnet.base.org"],
-              blockExplorerUrls: ["https://basescan.org"],
+              rpcUrls: ["https://sepolia.base.org"],
+              blockExplorerUrls: ["https://sepolia.basescan.org"],
             }],
           });
-          console.log("✅ Successfully added Base network");
-          alert("✅ Successfully added Base network! You can now use VMF features.");
+          console.log("✅ Successfully added Base Sepolia network");
+          alert("✅ Successfully added Base Sepolia network! You can now use VMF features.");
         } catch (addError) {
-          console.error("❌ Failed to add Base network:", addError);
-          alert("❌ Failed to add Base network. Please manually add Base network to your wallet:\n\nNetwork Name: Base Mainnet\nRPC URL: https://mainnet.base.org\nChain ID: 8453\nCurrency Symbol: ETH\nBlock Explorer: https://basescan.org");
+          console.error("❌ Failed to add Base Sepolia network:", addError);
+          alert("❌ Failed to add Base Sepolia network. Please manually add it to your wallet:\n\nNetwork Name: Base Sepolia\nRPC URL: https://sepolia.base.org\nChain ID: 84532\nCurrency Symbol: ETH\nBlock Explorer: https://sepolia.basescan.org");
         }
       } else {
-        console.error("❌ Failed to switch to Base network:", switchError);
-        alert("❌ Failed to switch to Base network. Please manually switch to Base network in your wallet to use VMF features.");
+        console.error("❌ Failed to switch to Base Sepolia network:", switchError);
+        alert("❌ Failed to switch to Base Sepolia network. Please manually switch to Base Sepolia in your wallet to use VMF features.");
       }
     }
   }
@@ -317,7 +318,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     async function calculateVMF() {
       if (amount && priceInfo) {
         try {
-          if (isConnected && connection?.chainId === 8453) {
+          if (isConnected && connection?.chainId === BASE_CHAIN_ID) {
             // Use provider-based calculation (tries Uniswap first, then oracle)
             const provider = new ethers.BrowserProvider(window.ethereum)
             const vmfAmount = await calculateVMFAmount(Number(amount), provider)
@@ -347,7 +348,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
 
   useEffect(() => {
     if (isConnected && connection) {
-      setNeedsNetworkSwitch(connection.chainId !== 8453)
+      setNeedsNetworkSwitch(connection.chainId !== BASE_CHAIN_ID)
     }
   }, [connection?.chainId, isConnected])
 
@@ -459,7 +460,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
 
   const handleNetworkSwitch = async () => {
     // For now, we'll just show an alert since the simplified wallet hook doesn't support network switching
-    alert("Please switch to Base network in your wallet")
+    alert("Please switch to Base Sepolia network in your wallet")
     setNeedsNetworkSwitch(false)
   }
 
@@ -498,17 +499,17 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
         return
       }
       
-      // CRITICAL: Verify we're on Base mainnet before proceeding
+      // CRITICAL: Verify we're on Base Sepolia before proceeding
       console.log("🔍 Initial network check - wallet chainId:", connection?.chainId)
       
-      if (!connection || connection.chainId !== 8453) {
+      if (!connection || connection.chainId !== BASE_CHAIN_ID) {
         const currentChain = connection?.chainId || 'unknown'
         console.error("❌ Wrong network detected:", currentChain)
-        alert(`❌ WRONG NETWORK! You are on chain ${currentChain}. Please switch to Base mainnet (chainId 8453) to continue.`)
+        alert(`❌ WRONG NETWORK! You are on chain ${currentChain}. Please switch to Base Sepolia (chainId ${BASE_CHAIN_ID}) to continue.`)
         return
       }
       
-      console.log("✅ Network verified: Base mainnet (8453)")
+      console.log(`✅ Network verified: Base Sepolia (${BASE_CHAIN_ID})`)
       
       // For now, skip USDC balance check since we don't have it in the new wallet system
       setCurrentStep("verify")
@@ -524,18 +525,18 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     try {
       setIsProcessing(true)
       
-      // CRITICAL: Verify we're on Base mainnet before any transaction
+      // CRITICAL: Verify we're on Base Sepolia before any transaction
       console.log("🔍 Transaction network check - wallet chainId:", connection?.chainId)
       
-      if (!connection || connection.chainId !== 8453) {
+      if (!connection || connection.chainId !== BASE_CHAIN_ID) {
         const currentChain = connection?.chainId || 'unknown'
         console.error("❌ Wrong network detected:", currentChain)
-        alert(`❌ WRONG NETWORK! You are on chain ${currentChain}. Please switch to Base mainnet (chainId 8453) before making any transactions.`)
+        alert(`❌ WRONG NETWORK! You are on chain ${currentChain}. Please switch to Base Sepolia (chainId ${BASE_CHAIN_ID}) before making any transactions.`)
         setIsProcessing(false)
         return false
       }
       
-      console.log("✅ Network verified: Base mainnet (8453)")
+      console.log(`✅ Network verified: Base Sepolia (${BASE_CHAIN_ID})`)
       
       const provider = new ethers.BrowserProvider(window.ethereum)
       const signer = await provider.getSigner()
@@ -570,7 +571,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
       }
       // Approve total USDC for the contract
       const totalUSDC = amounts.reduce((a, b) => a + b, BigInt(0))
-      const usdcContractAddress = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
+      const usdcContractAddress = "0x036CbD53842c5426634e7929541eC2318f3dCF7e";
       const erc20Abi = [
         "function balanceOf(address owner) view returns (uint256)",
         "function approve(address spender, uint256 amount) external returns (bool)"
@@ -603,14 +604,14 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     console.log("🔍 Checking network - wallet chainId:", connection?.chainId)
     
     // Use wallet connection state instead of creating new provider
-    if (!connection || connection.chainId !== 8453) {
+    if (!connection || connection.chainId !== BASE_CHAIN_ID) {
       const currentChain = connection?.chainId || 'unknown'
       console.error("❌ Wrong network detected:", currentChain)
-      alert(`❌ WRONG NETWORK! You are on chain ${currentChain}. Please switch to Base mainnet (chainId 8453) before confirming the transaction.`)
+      alert(`❌ WRONG NETWORK! You are on chain ${currentChain}. Please switch to Base Sepolia (chainId ${BASE_CHAIN_ID}) before confirming the transaction.`)
       return
     }
     
-    console.log("✅ Final network verification: Base mainnet (8453)")
+    console.log(`✅ Final network verification: Base Sepolia (${BASE_CHAIN_ID})`)
 
     const success = await executeSmartContract()
     if (success) {
@@ -686,11 +687,11 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                       <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-2" />
                       <h3 className="text-lg font-bold text-red-800 mb-2">Wrong Network!</h3>
                       <p className="text-sm text-red-700 mb-4">
-                        VMF requires Base network to function properly.
+                        VMF requires the Base Sepolia network to function properly.
                         <br />
                         Current network: ChainId {connection?.chainId}
                         <br />
-                        Required: Base Mainnet (ChainId 8453)
+                        Required: Base Sepolia (ChainId {BASE_CHAIN_ID})
                       </p>
                     </div>
                     <Button
@@ -700,7 +701,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                       🔄 Switch to Base Network
                     </Button>
                     <p className="text-xs text-red-600 mt-2">
-                      This will automatically add Base network to your wallet if needed.
+                      This will automatically add Base Sepolia to your wallet if needed.
                     </p>
                   </div>
                 </div>
@@ -786,7 +787,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                         <span className="font-medium text-orange-800">No USDC Balance</span>
                       </div>
                       <p className="text-sm text-orange-700 mb-3">
-                        You need USDC to purchase VMF coins. Get USDC directly on Base network.
+                        You need USDC to purchase VMF coins. Get USDC directly on Base Sepolia.
                       </p>
                       <div className="flex flex-col gap-2">
                         <Button

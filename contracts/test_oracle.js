@@ -23,8 +23,8 @@ const ORACLE_ABI = [
 
 async function testOracle() {
   try {
-    // Connect to Base mainnet
-    const provider = new ethers.JsonRpcProvider('https://mainnet.base.org');
+    // Connect to Base Sepolia
+    const provider = new ethers.JsonRpcProvider('https://sepolia.base.org');
     
     console.log('Testing Fixed Price Oracle...');
     console.log('Oracle Address:', FIXED_PRICE_ORACLE_ADDRESS);

@@ -38,7 +38,7 @@ The scripts will revoke these roles from the compromised wallet:
 ### Step 1: Set Environment Variables
 ```bash
 export PRIVATE_KEY="your_private_key"
-export BASE_RPC_URL="https://mainnet.base.org"
+export BASE_RPC_URL="https://sepolia.base.org"
 ```
 
 ### Step 2: Run Emergency Revocation

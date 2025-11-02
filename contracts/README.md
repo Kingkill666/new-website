@@ -16,7 +16,7 @@ VMF is a donation-focused ERC20 token with role-based access control. This versi
 ## Current Deployment
 
 - **Current VMF (Proxy):** `0x2213414893259b0c48066acd1763e7fba97859e5`
-- **Chain:** Base Mainnet (Chain ID: 8453)
+- **Chain:** Base Sepolia (Chain ID: 84532)
 - **Total Supply:** ~6.073e25 VMF
 - **Owner Balance:** ~1.151e25 VMF
 
@@ -26,7 +26,7 @@ VMF is a donation-focused ERC20 token with role-based access control. This versi
 ```bash
 # Required environment variables
 export PRIVATE_KEY="your_private_key_here"
-export BASE_RPC_URL="https://mainnet.base.org"
+export BASE_RPC_URL="https://sepolia.base.org"
 export BASESCAN_API_KEY="your_basescan_api_key"  # Optional but recommended
 
 # Optional: Set old contract for migration
@@ -86,7 +86,7 @@ export BASESCAN_API_KEY="your_api_key"
 cast logs --from-block 16000000 --to-block latest \
   --address 0x2213414893259b0c48066acd1763e7fba97859e5 \
   "Transfer(address indexed,address indexed,uint256)" \
-  --rpc-url https://mainnet.base.org
+  --rpc-url https://sepolia.base.org
 ```
 
 ### Migration Safety Best Practices

@@ -81,21 +81,21 @@ export const WALLETS: WalletInfo[] = [
   },
 ]
 
-// Base network configuration
+// Base network configuration (defaulting to Base Sepolia)
 export const BASE_NETWORK = {
-  chainId: 8453,
-  chainName: "Base",
+  chainId: 84532,
+  chainName: "Base Sepolia",
   nativeCurrency: {
     name: "Ethereum",
     symbol: "ETH",
     decimals: 18,
   },
   rpcUrls: [
-    "https://mainnet.base.org",
-    "https://base-mainnet.g.alchemy.com/v2/demo",
-    "https://base.gateway.tenderly.co",
+    "https://sepolia.base.org",
+    "https://base-sepolia.g.alchemy.com/v2/demo",
+    "https://base-sepolia.gateway.tenderly.co",
   ],
-  blockExplorerUrls: ["https://basescan.org"],
+  blockExplorerUrls: ["https://sepolia.basescan.org"],
 }
 
 // Base Sepolia testnet configuration
@@ -387,7 +387,7 @@ export const requestWalletConnection = async (walletId: string): Promise<any> =>
           // Return the connection with the existing accounts
           const connection = {
             address: accounts[0],
-            chainId: 8453, // Base mainnet
+            chainId: BASE_NETWORK.chainId,
             walletName: getWalletDisplayName(walletId),
           }
           return connection
@@ -469,50 +469,46 @@ export const requestWalletConnection = async (walletId: string): Promise<any> =>
 
     console.log(`✅ Connected to ${getWalletDisplayName(walletId)}: ${accounts[0]} on chain ${chainIdNumber}`)
 
-    // Ensure we're on the correct network (Base mainnet for production)
+    // Ensure we're on the correct network (Base Sepolia for testing)
     let finalChainId = chainIdNumber
-    if (chainIdNumber !== 8453) {
-      console.log(`🔄 Switching to Base mainnet (current: ${chainIdNumber})`)
+    if (chainIdNumber !== BASE_NETWORK.chainId) {
+      console.log(`🔄 Switching to ${BASE_NETWORK.chainName} (current: ${chainIdNumber})`)
       try {
         await provider.request({
           method: 'wallet_switchEthereumChain',
-          params: [{ chainId: '0x2105' }], // 8453 in hex
+          params: [{ chainId: `0x${BASE_NETWORK.chainId.toString(16)}` }],
         })
-        console.log('✅ Switched to Base mainnet')
-        finalChainId = 8453
+        console.log(`✅ Switched to ${BASE_NETWORK.chainName}`)
+        finalChainId = BASE_NETWORK.chainId
         
         // Wait a moment for the network switch to complete
         await new Promise(resolve => setTimeout(resolve, 1000))
       } catch (switchError: any) {
         if (switchError.code === 4902) {
           // Chain not added, add it
-          console.log('➕ Adding Base mainnet to wallet')
+          console.log(`➕ Adding ${BASE_NETWORK.chainName} to wallet`)
           await provider.request({
             method: 'wallet_addEthereumChain',
             params: [{
-              chainId: '0x2105',
-              chainName: 'Base Mainnet',
-              nativeCurrency: {
-                name: 'Ethereum',
-                symbol: 'ETH',
-                decimals: 18,
-              },
-              rpcUrls: ['https://mainnet.base.org'],
-              blockExplorerUrls: ['https://basescan.org'],
+              chainId: `0x${BASE_NETWORK.chainId.toString(16)}`,
+              chainName: BASE_NETWORK.chainName,
+              nativeCurrency: BASE_NETWORK.nativeCurrency,
+              rpcUrls: BASE_NETWORK.rpcUrls,
+              blockExplorerUrls: BASE_NETWORK.blockExplorerUrls,
             }],
           })
-          console.log('✅ Added Base mainnet')
-          finalChainId = 8453
+          console.log(`✅ Added ${BASE_NETWORK.chainName}`)
+          finalChainId = BASE_NETWORK.chainId
           
           // Wait a moment for the network addition to complete
           await new Promise(resolve => setTimeout(resolve, 1000))
         } else if (switchError.code === 4001) {
           // User rejected the network switch
           console.log('⚠️ User rejected network switch')
-          throw new Error(`Please switch to Base network in your ${getWalletDisplayName(walletId)} to use VMF`)
+          throw new Error(`Please switch to ${BASE_NETWORK.chainName} in your ${getWalletDisplayName(walletId)} to use VMF`)
         } else {
           console.error('❌ Failed to switch network:', switchError)
-          throw new Error(`Please switch to Base network in your ${getWalletDisplayName(walletId)}`)
+          throw new Error(`Please switch to ${BASE_NETWORK.chainName} in your ${getWalletDisplayName(walletId)}`)
         }
       }
       
@@ -522,7 +518,7 @@ export const requestWalletConnection = async (walletId: string): Promise<any> =>
       console.log(`🔍 Network after switch: ${newChainIdNumber}`)
       finalChainId = newChainIdNumber
     } else {
-      console.log('✅ Already on Base mainnet')
+      console.log(`✅ Already on ${BASE_NETWORK.chainName}`)
     }
 
     const connection = {
@@ -735,33 +731,29 @@ export const forceCoinbaseFreshConnection = async (provider: any): Promise<strin
       }
     }
 
-    // Step 5: Now switch back to Base mainnet
-    console.log("🔄 Step 5: Switching back to Base mainnet...")
+    // Step 5: Now switch back to Base Sepolia
+    console.log(`🔄 Step 5: Switching back to ${BASE_NETWORK.chainName}...`)
     try {
       await provider.request({
         method: 'wallet_switchEthereumChain',
-        params: [{ chainId: '0x2105' }] // Base mainnet
+        params: [{ chainId: `0x${BASE_NETWORK.chainId.toString(16)}` }]
       })
-      console.log("✅ Switched back to Base mainnet")
+      console.log(`✅ Switched back to ${BASE_NETWORK.chainName}`)
     } catch (switchError: any) {
       if (switchError.code === 4902) {
         // Chain not added, add it
-        console.log("➕ Adding Base mainnet to Coinbase")
+        console.log(`➕ Adding ${BASE_NETWORK.chainName} to Coinbase`)
         await provider.request({
           method: 'wallet_addEthereumChain',
           params: [{
-            chainId: '0x2105',
-            chainName: 'Base',
-            nativeCurrency: {
-              name: 'Ethereum',
-              symbol: 'ETH',
-              decimals: 18,
-            },
-            rpcUrls: ['https://mainnet.base.org'],
-            blockExplorerUrls: ['https://basescan.org'],
+            chainId: `0x${BASE_NETWORK.chainId.toString(16)}`,
+            chainName: BASE_NETWORK.chainName,
+            nativeCurrency: BASE_NETWORK.nativeCurrency,
+            rpcUrls: BASE_NETWORK.rpcUrls,
+            blockExplorerUrls: BASE_NETWORK.blockExplorerUrls,
           }],
         })
-        console.log("✅ Added Base mainnet to Coinbase")
+        console.log(`✅ Added ${BASE_NETWORK.chainName} to Coinbase`)
       }
     }
 

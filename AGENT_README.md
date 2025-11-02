@@ -33,7 +33,7 @@ cast call --rpc-url "$BASE_RPC_URL" $PROXY_ADDRESS 'rolesOf(address)(uint256)' $
 ```
 
 Before you start
-- Network: Base mainnet (env: `BASE_RPC_URL`, `PRIVATE_KEY`, `BASESCAN_API_KEY`).
+- Network: Base Sepolia (env: `BASE_RPC_URL`, `PRIVATE_KEY`, `BASESCAN_API_KEY`).
 - Set `PROXY_ADDRESS` to the live VMF proxy.
 - If the proxy was deployed earlier, upgrade first to an implementation that includes:
   - `upgradesDisabled()`, `disableUpgrades()`
@@ -65,10 +65,10 @@ cast call --rpc-url "$BASE_RPC_URL" $PROXY_ADDRESS 'owner()(address)'
 cast call --rpc-url "$BASE_RPC_URL" $PROXY_ADDRESS 'name()(string)'
 ```
 
-Base mainnet example
+Base Sepolia example
 ```bash
-# Known VMF proxy (Base):
-export PROXY_ADDRESS=0x2213414893259b0c48066acd1763e7fba97859e5
+# Known VMF proxy (Base Sepolia):
+export PROXY_ADDRESS=0x8157B303a10609C50e332717D70e53B09ebDb045
 
 # Check current owner and upgrade fuse
 cast call --rpc-url "$BASE_RPC_URL" $PROXY_ADDRESS 'owner()(address)'
@@ -90,8 +90,8 @@ Prerequisites
 
 Quick Run
 ```bash
-# Set the proxy address (example: VMF on Base mainnet)
-export PROXY_ADDRESS=0x2213414893259b0c48066acd1763e7fba97859e5
+# Set the proxy address (example: VMF on Base Sepolia)
+export PROXY_ADDRESS=0x8157B303a10609C50e332717D70e53B09ebDb045
 
 # Ensure .env contains BASE_RPC_URL, PRIVATE_KEY, BASESCAN_API_KEY
 ./contracts/disable-upgrades.sh

@@ -105,11 +105,11 @@ The original SushiSwap oracle had a **critical arithmetic overflow error** that 
 
 ```bash
 # Run tests
-export BASE_RPC_URL="https://mainnet.base.org"
+export BASE_RPC_URL="https://sepolia.base.org"
 ./test_sushiswap_oracle_fixed.sh
 
 # Deploy oracle
-export BASE_RPC_URL="https://mainnet.base.org"
+export BASE_RPC_URL="https://sepolia.base.org"
 export PRIVATE_KEY="your_private_key"
 forge script script/DeploySushiSwapOracleFixed.s.sol --fork-url "$BASE_RPC_URL" --broadcast -vvv
 

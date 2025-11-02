@@ -26,7 +26,7 @@ if [ -z "$PRIVATE_KEY" ] || [ -z "$BASE_RPC_URL" ]; then
     echo "Please set PRIVATE_KEY and BASE_RPC_URL"
     echo "Example:"
     echo "export PRIVATE_KEY=\"0x...\""
-    echo "export BASE_RPC_URL=\"https://mainnet.base.org\""
+    echo "export BASE_RPC_URL=\"https://sepolia.base.org\""
     exit 1
 fi
 
