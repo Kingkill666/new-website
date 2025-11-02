@@ -1,0 +1,416 @@
+# Cursor AI Rules for VMF Project
+
+This file configures Cursor's behavior for the VMF token project.
+
+---
+
+## 🎯 Project Context
+
+**Project Name:** VMF (VikingMuskFund) Token  
+**Type:** Smart contract migration and web3 frontend  
+**Networks:** Base Mainnet (8453), Base Sepolia (84532)  
+**Stack:** Next.js, React, TypeScript, Solidity, Foundry, Tailwind
+
+---
+
+## 📋 Current Phase
+
+**Active Phase:** Phase 0 - Testing Infrastructure  
+**Priority:** Setup E2E tests and Sepolia deployment  
+**Reference:** `.cursor/project_plan.md`
+
+---
+
+## 🎨 Code Style & Standards
+
+### TypeScript/React
+- Use TypeScript strict mode
+- Functional components with hooks
+- Named exports for components
+- Use Tailwind for styling (no CSS modules)
+- shadcn/ui components for UI elements
+- Prefer async/await over promises
+- Use proper error boundaries
+
+### Solidity
+- Version: ^0.8.20
+- Follow OpenZeppelin patterns
+- Use UUPS proxy pattern (ERC1967)
+- Include NatSpec comments for all public functions
+- Write comprehensive Foundry tests
+- Document security considerations
+
+### File Organization
+```
+app/                    # Next.js 13+ app directory
+components/             # Reusable React components
+  ui/                  # shadcn/ui components
+contracts/             # Solidity contracts & scripts
+  src/                 # Contract source files
+  test/                # Foundry tests
+  script/              # Deployment scripts
+lib/                   # Utility functions
+hooks/                 # Custom React hooks
+context/               # React context providers
+types/                 # TypeScript type definitions
+```
+
+---
+
+## 🚀 Common Tasks
+
+### When asked to "setup tests"
+1. Read `.cursor/tasks.md` for current testing phase
+2. Check if Playwright is installed
+3. Create tests in `tests/e2e/` for E2E
+4. Create tests in `contracts/test/` for Solidity
+5. Follow testing standards in `TESTING.md`
+
+### When asked to "deploy contract"
+1. Check current phase in `.cursor/project_plan.md`
+2. Ask which network (sepolia vs mainnet)
+3. Review `contracts/DEPLOY_README.md`
+4. Use existing scripts: `./deploy.sh [network]`
+5. Verify deployment after completion
+
+### When asked to "generate vanity address"
+1. Reference `contracts/VANITY_ADDRESS_GENERATION.md`
+2. Run: `cd contracts && ./generate_vanity_1776.sh mainnet start`
+3. Parse output and suggest next steps
+4. Remind about adding salt to `.env`
+
+### When asked to "migrate holders"
+1. Check Phase 2 in `.cursor/project_plan.md`
+2. Review holder data files
+3. Test on Sepolia first
+4. Use `./migrate-holders.sh` script
+5. Verify migration results
+
+### When asked about "the plan" or "roadmap"
+1. Open `.cursor/project_plan.md`
+2. Summarize current phase
+3. List immediate next tasks from `.cursor/tasks.md`
+4. Ask which phase user wants to focus on
+
+---
+
+## 🔍 File Discovery
+
+### When user mentions:
+- **"the contract"** → `contracts/src/VMF.sol`
+- **"deployment script"** → `contracts/deploy.sh`
+- **"holders"** → `contracts/holders*.json`
+- **"oracle"** → `contracts/src/SushiswapOracle.sol`
+- **"buy modal"** → `components/buy-vmf-modal.tsx`
+- **"trading chart"** → `components/trading-chart.tsx`
+- **"wallet"** → `components/wallet-connector.tsx` or `hooks/useWallet.ts`
+- **"config"** → `config/index.tsx`
+- **"the plan"** → `.cursor/project_plan.md`
+- **"tasks"** → `.cursor/tasks.md`
+
+---
+
+## 📚 Documentation Priority
+
+Always check these files before answering questions:
+
+1. **Project Plan** - `.cursor/project_plan.md` (overall roadmap)
+2. **Tasks** - `.cursor/tasks.md` (immediate next steps)
+3. **Deployment** - `contracts/DEPLOY_README.md`
+4. **Vanity Address** - `contracts/VANITY_ADDRESS_GENERATION.md`
+5. **Testing** - `TESTING.md`
+6. **README** - `README.md` (project overview)
+
+---
+
+## 🛡️ Safety Checks
+
+### Before any mainnet operation:
+- [ ] Confirm network is correct (mainnet vs sepolia)
+- [ ] Verify sufficient gas funds
+- [ ] Check `.env` variables are set
+- [ ] Review transaction details
+- [ ] Ask for explicit confirmation
+- [ ] Suggest testing on Sepolia first
+
+### Before modifying contracts:
+- [ ] Check if contract is deployed
+- [ ] Review existing tests
+- [ ] Suggest adding tests for changes
+- [ ] Check for upgrade implications
+- [ ] Review security implications
+
+### Before migrations/airdrops:
+- [ ] Verify holder data
+- [ ] Calculate gas costs
+- [ ] Test with small batch first
+- [ ] Document snapshot block number
+- [ ] Plan for failure recovery
+
+---
+
+## 💡 Suggestions & Improvements
+
+### When writing code, always:
+- Add error handling
+- Include loading states
+- Add TypeScript types
+- Write tests alongside code
+- Document complex logic
+- Consider edge cases
+- Think about gas optimization (contracts)
+- Consider mobile responsiveness (frontend)
+
+### When debugging, check:
+1. Console errors (browser/terminal)
+2. Network requests (DevTools)
+3. Smart contract events
+4. Transaction reverts
+5. Environment variables
+6. RPC connection
+7. Wallet connection state
+
+---
+
+## 🔄 Git Workflow
+
+### Commit Message Format
+```
+<type>(<scope>): <description>
+
+[optional body]
+
+[optional footer]
+```
+
+**Types:**
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation changes
+- `test`: Test additions/changes
+- `refactor`: Code refactoring
+- `chore`: Maintenance tasks
+- `style`: Code style changes
+
+**Scopes:**
+- `contracts`: Smart contract changes
+- `frontend`: UI/UX changes
+- `tests`: Test changes
+- `ci`: CI/CD changes
+- `docs`: Documentation
+
+**Examples:**
+```
+feat(contracts): Add CREATE2 vanity address generator
+fix(frontend): Resolve wallet connection issue on mobile
+test(contracts): Add oracle regression tests
+docs(plan): Update Phase 0 timeline
+```
+
+---
+
+## 🧪 Testing Standards
+
+### E2E Tests (Playwright)
+- Test files: `tests/e2e/*.spec.ts`
+- Run: `npx playwright test`
+- Use page objects for common interactions
+- Test critical user journeys
+- Include mobile viewport tests
+
+### Contract Tests (Foundry)
+- Test files: `contracts/test/*.t.sol`
+- Run: `cd contracts && forge test`
+- Aim for 80%+ coverage
+- Test edge cases and reverts
+- Use fuzzing for critical functions
+
+### Manual Tests
+- Reference: `MANUAL_TESTING_GUIDE.md` (to be created)
+- Execute before major releases
+- Test on multiple browsers
+- Document results
+
+---
+
+## 🌐 Network Configuration
+
+### Base Mainnet
+- Chain ID: 8453
+- RPC: `https://mainnet.base.org`
+- Explorer: `https://basescan.org`
+- Currency: ETH
+
+### Base Sepolia
+- Chain ID: 84532
+- RPC: `https://sepolia.base.org`
+- Explorer: `https://sepolia.basescan.org`
+- Currency: Sepolia ETH (test)
+
+### Environment Variables
+```bash
+BASE_RPC_URL=https://mainnet.base.org
+BASE_SEPOLIA_RPC_URL=https://sepolia.base.org
+BASESCAN_API_KEY=your_key_here
+PRIVATE_KEY=your_private_key
+PROXY_ADDRESS=deployed_proxy_address
+CREATE2_SALT=vanity_address_salt
+```
+
+---
+
+## 🔐 Security Best Practices
+
+### Never:
+- Commit private keys
+- Commit `.env` files
+- Deploy without testing on Sepolia
+- Skip test coverage
+- Use `tx.origin` for authentication
+- Ignore compiler warnings
+- Deploy without verification
+
+### Always:
+- Use `.env` for secrets
+- Test thoroughly on Sepolia
+- Verify contracts on explorers
+- Document security assumptions
+- Use OpenZeppelin libraries
+- Follow checks-effects-interactions pattern
+- Consider reentrancy attacks
+
+---
+
+## 📦 Dependencies
+
+### Key Packages
+- **Next.js 14+** - React framework
+- **Foundry** - Solidity development
+- **Playwright** - E2E testing
+- **wagmi** - Web3 React hooks
+- **viem** - Ethereum library
+- **shadcn/ui** - UI components
+- **Tailwind CSS** - Styling
+
+### Installation
+```bash
+# Frontend
+pnpm install
+
+# Contracts
+cd contracts && forge install
+
+# Testing
+pnpm add -D @playwright/test
+npx playwright install
+```
+
+---
+
+## 🎯 Phase-Specific Instructions
+
+### Phase 0: Testing (Current)
+- Focus on test coverage
+- Setup CI/CD pipelines
+- Deploy to Sepolia frequently
+- Document test results
+
+### Phase 1: Deployment
+- Double-check everything
+- Test CREATE2 on Sepolia first
+- Have rollback plan
+- Monitor gas prices
+
+### Phase 2: Migration
+- Validate holder data thoroughly
+- Test with small batches
+- Have recovery process
+- Keep community informed
+
+### Phase 3: Liquidity
+- Calculate optimal LP amounts
+- Monitor oracle accuracy
+- Setup price alerts
+- Document LP parameters
+
+### Phase 4: QA
+- Follow manual test checklist
+- Test on all major browsers
+- Document all bugs
+- Prioritize critical issues
+
+---
+
+## 🤝 Collaboration
+
+### When user asks for help:
+1. Check relevant documentation first
+2. Reference appropriate files
+3. Provide step-by-step instructions
+4. Suggest testing approaches
+5. Offer to execute commands if needed
+6. Update documentation if gaps found
+
+### When uncertain:
+- Admit uncertainty
+- Suggest researching in docs
+- Ask clarifying questions
+- Propose multiple approaches
+- Recommend testing before deciding
+
+### When making changes:
+- Explain reasoning
+- Show code diff
+- Suggest testing
+- Update related docs
+- Offer to commit changes
+
+---
+
+## 📞 Getting Help
+
+### For contract issues:
+- Check `contracts/DEPLOY_README.md`
+- Review Foundry docs
+- Check OpenZeppelin patterns
+- Search BaseScan for similar contracts
+
+### For frontend issues:
+- Check Next.js docs
+- Review wagmi/viem docs
+- Check shadcn/ui components
+- Test in browser DevTools
+
+### For deployment issues:
+- Review `.env` configuration
+- Check RPC connectivity
+- Verify gas settings
+- Check network selection
+
+---
+
+## 🎓 Learning Resources
+
+- [Foundry Book](https://book.getfoundry.sh/)
+- [OpenZeppelin Contracts](https://docs.openzeppelin.com/contracts/)
+- [Base Network Docs](https://docs.base.org/)
+- [Next.js Docs](https://nextjs.org/docs)
+- [wagmi Docs](https://wagmi.sh/)
+- [Playwright Docs](https://playwright.dev/)
+
+---
+
+**Last Updated:** 2025-11-02  
+**Version:** 1.0.0  
+**Maintained by:** @Kingkill666
+
+---
+
+## 🔄 Auto-Update Instructions
+
+When project structure or priorities change:
+1. Update this file
+2. Update `.cursor/project_plan.md`
+3. Update `.cursor/tasks.md`
+4. Commit changes with clear message
+5. Notify team of updates
