@@ -1,8 +1,9 @@
 const { ethers } = require('ethers');
+const { VMF_CONTRACT_ADDRESS } = require('./vmf-addresses');
 
 // Pool and token addresses
 const SUSHISWAP_V3_POOL = "0x9C83A203133B65982F35D1B00E8283C9fb518cb1";
-const VMF_ADDRESS = "0x2213414893259b0C48066Acd1763e7fbA97859E5";
+const VMF_ADDRESS = VMF_CONTRACT_ADDRESS;
 const USDC_ADDRESS = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 
 // Pool ABI
@@ -93,8 +94,8 @@ const POOL_ABI = [
 
 async function debugPool() {
   try {
-    // Connect to Base mainnet
-    const provider = new ethers.JsonRpcProvider('https://mainnet.base.org');
+    // Connect to Base Sepolia
+    const provider = new ethers.JsonRpcProvider('https://sepolia.base.org');
     
     console.log('Debugging SushiSwap V3 Pool...');
     console.log('Pool Address:', SUSHISWAP_V3_POOL);

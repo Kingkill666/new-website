@@ -5,11 +5,11 @@ cd "$(dirname "$0")"
 source .env
 
 CONTRACT_ADDRESS="0x2213414893259b0c48066acd1763e7fba97859e5"
-RPC_URL="https://mainnet.base.org"
+RPC_URL="https://sepolia.base.org"
 
 echo "=== VMF Token Holder Update ==="
 echo "Contract: $CONTRACT_ADDRESS"
-echo "Network: Base Mainnet"
+echo "Network: Base Sepolia"
 echo ""
 
 # Current holders from holders.json

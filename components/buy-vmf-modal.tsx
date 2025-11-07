@@ -9,6 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { X, ChevronDown, ChevronUp, CheckCircle, Copy, Check, Minus, Plus, AlertCircle } from "lucide-react"
 import { useWallet } from "@/hooks/useWallet"
 import { formatAddress } from "@/lib/wallet-config"
+import { VMF_CONTRACT_ADDRESS } from "@/lib/vmf-contract"
+import { BASE_CHAIN_ID } from "@/lib/network-utils"
 import { DialogFooter } from "@/components/ui/dialog"
 import { calculateVMFAmount, getPriceInfo, getPriceInfoNoProvider, testContractOracle } from "@/lib/oracle-utils"
 import axios from "axios"
@@ -78,7 +80,22 @@ const charities: Charity[] = [
   },
 ]
 
-const CONTRACT_ADDRESS = "0x2213414893259b0C48066Acd1763e7fbA97859E5"
+const CONTRACT_ADDRESS = VMF_CONTRACT_ADDRESS
+const DEFAULT_USDC_ADDRESS = "0x833589fCD6EDb6E08f4c7C32D4f71B54Bda02913"
+const DEFAULT_BASE_RPC = process.env.NEXT_PUBLIC_BASE_RPC || "https://mainnet.base.org"
+const USDC_TOKEN_ADDRESS = process.env.NEXT_PUBLIC_USDC || DEFAULT_USDC_ADDRESS
+const BATCH_TRANSFER_CONTRACT =
+  process.env.NEXT_PUBLIC_BATCH_TRANSFER || CONTRACT_ADDRESS
+const VMF_DISTRIBUTOR_CONTRACT = process.env.NEXT_PUBLIC_VMF_DISTRIBUTOR || ""
+const HAS_DEDICATED_TWO_STEP_FLOW =
+  Boolean(process.env.NEXT_PUBLIC_BATCH_TRANSFER) &&
+  Boolean(process.env.NEXT_PUBLIC_VMF_DISTRIBUTOR)
+const VMF_DELIVERY_SIGNATURES = [
+  "deliverVMF(address,uint256)",
+  "distributeVMF(address,uint256)",
+  "sendVMF(address,uint256)",
+  "mint(address,uint256)",
+]
 
 
 // Add the 4 extra charities for the DONATE modal
@@ -120,6 +137,19 @@ const charityDescriptions: Record<string, string> = {
   "little-patriots-embraced": "Supporting Military Children.",
 }
 
+const DONATION_BATCH_ABI = [
+  {
+    type: "function",
+    name: "handleUSDCBatch",
+    inputs: [
+      { name: "amounts", type: "uint256[]", internalType: "uint256[]" },
+      { name: "recipients", type: "address[]", internalType: "address[]" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+]
+
 export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
   const [currentStep, setCurrentStep] = useState<"buy" | "donate" | "verify" | "success">("buy")
   const [amount, setAmount] = useState("")
@@ -127,19 +157,54 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
   const [charityDistributions, setCharityDistributions] = useState<CharityDistribution[]>([])
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false)
   const [isCharityDropdownOpen, setIsCharityDropdownOpen] = useState(false)
-  const { connection, isConnected, connectWallet, disconnect, formattedAddress } = useWallet()
+  const { connection, isConnected, disconnect, formattedAddress } = useWallet()
   const { open: openAppKit } = useAppKit()
   const [transactionHash, setTransactionHash] = useState("")
+  const [donationTxHash, setDonationTxHash] = useState("")
   const [vmfAmount, setVmfAmount] = useState("")
   const [fees, setFees] = useState<string | null>(null)
   const [isEstimatingGas, setIsEstimatingGas] = useState(false)
   const [charityPool, setCharityPool] = useState("0.00")
-  const [copied, setCopied] = useState(false)
+  const [copiedHash, setCopiedHash] = useState<string | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const [needsNetworkSwitch, setNeedsNetworkSwitch] = useState(false)
   const [isOnBaseNetwork, setIsOnBaseNetwork] = useState(false)
   const [priceInfo, setPriceInfo] = useState<{price: number, source: string} | null>(null)
   const [isLoadingPrice, setIsLoadingPrice] = useState(false)
+  const [hasPromptedConnect, setHasPromptedConnect] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === "undefined" || process.env.NODE_ENV === "production") {
+      return
+    }
+
+    const debugApi = {
+      setStep: (step: typeof currentStep) => setCurrentStep(step),
+      setHashes: (hashes: { donationTx?: string; vmfTx?: string }) => {
+        if (typeof hashes.donationTx === "string") {
+          setDonationTxHash(hashes.donationTx)
+        }
+        if (typeof hashes.vmfTx === "string") {
+          setTransactionHash(hashes.vmfTx)
+        }
+      },
+      reset: () => {
+        setDonationTxHash("")
+        setTransactionHash("")
+      },
+    }
+
+    ;(window as typeof window & { __VMF_BUY_MODAL_DEBUG__?: typeof debugApi }).__VMF_BUY_MODAL_DEBUG__ = debugApi
+
+    return () => {
+      if (
+        (window as typeof window & { __VMF_BUY_MODAL_DEBUG__?: typeof debugApi }).__VMF_BUY_MODAL_DEBUG__ ===
+        debugApi
+      ) {
+        delete (window as typeof window & { __VMF_BUY_MODAL_DEBUG__?: typeof debugApi }).__VMF_BUY_MODAL_DEBUG__
+      }
+    }
+  }, [])
 
   // Focus management for accessibility
   useEffect(() => {
@@ -152,13 +217,29 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     }
   }, [isOpen])
 
+  // Prompt Reown WalletKit as soon as the modal opens
+  useEffect(() => {
+    if (!isOpen) {
+      setHasPromptedConnect(false)
+      return
+    }
+
+    if (!isConnected && !hasPromptedConnect) {
+      setHasPromptedConnect(true)
+      openAppKit({ view: "Connect" }).catch(() => {
+        // Allow retries if the user dismisses the modal without connecting
+        setHasPromptedConnect(false)
+      })
+    }
+  }, [hasPromptedConnect, isConnected, isOpen, openAppKit])
+
   // Check network status
   useEffect(() => {
     const checkNetworkStatus = () => {
-      if (isConnected && connection?.chainId === 8453) {
+      if (isConnected && connection?.chainId === BASE_CHAIN_ID) {
         setIsOnBaseNetwork(true)
         setNeedsNetworkSwitch(false)
-      } else if (isConnected && connection?.chainId !== 8453) {
+      } else if (isConnected && connection?.chainId !== BASE_CHAIN_ID) {
         setIsOnBaseNetwork(false)
         setNeedsNetworkSwitch(true)
       } else {
@@ -216,28 +297,13 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
       setIsLoadingPrice(true)
       try {
         let info;
-        if (isConnected && connection?.chainId === 8453) {
-          // Use provider-based pricing (prioritizes contract oracle)
-          const provider = new ethers.BrowserProvider(window.ethereum)
+        if (isConnected) {
+          const provider = new ethers.JsonRpcProvider(DEFAULT_BASE_RPC)
           info = await getPriceInfo(provider)
-          console.log("✅ Got price from provider:", info);
-        } else if (isConnected && connection?.chainId !== 8453) {
-          // Wrong network - try to switch to Base
-          console.log("⚠️ Wrong network detected, attempting to switch to Base...");
-          try {
-            await switchToBaseNetwork();
-            // Retry with Base network
-            const provider = new ethers.BrowserProvider(window.ethereum)
-            info = await getPriceInfo(provider)
-            console.log("✅ Got price after network switch:", info);
-          } catch (switchError) {
-            console.warn("⚠️ Network switch failed, using external sources:", switchError);
-            info = await getPriceInfoNoProvider()
-          }
+          console.log("✅ Got price from RPC provider:", info)
         } else {
-          // Use external sources when not connected
           info = await getPriceInfoNoProvider()
-          console.log("✅ Got price from external sources:", info);
+          console.log("✅ Got price from external sources:", info)
         }
         setPriceInfo(info)
       } catch (error) {
@@ -275,7 +341,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
       // Try to switch to Base network
       await window.ethereum.request({
         method: "wallet_switchEthereumChain",
-        params: [{ chainId: "0x2105" }], // Base mainnet
+        params: [{ chainId: "0x2105" }],
       });
       console.log("✅ Successfully switched to Base network");
       
@@ -286,13 +352,13 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
       console.log("⚠️ Switch failed, trying to add Base network...");
       
       if (switchError.code === 4902) {
-        // Chain not added, try to add Base Mainnet
+        // Chain not added, try to add Base
         try {
           await window.ethereum.request({
             method: "wallet_addEthereumChain",
             params: [{
               chainId: "0x2105",
-              chainName: "Base Mainnet",
+              chainName: "Base",
               nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
               rpcUrls: ["https://mainnet.base.org"],
               blockExplorerUrls: ["https://basescan.org"],
@@ -302,51 +368,58 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
           alert("✅ Successfully added Base network! You can now use VMF features.");
         } catch (addError) {
           console.error("❌ Failed to add Base network:", addError);
-          alert("❌ Failed to add Base network. Please manually add Base network to your wallet:\n\nNetwork Name: Base Mainnet\nRPC URL: https://mainnet.base.org\nChain ID: 8453\nCurrency Symbol: ETH\nBlock Explorer: https://basescan.org");
+          alert("❌ Failed to add Base network. Please manually add it to your wallet:\n\nNetwork Name: Base\nRPC URL: https://mainnet.base.org\nChain ID: 8453\nCurrency Symbol: ETH\nBlock Explorer: https://basescan.org");
         }
       } else {
         console.error("❌ Failed to switch to Base network:", switchError);
-        alert("❌ Failed to switch to Base network. Please manually switch to Base network in your wallet to use VMF features.");
+        alert("❌ Failed to switch to Base network. Please manually switch to Base in your wallet to use VMF features.");
       }
     }
   }
 
   // Calculate VMF amount based on current price (Uniswap or oracle)
   useEffect(() => {
-    async function calculateVMF() {
-      if (amount && priceInfo) {
-        try {
-          if (isConnected && connection?.chainId === 8453) {
-            // Use provider-based calculation (tries Uniswap first, then oracle)
-            const provider = new ethers.BrowserProvider(window.ethereum)
-            const vmfAmount = await calculateVMFAmount(Number(amount), provider)
-            setVmfAmount(vmfAmount.toFixed(4))
-          } else {
-            // Use price info directly when not connected
-            const vmfAmount = Number(amount) / priceInfo.price
-            setVmfAmount(vmfAmount.toFixed(4))
+    if (!amount || !priceInfo) {
+      setVmfAmount("0")
+      return
+    }
+
+    let cancelled = false
+
+    async function recompute() {
+      try {
+        if (priceInfo.price > 0) {
+          const provider = new ethers.JsonRpcProvider(DEFAULT_BASE_RPC)
+          const nextAmount = await calculateVMFAmount(Number(amount), provider)
+          if (!cancelled) {
+            setVmfAmount(nextAmount.toFixed(4))
           }
+        } else if (!cancelled) {
+          setVmfAmount(Number(amount).toFixed(4))
+        }
+        if (!cancelled) {
           setCharityPool(amount)
-        } catch (error) {
-          console.error("Failed to calculate VMF amount:", error)
-          // Fallback to simple calculation using current price
-          if (priceInfo && priceInfo.price > 0) {
-            const vmfAmount = Number(amount) / priceInfo.price
-            setVmfAmount(vmfAmount.toFixed(4))
-          } else {
-            // Ultimate fallback to 1:1 ratio
-            setVmfAmount(Number.parseFloat(amount).toFixed(4))
-          }
+        }
+      } catch (error) {
+        console.error("Failed to calculate VMF amount:", error)
+        if (!cancelled) {
+          const fallback =
+            priceInfo?.price && priceInfo.price > 0 ? Number(amount) / priceInfo.price : Number(amount)
+          setVmfAmount(fallback.toFixed(4))
           setCharityPool(amount)
         }
       }
     }
-    calculateVMF()
-  }, [amount, isConnected, connection?.chainId, priceInfo])
+
+    recompute()
+    return () => {
+      cancelled = true
+    }
+  }, [amount, priceInfo])
 
   useEffect(() => {
     if (isConnected && connection) {
-      setNeedsNetworkSwitch(connection.chainId !== 8453)
+      setNeedsNetworkSwitch(connection.chainId !== BASE_CHAIN_ID)
     }
   }, [connection?.chainId, isConnected])
 
@@ -366,67 +439,54 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     }
   }, [selectedCharities])
 
-  // Estimate gas fees dynamically
+  // Estimate gas fees using public RPC data only (avoids wallet popups)
   useEffect(() => {
-    async function estimateGas() {
+    const readyForEstimate = isConnected && amount && Number(amount) > 0 && charityDistributions.length > 0
+    if (!readyForEstimate) {
+      setFees(null)
+      return
+    }
+
+    let cancelled = false
+    async function estimateGasViaRpc() {
       setIsEstimatingGas(true)
       try {
-        if (!isConnected || !amount || Number(amount) <= 0 || charityDistributions.length === 0) {
+        const provider = new ethers.JsonRpcProvider(DEFAULT_BASE_RPC)
+        const feeData = await provider.getFeeData()
+        if (!feeData.maxFeePerGas && !feeData.gasPrice) {
           setFees(null)
-          setIsEstimatingGas(false)
           return
         }
-        const provider = new ethers.BrowserProvider(window.ethereum)
-        const signer = await provider.getSigner()
-        const contract = new ethers.Contract(
-          CONTRACT_ADDRESS,
-          [
-            {
-              type: "function",
-              name: "handleUSDCBatch",
-              inputs: [
-                { name: "amounts", type: "uint256[]", internalType: "uint256[]" },
-                { name: "recipients", type: "address[]", internalType: "address[]" },
-              ],
-              outputs: [],
-              stateMutability: "nonpayable",
-            },
-          ],
-          signer
-        )
-        // Prepare batch arrays
-        const amounts = charityDistributions.map(dist =>
-          ethers.parseUnits(((Number(amount) * dist.percentage) / 100).toFixed(2), 6)
-        )
-        const recipients = charityDistributions.map(dist => {
-          const charity = allCharities.find(c => c.id === dist.charityId)
-          return charity?.address
-        })
-        if (recipients.some(addr => !addr)) {
-          setFees(null)
-          setIsEstimatingGas(false)
-          return
-        }
-        const gasEstimate = await (contract as any).estimateGas.handleUSDCBatch(amounts, recipients)
-        // Fetch Base gas price from official API
-        const { data: gasData } = await axios.get("https://gas.api.base.org")
-        const baseGasPriceWei = gasData.recommended.maxFeePerGas // in wei
-        // Get ETH/USD price
+
+        const baseGasPriceWei = feeData.maxFeePerGas ?? feeData.gasPrice!
         const { data } = await axios.get("https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd")
         const ethUsd = data?.ethereum?.usd ?? 3500
-        // Calculate gas fee in ETH and USD
-        const ethGasFee = BigInt(gasEstimate) * BigInt(baseGasPriceWei)
-        const feeInEth = Number(ethers.formatEther(ethGasFee.toString()))
-        const feeUsd = (feeInEth * ethUsd).toFixed(2)
-        setFees(feeUsd)
-      } catch (e) {
-        setFees(null)
+
+        const assumedUnits = 350000n // rough fallback for approval + batch tx
+        const feeEth = Number(ethers.formatEther(baseGasPriceWei * assumedUnits))
+        const feeUsd = (feeEth * ethUsd).toFixed(2)
+
+        if (!cancelled) {
+          setFees(feeUsd)
+        }
+      } catch (error) {
+        console.warn("Gas estimate placeholder failed:", error)
+        if (!cancelled) {
+          setFees(null)
+        }
       } finally {
-        setIsEstimatingGas(false)
+        if (!cancelled) {
+          setIsEstimatingGas(false)
+        }
       }
     }
-    estimateGas()
-      }, [isConnected, amount, charityDistributions])
+
+    estimateGasViaRpc()
+
+    return () => {
+      cancelled = true
+    }
+  }, [isConnected, amount, charityDistributions.length])
 
   const handleCharitySelect = (charityId: string) => {
     if (selectedCharities.includes(charityId)) {
@@ -458,36 +518,8 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
 
   const handleNetworkSwitch = async () => {
     // For now, we'll just show an alert since the simplified wallet hook doesn't support network switching
-    alert("Please switch to Base network in your wallet")
+    alert("Please switch to the Base network in your wallet")
     setNeedsNetworkSwitch(false)
-  }
-
-  // Porto demo connector (dynamically imported)
-  const connectPorto = async () => {
-    try {
-      console.log("🔵 Initializing Porto demo connector...")
-      const mod = await import('porto')
-      const Porto = mod?.Porto ?? mod.default ?? null
-      if (!Porto) {
-        throw new Error('Porto SDK not available. Please install the `porto` package.')
-      }
-
-      // Create a Porto instance and request a wallet connect (demo flow)
-      const porto = Porto.create()
-      console.log('🔵 Porto instance created, requesting wallet_connect...')
-
-      // The RPC method used in Porto's vanilla example is 'wallet_connect'
-      const response = await porto.provider.request({ method: 'wallet_connect' })
-      console.log('🔵 Porto response:', response)
-
-      // Provide user feedback - the actual app-level connection flow should
-      // reconcile this with the existing useWallet hook (future improvement).
-      alert('Porto demo connected: ' + JSON.stringify(response))
-    } catch (err: any) {
-      console.error('❌ Porto connection failed', err)
-      const msg = err?.message ?? String(err)
-      alert('Porto connection failed: ' + msg)
-    }
   }
 
   const handleBuyNext = async () => {
@@ -497,17 +529,17 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
         return
       }
       
-      // CRITICAL: Verify we're on Base mainnet before proceeding
+      // CRITICAL: Verify we're on Base before proceeding
       console.log("🔍 Initial network check - wallet chainId:", connection?.chainId)
       
-      if (!connection || connection.chainId !== 8453) {
+      if (!connection || connection.chainId !== BASE_CHAIN_ID) {
         const currentChain = connection?.chainId || 'unknown'
         console.error("❌ Wrong network detected:", currentChain)
-        alert(`❌ WRONG NETWORK! You are on chain ${currentChain}. Please switch to Base mainnet (chainId 8453) to continue.`)
+        alert(`❌ WRONG NETWORK! You are on chain ${currentChain}. Please switch to Base (chainId ${BASE_CHAIN_ID}) to continue.`)
         return
       }
       
-      console.log("✅ Network verified: Base mainnet (8453)")
+      console.log(`✅ Network verified: Base (${BASE_CHAIN_ID})`)
       
       // For now, skip USDC balance check since we don't have it in the new wallet system
       setCurrentStep("verify")
@@ -515,72 +547,147 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
   }
 
   const executeSmartContract = async () => {
-    if (!isConnected || !amount) {
+    if (!isConnected || !connection?.address) {
       alert("Smart contract execution requires a connected wallet")
       return false
     }
 
+    if (!amount || Number(amount) <= 0) {
+      alert("Please enter a valid amount before continuing.")
+      return false
+    }
+
+    if (selectedCharities.length === 0) {
+      alert("Please select at least one charity.")
+      return false
+    }
+
+    if (getTotalPercentage() !== 100) {
+      alert("Please ensure the charity allocations add up to 100%.")
+      return false
+    }
+
+    setIsProcessing(true)
+    setDonationTxHash("")
+    setTransactionHash("")
+    setCopiedHash(null)
+
     try {
-      setIsProcessing(true)
-      
-      // CRITICAL: Verify we're on Base mainnet before any transaction
-      console.log("🔍 Transaction network check - wallet chainId:", connection?.chainId)
-      
-      if (!connection || connection.chainId !== 8453) {
-        const currentChain = connection?.chainId || 'unknown'
-        console.error("❌ Wrong network detected:", currentChain)
-        alert(`❌ WRONG NETWORK! You are on chain ${currentChain}. Please switch to Base mainnet (chainId 8453) before making any transactions.`)
-        setIsProcessing(false)
+      if (!window.ethereum) {
+        alert("Please install MetaMask or another Web3 wallet to continue.")
         return false
       }
-      
-      console.log("✅ Network verified: Base mainnet (8453)")
-      
+
+      console.log("🔍 Transaction network check - wallet chainId:", connection?.chainId)
+      if (!connection || connection.chainId !== BASE_CHAIN_ID) {
+        const currentChain = connection?.chainId || "unknown"
+        console.error("❌ Wrong network detected:", currentChain)
+        alert(`❌ WRONG NETWORK! You are on chain ${currentChain}. Please switch to Base (chainId ${BASE_CHAIN_ID}) before making any transactions.`)
+        return false
+      }
+      console.log(`✅ Network verified: Base (${BASE_CHAIN_ID})`)
+
       const provider = new ethers.BrowserProvider(window.ethereum)
       const signer = await provider.getSigner()
-      const contract = new ethers.Contract(
-        CONTRACT_ADDRESS,
-        [
-          {
-            type: "function",
-            name: "handleUSDCBatch",
-            inputs: [
-              { name: "amounts", type: "uint256[]", internalType: "uint256[]" },
-              { name: "recipients", type: "address[]", internalType: "address[]" },
-            ],
-            outputs: [],
-            stateMutability: "nonpayable",
-          },
-        ],
-        signer
+      const signerAddress = await signer.getAddress()
+      const recipientAddress = connection.address
+      const donationContractAddress = HAS_DEDICATED_TWO_STEP_FLOW ? BATCH_TRANSFER_CONTRACT : CONTRACT_ADDRESS
+
+      const amounts = charityDistributions.map((dist) =>
+        ethers.parseUnits(((Number(amount) * dist.percentage) / 100).toFixed(2), 6),
       )
-      // Prepare batch arrays
-      const amounts = charityDistributions.map(dist =>
-        ethers.parseUnits(((Number(amount) * dist.percentage) / 100).toFixed(2), 6)
-      )
-      const recipients = charityDistributions.map(dist => {
-        const charity = allCharities.find(c => c.id === dist.charityId)
-        return charity?.address
+      const resolvedRecipients = charityDistributions.map((dist) => {
+        const charity = allCharities.find((c) => c.id === dist.charityId)
+        return charity?.address ?? null
       })
-      if (recipients.some(addr => !addr)) {
+
+      if (resolvedRecipients.some((addr) => !addr)) {
         alert("One or more selected charities are invalid.")
-        setIsProcessing(false)
         return false
       }
-      // Approve total USDC for the contract
-      const totalUSDC = amounts.reduce((a, b) => a + b, BigInt(0))
-      const usdcContractAddress = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
+
+      const recipients = resolvedRecipients.filter(Boolean) as string[]
+      const totalUSDC = amounts.reduce((a, b) => a + b, 0n)
+      if (totalUSDC === 0n) {
+        alert("Donation amount must be greater than zero.")
+        return false
+      }
+
+      const expectedVmfDeliveryAmountWei = (() => {
+        const parsedVmf = parseFloat(vmfAmount || "0")
+        if (Number.isFinite(parsedVmf) && parsedVmf > 0) {
+          return ethers.parseUnits(parsedVmf.toFixed(18), 18)
+        }
+        const donationUsd = Number.parseFloat(amount)
+        const price = priceInfo?.price && priceInfo.price > 0 ? priceInfo.price : 1
+        const fallbackVmf = donationUsd / price
+        if (!Number.isFinite(fallbackVmf) || fallbackVmf <= 0) {
+          return 0n
+        }
+        return ethers.parseUnits(fallbackVmf.toFixed(18), 18)
+      })()
+
+      let vmfDeliveryCallData: string | null = null
+      if (HAS_DEDICATED_TWO_STEP_FLOW) {
+        if (!VMF_DISTRIBUTOR_CONTRACT) {
+          throw new Error("VMF distributor contract is not configured.")
+        }
+        if (expectedVmfDeliveryAmountWei <= 0n) {
+          throw new Error("Calculated VMF delivery amount is zero. Please enter a valid donation amount.")
+        }
+        const deliveryInterface = new ethers.Interface(VMF_DELIVERY_SIGNATURES.map((fn) => `function ${fn}`))
+        let preparedCall: string | null = null
+        for (const signature of VMF_DELIVERY_SIGNATURES) {
+          const methodName = signature.slice(0, signature.indexOf("("))
+          const data = deliveryInterface.encodeFunctionData(methodName, [recipientAddress, expectedVmfDeliveryAmountWei])
+          try {
+            await provider.call({ to: VMF_DISTRIBUTOR_CONTRACT, data, from: signerAddress })
+            preparedCall = data
+            break
+          } catch (error) {
+            console.log(`⚠️ VMF delivery method ${methodName} not available`, error)
+            continue
+          }
+        }
+        if (!preparedCall) {
+          throw new Error("VMF distributor contract does not support any known delivery methods.")
+        }
+        vmfDeliveryCallData = preparedCall
+      }
+
       const erc20Abi = [
         "function balanceOf(address owner) view returns (uint256)",
-        "function approve(address spender, uint256 amount) external returns (bool)"
-      ];
-      const usdcContract = new ethers.Contract(usdcContractAddress, erc20Abi, signer);
-      const approveTx = await usdcContract.approve(CONTRACT_ADDRESS, totalUSDC);
-      await approveTx.wait();
-      // Call batch donation
-      const tx = await contract.handleUSDCBatch(amounts, recipients)
-      setTransactionHash(tx.hash)
-      await tx.wait()
+        "function approve(address spender, uint256 amount) external returns (bool)",
+      ]
+      const usdcContract = new ethers.Contract(USDC_TOKEN_ADDRESS, erc20Abi, signer)
+      const approveTx = await usdcContract.approve(donationContractAddress, totalUSDC)
+      await approveTx.wait()
+      console.log("✅ USDC approval confirmed")
+
+      const donationContract = new ethers.Contract(donationContractAddress, DONATION_BATCH_ABI, signer)
+      const donationTx = await donationContract.handleUSDCBatch(amounts, recipients)
+      setDonationTxHash(donationTx.hash)
+      await donationTx.wait()
+      console.log("✅ USDC batch transfer confirmed:", donationTx.hash)
+
+      if (!HAS_DEDICATED_TWO_STEP_FLOW) {
+        setTransactionHash(donationTx.hash)
+        await new Promise((resolve) => setTimeout(resolve, 2000))
+        return true
+      }
+
+      if (!vmfDeliveryCallData || !VMF_DISTRIBUTOR_CONTRACT) {
+        throw new Error("VMF distributor call data is missing.")
+      }
+
+      const vmfDeliveryTx = await signer.sendTransaction({
+        to: VMF_DISTRIBUTOR_CONTRACT,
+        data: vmfDeliveryCallData,
+      })
+      setTransactionHash(vmfDeliveryTx.hash)
+      await vmfDeliveryTx.wait()
+      console.log("✅ VMF delivery confirmed:", vmfDeliveryTx.hash)
+
       await new Promise((resolve) => setTimeout(resolve, 2000))
       return true
     } catch (error: any) {
@@ -602,14 +709,14 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     console.log("🔍 Checking network - wallet chainId:", connection?.chainId)
     
     // Use wallet connection state instead of creating new provider
-    if (!connection || connection.chainId !== 8453) {
+    if (!connection || connection.chainId !== BASE_CHAIN_ID) {
       const currentChain = connection?.chainId || 'unknown'
       console.error("❌ Wrong network detected:", currentChain)
-      alert(`❌ WRONG NETWORK! You are on chain ${currentChain}. Please switch to Base mainnet (chainId 8453) before confirming the transaction.`)
+      alert(`❌ WRONG NETWORK! You are on chain ${currentChain}. Please switch to Base (chainId ${BASE_CHAIN_ID}) before confirming the transaction.`)
       return
     }
     
-    console.log("✅ Final network verification: Base mainnet (8453)")
+    console.log(`✅ Final network verification: Base (${BASE_CHAIN_ID})`)
 
     const success = await executeSmartContract()
     if (success) {
@@ -617,10 +724,18 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     }
   }
 
-  const handleCopyHash = () => {
-    navigator.clipboard.writeText(transactionHash)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+  const handleCopyHash = (hash: string) => {
+    navigator.clipboard.writeText(hash)
+    setCopiedHash(hash)
+    setTimeout(() => setCopiedHash(null), 2000)
+  }
+
+  const handleWalletDisconnect = async () => {
+    await disconnect()
+    setHasPromptedConnect(false)
+    setDonationTxHash("")
+    setTransactionHash("")
+    setCopiedHash(null)
   }
 
   const handleClose = () => {
@@ -629,6 +744,9 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     setSelectedCharities([])
     setCharityDistributions([])
     setTransactionHash("")
+    setDonationTxHash("")
+    setCopiedHash(null)
+    setHasPromptedConnect(false)
     onClose()
   }
 
@@ -685,11 +803,11 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                       <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-2" />
                       <h3 className="text-lg font-bold text-red-800 mb-2">Wrong Network!</h3>
                       <p className="text-sm text-red-700 mb-4">
-                        VMF requires Base network to function properly.
+                        VMF requires the Base network to function properly.
                         <br />
                         Current network: ChainId {connection?.chainId}
                         <br />
-                        Required: Base Mainnet (ChainId 8453)
+                        Required: Base (ChainId {BASE_CHAIN_ID})
                       </p>
                     </div>
                     <Button
@@ -699,65 +817,38 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                       🔄 Switch to Base Network
                     </Button>
                     <p className="text-xs text-red-600 mt-2">
-                      This will automatically add Base network to your wallet if needed.
+                      This will automatically add Base to your wallet if needed.
                     </p>
                   </div>
                 </div>
               )}
 
-                              {!isConnected ? (
-                <>
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4" role="alert">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <AlertCircle className="h-4 w-4 text-blue-600" aria-hidden="true" />
-                      <span className="font-medium text-blue-800">Connect Your Wallet</span>
-                    </div>
-                    <p className="text-sm text-blue-700 mb-3">
-                      Please select a wallet to connect and continue with the purchase.
-                    </p>
-                    <div className="grid grid-cols-1 gap-3">
-                      <Button
-                        onClick={() => openAppKit()}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2"
-                        aria-label="Connect Coinbase Smart Wallet"
-                      >
-                        <img src="/images/coinbase-logo.png" alt="Coinbase" className="h-6 w-6" />
-                        Coinbase Smart Wallet
-                      </Button>
-                      <Button
-                        onClick={() => connectWallet("metamask")}
-                        className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2"
-                        aria-label="Connect MetaMask"
-                      >
-                        <span className="text-2xl">🦊</span>
-                        MetaMask
-                      </Button>
-                      <Button
-                        onClick={() => connectWallet("rainbow")}
-                        className="w-full bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 hover:from-pink-500 hover:to-blue-500 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2"
-                        aria-label="Connect Rainbow Wallet"
-                      >
-                        <span className="text-2xl">🌈</span>
-                        Rainbow Wallet
-                      </Button>
-                      <Button
-                        onClick={() => connectWallet("farcaster")}
-                        className="w-full bg-[#8C6DFD] hover:bg-[#7a5be6] text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2"
-                        aria-label="Connect Farcaster Wallet"
-                      >
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" rx="6" fill="#8C6DFD"/><path d="M7 18V10.5C7 8.01472 9.01472 6 11.5 6H12.5C14.9853 6 17 8.01472 17 10.5V18H15V12C15 10.8954 14.1046 10 13 10H11C9.89543 10 9 10.8954 9 12V18H7Z" fill="white"/></svg>
-                        Farcaster Wallet
-                      </Button>
-                    </div>
+              {!isConnected ? (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4" role="alert">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <AlertCircle className="h-4 w-4 text-blue-600" aria-hidden="true" />
+                    <span className="font-medium text-blue-800">Connect Your Wallet</span>
                   </div>
-                </>
+                  <p className="text-sm text-blue-700 mb-3">
+                    Reown WalletKit opens automatically so you can pick Coinbase, MetaMask, Farcaster, Rainbow, or any WalletConnect wallet.
+                    If you closed it, relaunch the secure WalletKit below.
+                  </p>
+                  <Button
+                    onClick={() => openAppKit({ view: "Connect" })}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2"
+                    aria-label="Open Reown WalletKit"
+                  >
+                    <img src="/images/coinbase-logo.png" alt="Reown" className="h-6 w-6" />
+                    Open Reown WalletKit
+                  </Button>
+                </div>
               ) : (
                 <>
                   {/* Connected Wallet Display */}
                   <div className="bg-green-50 border border-green-200 rounded-lg p-4 relative" role="status" aria-live="polite">
                     {/* Disconnect X button (for all wallets) */}
                     <button
-                      onClick={disconnect}
+                      onClick={handleWalletDisconnect}
                       className="absolute top-3 right-3 rounded-full p-1 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-400"
                       aria-label="Disconnect wallet"
                     >
@@ -785,7 +876,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                         <span className="font-medium text-orange-800">No USDC Balance</span>
                       </div>
                       <p className="text-sm text-orange-700 mb-3">
-                        You need USDC to purchase VMF coins. Get USDC directly on Base network.
+                        You need USDC to purchase VMF coins. Get USDC directly on Base.
                       </p>
                       <div className="flex flex-col gap-2">
                         <Button
@@ -1227,19 +1318,37 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                   </div>
                 </div>
 
-          {transactionHash && (
+                {donationTxHash && (
                   <div className="flex justify-between items-center py-2 border-b border-gray-200" role="listitem">
-                    <span className="font-medium text-gray-700">Transaction:</span>
+                    <span className="font-medium text-gray-700">USDC Donation Tx:</span>
+                    <div className="flex items-center space-x-2">
+                      <span className="font-mono text-sm">{formatAddress(donationTxHash)}</span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleCopyHash(donationTxHash)}
+                        className="h-6 w-6 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        aria-label={copiedHash === donationTxHash ? "Transaction hash copied" : "Copy donation transaction hash"}
+                      >
+                        {copiedHash === donationTxHash ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {transactionHash && (!donationTxHash || transactionHash !== donationTxHash) && (
+                  <div className="flex justify-between items-center py-2 border-b border-gray-200" role="listitem">
+                    <span className="font-medium text-gray-700">VMF Delivery Tx:</span>
                     <div className="flex items-center space-x-2">
                       <span className="font-mono text-sm">{formatAddress(transactionHash)}</span>
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={handleCopyHash}
+                        onClick={() => handleCopyHash(transactionHash)}
                         className="h-6 w-6 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                        aria-label={copied ? "Transaction hash copied" : "Copy transaction hash"}
+                        aria-label={copiedHash === transactionHash ? "Transaction hash copied" : "Copy VMF transaction hash"}
                       >
-                        {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                        {copiedHash === transactionHash ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
                       </Button>
                     </div>
                   </div>
@@ -1312,14 +1421,21 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
                     <div className="space-y-2 text-xs" role="list" aria-label="Advanced transaction details">
                       <div className="flex justify-between" role="listitem">
                         <span>Network:</span>
+                        <span>Base</span>
                       </div>
                       <div className="flex justify-between" role="listitem">
                         <span>Contract:</span>
                         <span className="font-mono">{formatAddress(CONTRACT_ADDRESS)}</span>
                       </div>
-                      {transactionHash && (
+                      {donationTxHash && (
                         <div className="flex justify-between" role="listitem">
-                          <span>Tx Hash:</span>
+                          <span>USDC Tx:</span>
+                          <span className="font-mono">{formatAddress(donationTxHash)}</span>
+                        </div>
+                      )}
+                      {transactionHash && (!donationTxHash || transactionHash !== donationTxHash) && (
+                        <div className="flex justify-between" role="listitem">
+                          <span>VMF Tx:</span>
                           <span className="font-mono">{formatAddress(transactionHash)}</span>
                         </div>
                       )}

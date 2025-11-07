@@ -3,12 +3,13 @@ pragma solidity ^0.8.23;
 
 import "forge-std/Script.sol";
 import "../src/SushiSwapV3PriceOracleAccurate.sol";
+import "../src/addresses/VMFAddresses.sol";
 
 /// @title DeploySushiSwapOracleAccurate
 /// @notice Deployment script for the accurate SushiSwap V3 Price Oracle
 contract DeploySushiSwapOracleAccurate is Script {
-    // Base mainnet addresses
-    address constant VMF_ADDRESS = 0x2213414893259b0C48066Acd1763e7fbA97859E5;
+    // Base Sepolia addresses
+    address constant VMF_ADDRESS = VMFAddresses.PROXY;
     address constant USDC_ADDRESS = 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913;
     address constant SUSHISWAP_POOL = 0x9C83A203133B65982F35D1B00E8283C9fb518cb1;
     
@@ -23,8 +24,8 @@ contract DeploySushiSwapOracleAccurate is Script {
         console.log("USDC Address:", USDC_ADDRESS);
         console.log("SushiSwap Pool:", SUSHISWAP_POOL);
         
-        // Validate we're on Base mainnet
-        require(block.chainid == 8453, "Must be on Base mainnet (chainId 8453)");
+        // Validate we're on Base Sepolia
+        require(block.chainid == 84532, "Must be on Base Sepolia (chainId 84532)");
         
         // Get deployer private key
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");

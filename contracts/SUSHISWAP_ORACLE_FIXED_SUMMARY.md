@@ -66,7 +66,7 @@ The original SushiSwap oracle had a **critical arithmetic overflow error** that 
 
 ### **Pool Data**
 - **Pool**: `0x9C83A203133B65982F35D1B00E8283C9fb518cb1`
-- **Token0**: VMF (`0x2213414893259b0C48066Acd1763e7fbA97859E5`)
+- **Token0**: VMF (`0x8157B303a10609C50e332717D70E53B09ebdb045`)
 - **Token1**: USDC (`0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913`)
 - **Tick**: -322,666
 - **SqrtPriceX96**: 7,809,721,790,214,165,641,922
@@ -85,7 +85,7 @@ The original SushiSwap oracle had a **critical arithmetic overflow error** that 
 ## 🎯 **Integration with VMF Contract**
 
 ### **Current Setup**
-- **VMF Contract**: `0x2213414893259b0C48066Acd1763e7fbA97859E5`
+- **VMF Contract**: `0x8157B303a10609C50e332717D70E53B09ebdb045`
 - **Current Oracle**: FixedPriceOracle (`0x9444b5Cf6f89ab72C6173bF0dd13c7F7bec809D2`)
 - **Price**: 0.01 USDC per VMF (fixed)
 
@@ -105,16 +105,16 @@ The original SushiSwap oracle had a **critical arithmetic overflow error** that 
 
 ```bash
 # Run tests
-export BASE_RPC_URL="https://mainnet.base.org"
+export BASE_RPC_URL="https://sepolia.base.org"
 ./test_sushiswap_oracle_fixed.sh
 
 # Deploy oracle
-export BASE_RPC_URL="https://mainnet.base.org"
+export BASE_RPC_URL="https://sepolia.base.org"
 export PRIVATE_KEY="your_private_key"
 forge script script/DeploySushiSwapOracleFixed.s.sol --fork-url "$BASE_RPC_URL" --broadcast -vvv
 
 # Set oracle in VMF contract
-cast send 0x2213414893259b0C48066Acd1763e7fbA97859E5 "setPriceOracle(address)" "0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f" --private-key "$PRIVATE_KEY" --rpc-url "$BASE_RPC_URL"
+cast send 0x8157B303a10609C50e332717D70E53B09ebdb045 "setPriceOracle(address)" "0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f" --private-key "$PRIVATE_KEY" --rpc-url "$BASE_RPC_URL"
 ```
 
 ## 🎉 **Conclusion**

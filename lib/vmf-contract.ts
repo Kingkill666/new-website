@@ -1,0 +1,5 @@
+export const VMF_CONTRACT_ADDRESS = "0xa3e82aDf6bD3207a1D2470ed7Ad742596Ee81776";
+
+export const VMF_IMPLEMENTATION_ADDRESS = "0xa3e82aDf6bD3207a1D2470ed7Ad742596Ee81776";
+
+export const VMF_BASESCAN_URL = `https://basescan.org/address/${VMF_CONTRACT_ADDRESS}`;

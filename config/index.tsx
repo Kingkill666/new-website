@@ -2,7 +2,7 @@
 import { cookieStorage, createStorage } from 'wagmi' // Use 'wagmi' directly (Wagmi v2+)
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 import { base } from '@reown/appkit/networks'
-import { coinbaseWallet } from '@wagmi/connectors'
+import { coinbaseWallet, metaMask, walletConnect } from '@wagmi/connectors'
 import type { Chain } from 'viem' // Import Chain type for explicit typing
 
 // WalletConnect / Reown project id used across the app. The value is public by design,so provide a
@@ -20,6 +20,13 @@ if (process.env.NODE_ENV !== 'production' && projectId === DEFAULT_PROJECT_ID) {
 // Define supported networks - Base only for VMF
 export const networks: [Chain, ...Chain[]] = [base] // Base network only for VMF token
 
+const dappMetadata = {
+  name: 'VMF - Veterans & Military Families',
+  description: 'Supporting those who served through blockchain technology',
+  url: 'https://vmfcoin.com',
+  icons: ['https://vmfcoin.com/favicon.png'],
+}
+
 // Create the Wagmi adapter instance with explicit configuration
 export const wagmiAdapter = new WagmiAdapter({
   storage: createStorage({ storage: cookieStorage }), // Use cookieStorage for SSR
@@ -28,9 +35,17 @@ export const wagmiAdapter = new WagmiAdapter({
   networks, // Pass the explicitly typed networks array
   connectors: [
     coinbaseWallet({
-      appName: 'VMF - Veterans & Military Families',
-      appLogoUrl: 'https://vmfcoin.com/favicon.png',
+      appName: dappMetadata.name,
+      appLogoUrl: dappMetadata.icons[0],
       preference: 'smartWalletOnly', // This enables the embedded wallet experience
+    }),
+    metaMask({
+      dappMetadata,
+    }),
+    walletConnect({
+      projectId,
+      metadata: dappMetadata,
+      showQrModal: false,
     }),
   ],
 })

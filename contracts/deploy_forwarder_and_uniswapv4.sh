@@ -4,12 +4,14 @@ set -ex
 
 # Load environment variables
 source .env
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/vmf-addresses.sh"
 
 
 # Build contracts and extract USDCForwardingHook bytecode
 forge build
 
-TOKEN_A="0x2213414893259b0C48066Acd1763e7fbA97859E5" # VMF coin address
+TOKEN_A="$VMF_ADDRESS" # VMF coin address
 
 # List of charity addresses
 charity_addresses=(

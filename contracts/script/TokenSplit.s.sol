@@ -4,6 +4,7 @@ pragma solidity ^0.8.20;
 import "forge-std/Script.sol";
 import "forge-std/console.sol";
 import "solady/tokens/ERC20.sol";
+import "../src/addresses/VMFAddresses.sol";
 
 /**
  * @title TokenSplitScript
@@ -25,7 +26,7 @@ contract TokenSplitScript is Script {
 
     // The address of your ERC20 token contract.
     // IMPORTANT: Replace this with your actual token address before running.
-    address public tokenContractAddress = 0x2213414893259b0C48066Acd1763e7fbA97859E5;
+    address public tokenContractAddress = VMFAddresses.PROXY;
 
     // The path to the JSON file containing the holder addresses.
     string public constant HOLDERS_FILE = "holders.json";

@@ -5,7 +5,9 @@ set -e
 # Wallet: 0xf521a4fE5910b4fb4A14C9546C2837D33bEc455d
 
 COMPROMISED_WALLET="0xf521a4fE5910b4fb4A14C9546C2837D33bEc455d"
-VMF_CONTRACT="0x2213414893259b0C48066Acd1763e7fbA97859E5"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/vmf-addresses.sh"
+VMF_CONTRACT="$VMF_ADDRESS"
 
 echo "🔍 VERIFYING REVOCATION OF COMPROMISED WALLET 🔍"
 echo "Wallet: $COMPROMISED_WALLET"
@@ -15,7 +17,7 @@ echo ""
 # Check if we have the required environment variables
 if [ -z "$BASE_RPC_URL" ]; then
     echo "❌ ERROR: Missing BASE_RPC_URL environment variable!"
-    echo "Please set: export BASE_RPC_URL=\"https://mainnet.base.org\""
+    echo "Please set: export BASE_RPC_URL=\"https://sepolia.base.org\""
     exit 1
 fi
 

@@ -3,7 +3,9 @@ set -e
 
 # Grant all roles to the specified address
 ADDRESS="0xAf3fDfAb4CA3182Dc58B6E81a4a2D89FdE0214cD"
-CONTRACT="0x2213414893259b0C48066Acd1763e7fbA97859E5"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/vmf-addresses.sh"
+CONTRACT="$VMF_ADDRESS"
 
 echo "Granting all roles to: $ADDRESS"
 echo "Contract: $CONTRACT"

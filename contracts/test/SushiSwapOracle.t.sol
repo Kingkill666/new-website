@@ -3,12 +3,13 @@ pragma solidity ^0.8.23;
 
 import "forge-std/Test.sol";
 import "../src/SushiSwapV3PriceOracleFixed.sol";
+import "../src/addresses/VMFAddresses.sol";
 
 /// @title SushiSwapOracleTest
 /// @notice Tests for SushiSwap V3 Price Oracle validation
 contract SushiSwapOracleTest is Test {
-    // Base mainnet addresses
-    address constant VMF_ADDRESS = 0x2213414893259b0C48066Acd1763e7fbA97859E5;
+    // Base Sepolia addresses
+    address constant VMF_ADDRESS = VMFAddresses.PROXY;
     address constant USDC_ADDRESS = 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913;
     address constant SUSHISWAP_POOL = 0x9C83A203133B65982F35D1B00E8283C9fb518cb1;
     
@@ -19,8 +20,8 @@ contract SushiSwapOracleTest is Test {
     SushiSwapV3PriceOracleFixed public oracle;
     
     function setUp() public {
-        // Deploy oracle on Base mainnet
-        vm.createSelectFork("https://mainnet.base.org");
+        // Deploy oracle on Base Sepolia
+        vm.createSelectFork("https://sepolia.base.org");
         
     // Deploy the fixed oracle contract
     oracle = new SushiSwapV3PriceOracleFixed(SUSHISWAP_POOL, VMF_ADDRESS, USDC_ADDRESS);

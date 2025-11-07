@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -11,11 +11,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { useWallet } from "@/hooks/useWallet"
-import {
-  WALLETS,
-  getWalletDisplayName,
-  isWalletInstalled,
-} from "@/lib/wallet-config"
+import { getWalletDisplayName } from "@/lib/wallet-config"
 import { cn } from "@/lib/utils"
 
 type WalletConnectorProps = {
@@ -42,21 +38,37 @@ export const WalletConnector = ({
     error,
     setError,
   } = useWallet()
+  const [hasPrompted, setHasPrompted] = useState(false)
 
   useEffect(() => {
     if (isConnected) {
       setOpen(false)
+      setHasPrompted(false)
     }
   }, [isConnected])
+
+  useEffect(() => {
+    if (!open) {
+      setHasPrompted(false)
+      setError(null)
+      return
+    }
+
+    if (!isConnected && !hasPrompted) {
+      setHasPrompted(true)
+      connectWallet().catch(() => {
+        setHasPrompted(false)
+      })
+    }
+  }, [connectWallet, hasPrompted, isConnected, open, setError])
 
   const handleOpenChange = (value: boolean) => {
     if (!value) {
       setError(null)
+      setHasPrompted(false)
     }
     setOpen(value)
   }
-
-  const availableWallets = useMemo(() => WALLETS, [])
 
   const primaryLabel = isConnected
     ? formattedAddress || connection?.address
@@ -81,14 +93,14 @@ export const WalletConnector = ({
           <DialogDescription>
             {isConnected
               ? "You can manage your wallet connection below."
-              : "Choose a wallet provider to connect with VMF."}
+              : "Reown WalletKit opens automatically so you can choose any supported wallet."}
           </DialogDescription>
         </DialogHeader>
 
         {error && (
           <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-600">
             {error}
-      </div>
+          </div>
         )}
 
         {isConnected ? (
@@ -114,8 +126,9 @@ export const WalletConnector = ({
             <Button
               variant="destructive"
               className="w-full"
-                onClick={() => {
+              onClick={() => {
                 disconnect()
+                setHasPrompted(false)
                 setOpen(false)
               }}
             >
@@ -123,47 +136,22 @@ export const WalletConnector = ({
             </Button>
           </div>
         ) : (
-          <div className="space-y-2">
-            {availableWallets.map((wallet) => {
-              const installed =
-                typeof window !== "undefined"
-                  ? isWalletInstalled(wallet.id)
-                  : false
-              const connecting = isConnecting === wallet.id
-
-              return (
-                <Button
-                  key={wallet.id}
-                  variant="outline"
-                  className="flex w-full items-center justify-between border border-gray-200 bg-white text-left"
-                  disabled={connecting}
-                  onClick={async () => {
-                    await connectWallet(wallet.id)
-                  }}
-                >
-                  <span className="flex items-center gap-3">
-                    {wallet.icon && (
-                      <span className="text-lg" aria-hidden="true">
-                        {wallet.icon}
-                      </span>
-                    )}
-                    <span className="font-medium">{wallet.name}</span>
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    {connecting
-                      ? "Connecting..."
-                      : installed
-                        ? "Installed"
-                        : "External"}
-                  </span>
-                </Button>
-              )
-            })}
+          <div className="space-y-4">
+            <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800">
+              Reown WalletKit opens automatically so you can select Coinbase, MetaMask, Farcaster, Rainbow, or any WalletConnect-compatible wallet. If you closed it, relaunch the secure modal below.
+            </div>
+            <Button
+              variant="outline"
+              className="w-full border border-gray-200 bg-white text-left font-semibold"
+              disabled={Boolean(isConnecting)}
+              onClick={() => connectWallet()}
+            >
+              {isConnecting ? "Connecting..." : "Open Reown WalletKit"}
+            </Button>
             <p className="text-xs text-muted-foreground">
-              Don&apos;t see your wallet? Make sure the extension or mobile app
-              is installed and unlocked, then try again.
+              WalletKit handles discovery, deep links, and network switching on Base. Once connected, you&apos;ll see your wallet details here.
             </p>
-        </div>
+          </div>
       )}
       </DialogContent>
     </Dialog>

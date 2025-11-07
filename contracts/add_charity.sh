@@ -2,7 +2,9 @@
 set -ex
 
 # Contract configuration
-contract_address="0x2213414893259b0C48066Acd1763e7fbA97859E5"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/vmf-addresses.sh"
+contract_address="$VMF_ADDRESS"
 
 # Load environment variables
 source .env

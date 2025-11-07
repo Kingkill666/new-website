@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { VMF_CONTRACT_ADDRESS } from '@/lib/vmf-contract'
+
+const VMF_CONTRACT_LOWERCASE = VMF_CONTRACT_ADDRESS.toLowerCase()
 
 export async function GET(request: NextRequest) {
   try {
@@ -53,7 +56,7 @@ export async function GET(request: NextRequest) {
     // Fallback: Try DexScreener with token address
     try {
       console.log('📡 [API] Trying DexScreener with token address...')
-      const VMF_CONTRACT = '0x2213414893259b0C48066Acd1763e7fbA97859E5'
+      const VMF_CONTRACT = VMF_CONTRACT_ADDRESS
       const DEXSCREENER_TOKEN_URL = `https://api.dexscreener.com/latest/dex/tokens/${VMF_CONTRACT}`
       
       const response = await fetch(DEXSCREENER_TOKEN_URL, {
@@ -96,7 +99,7 @@ export async function GET(request: NextRequest) {
     // Try CoinGecko as fallback
     try {
       console.log('📡 Trying CoinGecko...')
-      const COINGECKO_URL = `https://api.coingecko.com/api/v3/simple/token_price/base?contract_addresses=0x2213414893259b0C48066Acd1763e7fbA97859E5&vs_currencies=usd`
+      const COINGECKO_URL = `https://api.coingecko.com/api/v3/simple/token_price/base?contract_addresses=${VMF_CONTRACT_ADDRESS}&vs_currencies=usd`
       
       const response = await fetch(COINGECKO_URL, {
         method: 'GET',
@@ -107,7 +110,7 @@ export async function GET(request: NextRequest) {
       
       if (response.ok) {
         const data = await response.json()
-        const tokenData = data['0x2213414893259b0c48066acd1763e7fba97859e5']
+        const tokenData = data[VMF_CONTRACT_LOWERCASE]
         
         if (tokenData && tokenData.usd && tokenData.usd > 0) {
           console.log('✅ CoinGecko price fetched:', tokenData.usd)
@@ -125,10 +128,10 @@ export async function GET(request: NextRequest) {
     // Try Uniswap V4 on Base directly
     try {
       console.log('📡 [API] Trying Uniswap V4 on Base...')
-      const VMF_CONTRACT = '0x2213414893259b0C48066Acd1763e7fbA97859E5'
-      const USDC_CONTRACT = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' // USDC on Base
+      const VMF_CONTRACT = VMF_CONTRACT_ADDRESS
+      const USDC_CONTRACT = '0x833589fCD6EDb6E08f4c7C32D4f71B54Bda02913' // USDC on Base
       const UNISWAP_V3_QUOTER = '0x3d4e44Eb1374240CE5F1B871ab261CD16335B76a' // Quoter V2 on Base
-      
+
       // Uniswap V3 uses a quoter contract to get price quotes
       // We'll quote swapping 1 USDC for VMF to get the price
       const oneUSDC = '1000000' // 1 USDC (6 decimals)
@@ -186,7 +189,7 @@ export async function GET(request: NextRequest) {
     // Try static multiple from contract as fallback
     try {
       console.log('📡 [API] Trying static multiple from contract...')
-      const VMF_CONTRACT = '0x2213414893259b0C48066Acd1763e7fbA97859E5'
+      const VMF_CONTRACT = VMF_CONTRACT_ADDRESS
       
       // Get donationMultipleBps
       const multipleResponse = await fetch('https://mainnet.base.org', {

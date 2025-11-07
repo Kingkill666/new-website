@@ -3,9 +3,10 @@ set -ex
 
 # Load environment variables
 source .env
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/vmf-addresses.sh"
 
 # Contract addresses
-VMF_ADDRESS="0x2213414893259b0C48066Acd1763e7fbA97859E5"  # VMF token address
 USDC_ADDRESS="0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"  # USDC token address
 SUSHISWAP_V3_POOL="0x9C83A203133B65982F35D1B00E8283C9fb518cb1"  # SushiSwap V3 VMF/USDC pool
 

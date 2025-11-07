@@ -1,4 +1,36 @@
-import { test, expect, Locator } from '@playwright/test';
+import { test, expect, Locator, Page } from '@playwright/test';
+
+const BUY_BUTTON_SELECTORS = [
+  'button:has-text("BUY VMF")',
+  'button:has-text("Buy VMF")',
+  '[data-testid="buy-vmf-button"]',
+  '.buy-vmf-button',
+  'button[class*="buy"]'
+];
+
+async function openBuyModal(page: Page) {
+  let buyButton: Locator | null = null;
+
+  for (const selector of BUY_BUTTON_SELECTORS) {
+    try {
+      const candidate = page.locator(selector).first();
+      if (await candidate.isVisible({ timeout: 1000 })) {
+        buyButton = candidate;
+        break;
+      }
+    } catch (_error) {
+      continue;
+    }
+  }
+
+  if (!buyButton) {
+    throw new Error('Buy VMF button not found');
+  }
+
+  await expect(buyButton).toBeVisible();
+  await buyButton.click();
+  await page.waitForTimeout(1000);
+}
 
 test.describe('VMF Buy Modal', () => {
   test.beforeEach(async ({ page }) => {
@@ -39,66 +71,30 @@ test.describe('VMF Buy Modal', () => {
       consoleLogs.push(`[${msg.type()}] ${msg.text()}`);
     });
 
-    // Look for the BUY VMF button - try different possible selectors
-    const buyButtonSelectors = [
-      'button:has-text("BUY VMF")',
-      'button:has-text("Buy VMF")',
-      '[data-testid="buy-vmf-button"]',
-      '.buy-vmf-button',
-      'button[class*="buy"]'
+    await openBuyModal(page);
+
+    const modalSelectors = [
+      '[role="dialog"]',
+      '.modal',
+      '.dialog',
+      '[data-testid="buy-modal"]',
+      '.buy-vmf-modal'
     ];
 
-    let buyButton: Locator | undefined;
-    for (const selector of buyButtonSelectors) {
+    let modalFound = false;
+    for (const selector of modalSelectors) {
       try {
-        buyButton = page.locator(selector).first();
-        if (await buyButton.isVisible({ timeout: 1000 })) {
+        const modal = page.locator(selector);
+        if (await modal.isVisible({ timeout: 1000 })) {
+          modalFound = true;
           break;
         }
-      } catch (_e) {
+      } catch {
         continue;
       }
     }
 
-    // If we found a button, click it
-    if (buyButton) {
-      await expect(buyButton).toBeVisible();
-      await buyButton.click();
-
-      // Wait for modal to appear
-      await page.waitForTimeout(1000);
-
-      // Check if modal opened (look for common modal indicators)
-      const modalSelectors = [
-        '[role="dialog"]',
-        '.modal',
-        '.dialog',
-        '[data-testid="buy-modal"]',
-        '.buy-vmf-modal'
-      ];
-
-      let modalFound = false;
-      for (const selector of modalSelectors) {
-        try {
-          const modal = page.locator(selector);
-          if (await modal.isVisible({ timeout: 1000 })) {
-            modalFound = true;
-            break;
-          }
-        } catch (e) {
-          continue;
-        }
-      }
-
-      // If modal was found, test passed
-      if (modalFound) {
-        console.log('✅ Buy modal opened successfully');
-      } else {
-        console.log('⚠️  Modal may not have opened, but no errors occurred');
-      }
-    } else {
-      console.log('⚠️  Buy VMF button not found, but page loaded without errors');
-    }
+    expect(modalFound).toBe(true);
 
     // Wait a bit to catch any async errors
     await page.waitForTimeout(2000);
@@ -129,27 +125,14 @@ test.describe('VMF Buy Modal', () => {
       }
     });
 
-    // Look for wallet connection elements
-    const walletSelectors = [
-      'appkit-button',
-      '[data-testid="wallet-button"]',
-      'button:has-text("Connect")',
-      'button:has-text("Connect Wallet")',
-      '.wallet-connect'
-    ];
+    await openBuyModal(page);
 
-    let walletElement: Locator | undefined;
-    for (const selector of walletSelectors) {
-      try {
-        walletElement = page.locator(selector).first();
-        if (await walletElement.isVisible({ timeout: 1000 })) {
-          console.log(`Found wallet element: ${selector}`);
-          break;
-        }
-      } catch (e) {
-        continue;
-      }
-    }
+    await expect(
+      page.getByText('Reown WalletKit opens automatically', { exact: false })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: /Open Reown WalletKit/i })
+    ).toBeVisible();
 
     // Wait to catch any errors
     await page.waitForTimeout(2000);
@@ -197,6 +180,27 @@ test.describe('VMF Buy Modal', () => {
     );
 
     expect(criticalErrors).toHaveLength(0);
+  });
+
+  test('should display both transaction summaries in success modal when debug helper is used', async ({ page }) => {
+    await openBuyModal(page);
+
+    await page.waitForFunction(() => Boolean((window as any).__VMF_BUY_MODAL_DEBUG__), undefined, {
+      timeout: 5000
+    });
+
+    const hashes = {
+      donationHash: '0x1111111111111111111111111111111111111111111111111111111111111111',
+      vmfHash: '0x2222222222222222222222222222222222222222222222222222222222222222'
+    };
+
+    await page.evaluate(({ donationHash, vmfHash }) => {
+      window.__VMF_BUY_MODAL_DEBUG__?.setHashes({ donationTx: donationHash, vmfTx: vmfHash });
+      window.__VMF_BUY_MODAL_DEBUG__?.setStep('success');
+    }, hashes);
+
+    await expect(page.getByText('USDC Donation Tx', { exact: false })).toBeVisible();
+    await expect(page.getByText('VMF Delivery Tx', { exact: false })).toBeVisible();
   });
 
   test('should open Coinbase Smart Wallet modal without extension errors', async ({ page }) => {

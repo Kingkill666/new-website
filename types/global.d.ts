@@ -6,6 +6,11 @@ interface Window {
   phantom?: {
     ethereum?: any;
   };
+  __VMF_BUY_MODAL_DEBUG__?: {
+    setStep: (step: 'buy' | 'donate' | 'verify' | 'success') => void;
+    setHashes: (hashes: { donationTx?: string; vmfTx?: string }) => void;
+    reset: () => void;
+  };
 }
 
 declare global {
@@ -14,6 +19,11 @@ declare global {
     coinbaseWalletExtension?: any;
     phantom?: {
       ethereum?: any;
+    };
+    __VMF_BUY_MODAL_DEBUG__?: {
+      setStep: (step: 'buy' | 'donate' | 'verify' | 'success') => void;
+      setHashes: (hashes: { donationTx?: string; vmfTx?: string }) => void;
+      reset: () => void;
     };
   }
 

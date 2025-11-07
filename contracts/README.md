@@ -22,6 +22,11 @@ BASE_SEPOLIA_RPC_URL=https://sepolia.base.org
 BASESCAN_API_KEY=...
 ```
 
+Optional helpers:
+
+- `OLD_VMF_ADDRESS` – legacy proxy to compare balances when migrating
+- `FACTORY_ADDRESS` – previously deployed `VMFCreate2Factory`
+
 Notes:
 - `PROXY_ADDRESS` in `.env` is only used by `upgrade.sh`.
 - `deploy.sh` always deploys a fresh proxy and ignores `PROXY_ADDRESS`.
@@ -41,4 +46,5 @@ For full documentation, see `VANITY_ADDRESS_GENERATION.md`.
 
 Operational scripts like `add_charity.sh`, `grant_roles.sh`, and holder utilities remain unchanged. See inline comments in each script for usage.
 
+For detailed guidance, start with `DEPLOY_README.md` and `UPGRADE_README.md`.
 For detailed guidance, start with `DEPLOY_README.md` and `UPGRADE_README.md`.

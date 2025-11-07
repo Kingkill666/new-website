@@ -56,6 +56,12 @@ if [ ! -f .env ]; then
     exit 1
 fi
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -f "$SCRIPT_DIR/vmf-addresses.sh" ]; then
+    # Populate PROXY_ADDRESS or helper vars when available
+    source "$SCRIPT_DIR/vmf-addresses.sh"
+fi
+
 source .env
 
 # Validate required environment variables

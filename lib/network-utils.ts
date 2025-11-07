@@ -71,18 +71,18 @@ export async function switchToBaseNetwork(): Promise<boolean> {
       } catch (addError) {
         console.error('❌ VMF: Failed to add Base network:', addError)
         throw new Error(
-          'VMF requires Base network. Failed to add Base network to your wallet:\n\n' +
+          'VMF requires the Base network. Failed to add Base network to your wallet:\n\n' +
           'Network Name: Base\n' +
           'RPC URL: https://mainnet.base.org\n' +
           'Chain ID: 8453\n' +
           'Currency Symbol: ETH\n' +
           'Block Explorer: https://basescan.org\n\n' +
-          'Please manually add Base network to use VMF.'
+          'Please manually add the Base network to use VMF.'
         )
       }
     } else {
       console.error('❌ VMF: Failed to switch to Base network:', switchError)
-      throw new Error('VMF requires Base network. Please manually switch to Base network in your wallet to use VMF.')
+      throw new Error('VMF requires the Base network. Please manually switch to Base in your wallet to use VMF.')
     }
   }
 }

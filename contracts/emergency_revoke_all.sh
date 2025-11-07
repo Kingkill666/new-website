@@ -11,7 +11,9 @@ set -e
 # 4. Provide instructions for updating receivers
 
 COMPROMISED_WALLET="0xf521a4fE5910b4fb4A14C9546C2837D33bEc455d"
-VMF_CONTRACT="0x2213414893259b0C48066Acd1763e7fbA97859E5"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/vmf-addresses.sh"
+VMF_CONTRACT="$VMF_ADDRESS"
 
 echo "🚨 EMERGENCY: REVOKING ALL PERMISSIONS FROM COMPROMISED WALLET 🚨"
 echo "Wallet: $COMPROMISED_WALLET"
@@ -24,7 +26,7 @@ if [ -z "$PRIVATE_KEY" ] || [ -z "$BASE_RPC_URL" ]; then
     echo "Please set PRIVATE_KEY and BASE_RPC_URL"
     echo "Example:"
     echo "export PRIVATE_KEY=\"0x...\""
-    echo "export BASE_RPC_URL=\"https://mainnet.base.org\""
+    echo "export BASE_RPC_URL=\"https://sepolia.base.org\""
     exit 1
 fi
 
