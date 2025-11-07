@@ -80,16 +80,16 @@ export async function getVMFPriceFromOracle(provider: ethers.Provider): Promise<
     console.log("🔍 Testing VMF contract call...");
     console.log("📍 Contract address:", VMF_CONTRACT_ADDRESS);
     
-    // Check network - MUST be Base Sepolia (chainId 84532)
+    // Check network - MUST be Base (chainId 8453)
     const network = await provider.getNetwork();
     console.log("🌐 Provider network:", network);
     
-    if (network.chainId !== BigInt(84532)) {
-      console.error("❌ Wrong network! Expected Base Sepolia (84532), got:", network.chainId);
-      throw new Error(`Wrong network. Expected Base Sepolia (84532), got ${network.chainId}. Please switch to Base Sepolia.`);
+    if (network.chainId !== BigInt(8453)) {
+      console.error("❌ Wrong network! Expected Base (8453), got:", network.chainId);
+      throw new Error(`Wrong network. Expected Base (8453), got ${network.chainId}. Please switch to Base.`);
     }
     
-    console.log("✅ Network verified: Base Sepolia");
+    console.log("✅ Network verified: Base");
     
     // First check if oracle is set
     const vmfContract = new ethers.Contract(VMF_CONTRACT_ADDRESS, VMF_ABI, provider);
@@ -185,8 +185,8 @@ export async function testContractOracle(provider: ethers.Provider): Promise<voi
     const network = await provider.getNetwork();
     console.log("🌐 Network:", network.name, "ChainId:", network.chainId.toString());
     
-    if (network.chainId !== BigInt(84532)) {
-      console.log("❌ Wrong network! Expected Base Sepolia (84532)");
+    if (network.chainId !== BigInt(8453)) {
+      console.log("❌ Wrong network! Expected Base (8453)");
       return;
     }
     
@@ -282,12 +282,12 @@ export async function getPriceInfo(provider: ethers.Provider): Promise<{price: n
     // First try to get price from contract oracle (most reliable for VMF)
     try {
       console.log("📡 Checking network...");
-      // Check network - MUST be Base Sepolia (chainId 84532)
+      // Check network - MUST be Base (chainId 8453)
       const network = await provider.getNetwork();
       console.log("🌐 Network chainId:", network.chainId.toString());
       
-      if (network.chainId !== BigInt(84532)) {
-        throw new Error(`Wrong network. Expected Base Sepolia (84532), got ${network.chainId}. Please switch to Base Sepolia.`);
+      if (network.chainId !== BigInt(8453)) {
+        throw new Error(`Wrong network. Expected Base (8453), got ${network.chainId}. Please switch to Base.`);
       }
       
       console.log("📋 Creating VMF contract instance...");
@@ -374,10 +374,10 @@ export async function getOracleInfo(provider: ethers.Provider): Promise<{
   reason: string;
 }> {
   try {
-    // Check network - MUST be Base Sepolia (chainId 84532)
+    // Check network - MUST be Base (chainId 8453)
     const network = await provider.getNetwork();
-    if (network.chainId !== BigInt(84532)) {
-      throw new Error(`Wrong network. Expected Base Sepolia (84532), got ${network.chainId}. Please switch to Base Sepolia.`);
+    if (network.chainId !== BigInt(8453)) {
+      throw new Error(`Wrong network. Expected Base (8453), got ${network.chainId}. Please switch to Base.`);
     }
     
     const vmfContract = new ethers.Contract(VMF_CONTRACT_ADDRESS, VMF_ABI, provider);

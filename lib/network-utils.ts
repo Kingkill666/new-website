@@ -1,20 +1,20 @@
 // Network utilities for ensuring Base network connection
-import { baseSepolia } from '@reown/appkit/networks'
+import { base } from '@reown/appkit/networks'
 
-export const BASE_CHAIN_ID = 84532
-export const BASE_NETWORK = baseSepolia
+export const BASE_CHAIN_ID = 8453
+export const BASE_NETWORK = base
 
 // Base network configuration for manual addition
 export const BASE_NETWORK_CONFIG = {
-  chainId: '0x14a34', // 84532 in hex
-  chainName: 'Base Sepolia',
+  chainId: '0x2105', // 8453 in hex
+  chainName: 'Base',
   nativeCurrency: {
     name: 'Ether',
     symbol: 'ETH',
     decimals: 18,
   },
-  rpcUrls: ['https://sepolia.base.org'],
-  blockExplorerUrls: ['https://sepolia.basescan.org'],
+  rpcUrls: ['https://mainnet.base.org'],
+  blockExplorerUrls: ['https://basescan.org'],
 }
 
 /**
@@ -29,7 +29,7 @@ export function isBaseNetwork(chainId?: number): boolean {
  */
 export function getNetworkName(chainId?: number): string {
   if (isBaseNetwork(chainId)) {
-    return 'Base Sepolia'
+    return 'Base'
   }
   return `Chain ${chainId || 'Unknown'}`
 }
@@ -43,7 +43,7 @@ export async function switchToBaseNetwork(): Promise<boolean> {
   }
 
   try {
-    console.log('🔄 VMF: Automatically switching to Base Sepolia network...')
+    console.log('🔄 VMF: Automatically switching to Base network...')
     
     // Try to switch to Base network
     await window.ethereum.request({
@@ -51,11 +51,11 @@ export async function switchToBaseNetwork(): Promise<boolean> {
       params: [{ chainId: BASE_NETWORK_CONFIG.chainId }],
     })
     
-    console.log('✅ VMF: Successfully switched to Base Sepolia network')
+    console.log('✅ VMF: Successfully switched to Base network')
     return true
     
   } catch (switchError: any) {
-    console.log('⚠️ VMF: Switch failed, automatically adding Base Sepolia network...')
+    console.log('⚠️ VMF: Switch failed, automatically adding Base network...')
     
     if (switchError.code === 4902) {
       // Chain not added, try to add Base network
@@ -65,24 +65,24 @@ export async function switchToBaseNetwork(): Promise<boolean> {
           params: [BASE_NETWORK_CONFIG],
         })
         
-        console.log('✅ VMF: Successfully added Base Sepolia network')
+        console.log('✅ VMF: Successfully added Base network')
         return true
         
       } catch (addError) {
-        console.error('❌ VMF: Failed to add Base Sepolia network:', addError)
+        console.error('❌ VMF: Failed to add Base network:', addError)
         throw new Error(
-          'VMF requires Base Sepolia network. Failed to add Base Sepolia network to your wallet:\n\n' +
-          'Network Name: Base Sepolia\n' +
-          'RPC URL: https://sepolia.base.org\n' +
-          'Chain ID: 84532\n' +
+          'VMF requires the Base network. Failed to add Base network to your wallet:\n\n' +
+          'Network Name: Base\n' +
+          'RPC URL: https://mainnet.base.org\n' +
+          'Chain ID: 8453\n' +
           'Currency Symbol: ETH\n' +
-          'Block Explorer: https://sepolia.basescan.org\n\n' +
-          'Please manually add Base Sepolia network to use VMF.'
+          'Block Explorer: https://basescan.org\n\n' +
+          'Please manually add the Base network to use VMF.'
         )
       }
     } else {
-      console.error('❌ VMF: Failed to switch to Base Sepolia network:', switchError)
-      throw new Error('VMF requires Base Sepolia network. Please manually switch to Base Sepolia in your wallet to use VMF.')
+      console.error('❌ VMF: Failed to switch to Base network:', switchError)
+      throw new Error('VMF requires the Base network. Please manually switch to Base in your wallet to use VMF.')
     }
   }
 }
@@ -98,7 +98,7 @@ export async function forceBaseNetwork(): Promise<void> {
     const currentChainIdNumber = parseInt(currentChainId, 16)
     
     if (!isBaseNetwork(currentChainIdNumber)) {
-      console.log('🔄 VMF: Wallet connected to wrong network, forcing switch to Base Sepolia...')
+      console.log('🔄 VMF: Wallet connected to wrong network, forcing switch to Base...')
       await switchToBaseNetwork()
     }
   } catch (error) {

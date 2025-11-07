@@ -81,38 +81,38 @@ export const WALLETS: WalletInfo[] = [
   },
 ]
 
-// Base network configuration (defaulting to Base Sepolia)
+// Base network configuration (defaulting to Base mainnet)
 export const BASE_NETWORK = {
-  chainId: 84532,
-  chainName: "Base Sepolia",
+  chainId: 8453,
+  chainName: "Base",
   nativeCurrency: {
     name: "Ethereum",
     symbol: "ETH",
     decimals: 18,
   },
   rpcUrls: [
-    "https://sepolia.base.org",
-    "https://base-sepolia.g.alchemy.com/v2/demo",
-    "https://base-sepolia.gateway.tenderly.co",
+    "https://mainnet.base.org",
+    "https://base-mainnet.g.alchemy.com/v2/demo",
+    "https://base.gateway.tenderly.co",
   ],
-  blockExplorerUrls: ["https://sepolia.basescan.org"],
+  blockExplorerUrls: ["https://basescan.org"],
 }
 
-// Base Sepolia testnet configuration
+// Base mainnet configuration
 export const BASE_SEPOLIA_NETWORK = {
-  chainId: 84532,
-  chainName: "Base Sepolia",
+  chainId: 8453,
+  chainName: "Base",
   nativeCurrency: {
     name: "Ethereum",
     symbol: "ETH",
     decimals: 18,
   },
   rpcUrls: [
-    "https://sepolia.base.org",
-    "https://base-sepolia.g.alchemy.com/v2/demo",
-    "https://base-sepolia.gateway.tenderly.co",
+    "https://mainnet.base.org",
+    "https://base-mainnet.g.alchemy.com/v2/demo",
+    "https://base.gateway.tenderly.co",
   ],
-  blockExplorerUrls: ["https://sepolia.basescan.org"],
+  blockExplorerUrls: ["https://basescan.org"],
 }
 
 export const isMobile = (): boolean => {
@@ -469,7 +469,7 @@ export const requestWalletConnection = async (walletId: string): Promise<any> =>
 
     console.log(`✅ Connected to ${getWalletDisplayName(walletId)}: ${accounts[0]} on chain ${chainIdNumber}`)
 
-    // Ensure we're on the correct network (Base Sepolia for testing)
+    // Ensure we're on the correct network (Base for testing)
     let finalChainId = chainIdNumber
     if (chainIdNumber !== BASE_NETWORK.chainId) {
       console.log(`🔄 Switching to ${BASE_NETWORK.chainName} (current: ${chainIdNumber})`)
@@ -539,7 +539,7 @@ export const requestWalletConnection = async (walletId: string): Promise<any> =>
     } else if (error.code === -32002) {
       throw new Error(`Connection request to ${getWalletDisplayName(walletId)} is pending. Please check your wallet.`)
     } else if (error.code === 4902) {
-      throw new Error(`Base Sepolia network not found in ${getWalletDisplayName(walletId)}. Please add it manually.`)
+      throw new Error(`Base network not found in ${getWalletDisplayName(walletId)}. Please add it manually.`)
     } else {
       throw new Error(`Failed to connect to ${getWalletDisplayName(walletId)}: ${error.message || "Unknown error"}`)
     }
@@ -648,7 +648,7 @@ export const ensureBaseSepoliaNetwork = async (provider?: any): Promise<void> =>
     const currentChainId = parseInt(chainId, 16)
     
     if (currentChainId !== targetChainId) {
-      console.log(`🔄 Switching to Base Sepolia network (${targetChainId})`)
+      console.log(`🔄 Switching to Base network (${targetChainId})`)
       
       await provider.request({
         method: 'wallet_switchEthereumChain',
@@ -658,7 +658,7 @@ export const ensureBaseSepoliaNetwork = async (provider?: any): Promise<void> =>
   } catch (error: any) {
     if (error.code === 4902) {
       // Chain not added, add it
-      console.log(`➕ Adding Base Sepolia network to wallet`)
+      console.log(`➕ Adding Base network to wallet`)
       
       await provider.request({
         method: 'wallet_addEthereumChain',
@@ -731,7 +731,7 @@ export const forceCoinbaseFreshConnection = async (provider: any): Promise<strin
       }
     }
 
-    // Step 5: Now switch back to Base Sepolia
+    // Step 5: Now switch back to Base
     console.log(`🔄 Step 5: Switching back to ${BASE_NETWORK.chainName}...`)
     try {
       await provider.request({

@@ -1,166 +1,73 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
-import { 
-  requestWalletConnection, 
-  connectMobileWallet, 
-  isWalletInstalled, 
-  getWalletDisplayName,
-  isMobile,
-  forceClearWalletState,
-  getWalletProvider
-} from "@/lib/wallet-config"
+import { useCallback, useMemo, useState } from "react"
+import { useAccount, useDisconnect } from "wagmi"
+import { useAppKit } from "@reown/appkit/react"
 import { formatAddress } from "@/lib/wallet-config"
 
+type WalletConnection = {
+  address: `0x${string}`
+  chainId?: number
+  walletName?: string
+}
+
 export const useWallet = () => {
-  const [connection, setConnection] = useState<any>(null)
-  const [isConnecting, setIsConnecting] = useState<string | null>(null)
+  const { address, chainId, connector, isConnected, isConnecting: accountIsConnecting } = useAccount()
+  const { disconnect } = useDisconnect()
+  const { open, close } = useAppKit()
+
   const [error, setError] = useState<string | null>(null)
+  const [pendingWalletId, setPendingWalletId] = useState<string | null>(null)
 
-  // Do NOT auto-connect from localStorage/sessionStorage on mount
-  // Only connect when the user explicitly clicks a wallet button
-
-  // Set up event listeners when connection changes
-  useEffect(() => {
-    if (typeof window === "undefined" || !window.ethereum) return
-
-    const handleAccountsChanged = (accounts: string[]) => {
-      console.log("📱 Accounts changed:", accounts)
-      if (accounts.length === 0) {
-        // User disconnected
-        setConnection(null)
-        localStorage.removeItem("wallet_connection")
-      } else if (connection && accounts[0] !== connection.address) {
-        // User switched accounts
-        setConnection({ ...connection, address: accounts[0] })
-        localStorage.setItem("wallet_connection", JSON.stringify({ ...connection, address: accounts[0] }))
-      }
+  const connection: WalletConnection | null = useMemo(() => {
+    if (!address) return null
+    return {
+      address,
+      chainId: chainId ?? undefined,
+      walletName: connector?.name,
     }
+  }, [address, chainId, connector?.name])
 
-    const handleChainChanged = (chainId: string) => {
-      console.log("🔄 Chain changed:", chainId)
-      // Optionally handle chain changes
-    }
-
-    const handleConnect = (connectInfo: any) => {
-      console.log("🔌 Wallet connected:", connectInfo)
-    }
-
-    const handleDisconnect = (error: any) => {
-      console.log("🔌 Wallet disconnected:", error)
-      setConnection(null)
-      localStorage.removeItem("wallet_connection")
-    }
-
-    // Add event listeners
-    window.ethereum.on("accountsChanged", handleAccountsChanged)
-    window.ethereum.on("chainChanged", handleChainChanged)
-    window.ethereum.on("connect", handleConnect)
-    window.ethereum.on("disconnect", handleDisconnect)
-
-    return () => {
-      if (window.ethereum.removeListener) {
-        window.ethereum.removeListener("accountsChanged", handleAccountsChanged)
-        window.ethereum.removeListener("chainChanged", handleChainChanged)
-        window.ethereum.removeListener("connect", handleConnect)
-        window.ethereum.removeListener("disconnect", handleDisconnect)
-      }
-    }
-  }, [connection])
-
-  const disconnect = useCallback(() => {
-    console.log("🔌 Disconnecting wallet")
-    
-    // Clear connection state
-    setConnection(null)
-    setIsConnecting(null)
-    setError(null)
-    
-    // Remove from localStorage
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("wallet_connection")
-      sessionStorage.removeItem("wallet_connection")
-    }
-    
-    // Force clear wallet state for all providers
-    const providers = [
-      window.ethereum,
-      window.coinbaseWalletExtension,
-      window.phantom?.ethereum
-    ].filter(Boolean)
-    
-    providers.forEach(async (provider) => {
+  const connectWallet = useCallback(
+    async (walletId?: string) => {
+      setError(null)
+      setPendingWalletId(walletId ?? "reown")
       try {
-        await forceClearWalletState(provider)
-      } catch (error) {
-        console.log("⚠️ Error clearing provider state:", error)
+        await open({ view: "Connect" })
+      } catch (err) {
+        console.error("❌ Failed to open AppKit wallet selector:", err)
+        const message = err instanceof Error ? err.message : "Failed to open wallet selector"
+        setError(message)
+        throw err
+      } finally {
+        setPendingWalletId(null)
       }
-    })
-    
-    // Remove event listeners if ethereum is available
-    if (typeof window !== "undefined" && window.ethereum && window.ethereum.removeListener) {
-      try {
-        window.ethereum.removeListener("accountsChanged", () => {})
-        window.ethereum.removeListener("chainChanged", () => {})
-        window.ethereum.removeListener("connect", () => {})
-        window.ethereum.removeListener("disconnect", () => {})
-      } catch (error) {
-        console.log("⚠️ Error removing event listeners:", error)
-      }
-    }
+    },
+    [open],
+  )
 
-    console.log("✅ Wallet disconnected and state cleared")
-  }, [])
-
-  const connectWallet = useCallback(async (walletId: string) => {
-    setIsConnecting(walletId)
-    setError(null)
-
-    console.log(`🎯 Attempting to connect to ${walletId}`)
-    console.log(`📱 Mobile device: ${isMobile()}`)
-
+  const disconnectWallet = useCallback(async () => {
     try {
-      let result
-
-      // Use mobile-specific connection for mobile devices
-      if (isMobile()) {
-        console.log("📱 Using mobile connection strategy...")
-        result = await connectMobileWallet(walletId)
-      } else {
-        console.log("💻 Using desktop connection strategy...")
-
-        // Force disconnect first to ensure popup appears
-        console.log("🔌 Forcing disconnect before fresh connection...")
-        disconnect()
-
-        // For desktop, always try to connect - let the wallet extension handle the popup
-        console.log(`🔌 Requesting connection to ${getWalletDisplayName(walletId)}`)
-        result = await requestWalletConnection(walletId)
-      }
-
-      // Save connection
-      setConnection(result)
-      localStorage.setItem("wallet_connection", JSON.stringify(result))
-      console.log("✅ Wallet connected successfully:", result)
-
-    } catch (error) {
-      console.error("❌ Wallet connection failed:", error)
-      setError(error instanceof Error ? error.message : "Connection failed")
+      await disconnect()
+      await close()
+    } catch (err) {
+      console.error("❌ Failed to disconnect wallet:", err)
     } finally {
-      setIsConnecting(null)
+      setPendingWalletId(null)
+      setError(null)
     }
-  }, [disconnect])
+  }, [disconnect, close])
 
-  const formattedAddress = connection ? formatAddress(connection.address) : null
+  const formattedAddress = connection?.address ? formatAddress(connection.address) : null
 
   return {
     connection,
-    isConnecting,
-    error,
+    isConnected,
+    isConnecting: pendingWalletId ?? (accountIsConnecting ? "reown" : null),
     connectWallet,
-    disconnect,
-    isConnected: !!connection,
+    disconnect: disconnectWallet,
     formattedAddress,
+    error,
     setError,
   }
 }

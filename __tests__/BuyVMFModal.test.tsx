@@ -3,6 +3,13 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { BuyVMFModal } from '@/components/buy-vmf-modal'
 
+jest.mock('@reown/appkit/react', () => ({
+  useAppKit: () => ({
+    open: jest.fn(),
+    close: jest.fn(),
+  }),
+}))
+
 // Mock wagmi hooks
 jest.mock('wagmi', () => ({
   useAccount: () => ({
@@ -83,7 +90,10 @@ describe('BuyVMFModal', () => {
     render(<BuyVMFModal isOpen={true} onClose={mockOnClose} />)
 
     expect(screen.getByText('Connect Your Wallet')).toBeInTheDocument()
-    expect(screen.getByText('Please connect your wallet to continue with the purchase.')).toBeInTheDocument()
+    expect(
+      screen.getByText(/Reown WalletKit opens automatically so you can pick Coinbase, MetaMask, Farcaster, Rainbow/i),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Open Reown WalletKit/i })).toBeInTheDocument()
   })
 
   it('shows amount input field', () => {
@@ -94,8 +104,7 @@ describe('BuyVMFModal', () => {
     expect(amountInput).toHaveAttribute('type', 'number')
   })
 
-  it('shows mobile-specific wallet connection instructions', () => {
-    // Mock mobile user agent
+  it('shows Reown WalletKit prompt on mobile environments', () => {
     Object.defineProperty(navigator, 'userAgent', {
       value: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X)',
       configurable: true,
@@ -103,20 +112,7 @@ describe('BuyVMFModal', () => {
 
     render(<BuyVMFModal isOpen={true} onClose={mockOnClose} />)
 
-    expect(screen.getByText('📱 Mobile Note:')).toBeInTheDocument()
-    expect(screen.getByText(/Clicking a wallet option will open the wallet app/)).toBeInTheDocument()
-  })
-
-  it('shows Coinbase Smart Wallet button on mobile', () => {
-    // Mock mobile user agent
-    Object.defineProperty(navigator, 'userAgent', {
-      value: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X)',
-      configurable: true,
-    })
-
-    render(<BuyVMFModal isOpen={true} onClose={mockOnClose} />)
-
-    expect(screen.getByText('Coinbase Smart Wallet')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Open Reown WalletKit/i })).toBeInTheDocument()
   })
 
   it('shows AppKit button on desktop', () => {
