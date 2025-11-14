@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { ethers } from "ethers"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { X, ChevronDown, ChevronUp, CheckCircle, Copy, Check, Minus, Plus, AlertCircle } from "lucide-react"
@@ -80,16 +80,37 @@ const charities: Charity[] = [
   },
 ]
 
-const CONTRACT_ADDRESS = VMF_CONTRACT_ADDRESS
-const DEFAULT_USDC_ADDRESS = "0x833589fCD6EDb6E08f4c7C32D4f71B54Bda02913"
+const CONTRACT_ADDRESS = ethers.getAddress(VMF_CONTRACT_ADDRESS)
+const DEFAULT_USDC_ADDRESS = ethers.getAddress("0x833589fcd6edb6e08f4c7c32d4f71b54bda02913")
 const DEFAULT_BASE_RPC = process.env.NEXT_PUBLIC_BASE_RPC || "https://mainnet.base.org"
-const USDC_TOKEN_ADDRESS = process.env.NEXT_PUBLIC_USDC || DEFAULT_USDC_ADDRESS
-const BATCH_TRANSFER_CONTRACT =
-  process.env.NEXT_PUBLIC_BATCH_TRANSFER || CONTRACT_ADDRESS
-const VMF_DISTRIBUTOR_CONTRACT = process.env.NEXT_PUBLIC_VMF_DISTRIBUTOR || ""
+const BASE_RPC_NETWORK = { chainId: BASE_CHAIN_ID, name: "base" as const }
+const baseRpcProvider = new ethers.JsonRpcProvider(DEFAULT_BASE_RPC, BASE_RPC_NETWORK)
+const getBaseProvider = () => baseRpcProvider
+
+const safeChecksumAddress = (value?: string) => {
+  if (!value) return undefined
+  try {
+    return ethers.getAddress(value)
+  } catch {
+    return undefined
+  }
+}
+
+const USDC_TOKEN_ADDRESS = safeChecksumAddress(process.env.NEXT_PUBLIC_USDC) || DEFAULT_USDC_ADDRESS
+const envBatchTransfer = safeChecksumAddress(process.env.NEXT_PUBLIC_BATCH_TRANSFER)
+const envVmfDistributor = safeChecksumAddress(process.env.NEXT_PUBLIC_VMF_DISTRIBUTOR)
+const BATCH_TRANSFER_CONTRACT = envBatchTransfer || CONTRACT_ADDRESS
+const VMF_DISTRIBUTOR_CONTRACT =
+  envVmfDistributor && envVmfDistributor !== CONTRACT_ADDRESS ? envVmfDistributor : null
+
 const HAS_DEDICATED_TWO_STEP_FLOW =
-  Boolean(process.env.NEXT_PUBLIC_BATCH_TRANSFER) &&
-  Boolean(process.env.NEXT_PUBLIC_VMF_DISTRIBUTOR)
+  Boolean(
+    envBatchTransfer &&
+    envVmfDistributor &&
+    envBatchTransfer !== envVmfDistributor &&
+    envBatchTransfer !== CONTRACT_ADDRESS &&
+    envVmfDistributor !== CONTRACT_ADDRESS,
+  )
 const VMF_DELIVERY_SIGNATURES = [
   "deliverVMF(address,uint256)",
   "distributeVMF(address,uint256)",
@@ -157,7 +178,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
   const [charityDistributions, setCharityDistributions] = useState<CharityDistribution[]>([])
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false)
   const [isCharityDropdownOpen, setIsCharityDropdownOpen] = useState(false)
-  const { connection, isConnected, disconnect, formattedAddress } = useWallet()
+  const { connection, connector, isConnected, disconnect, formattedAddress } = useWallet()
   const { open: openAppKit } = useAppKit()
   const [transactionHash, setTransactionHash] = useState("")
   const [donationTxHash, setDonationTxHash] = useState("")
@@ -172,6 +193,21 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
   const [priceInfo, setPriceInfo] = useState<{price: number, source: string} | null>(null)
   const [isLoadingPrice, setIsLoadingPrice] = useState(false)
   const [hasPromptedConnect, setHasPromptedConnect] = useState(false)
+
+  const getConnectedSigner = useCallback(async () => {
+    if (connector?.getProvider) {
+      const externalProvider = await connector.getProvider()
+      const browserProvider = new ethers.BrowserProvider(externalProvider, BASE_CHAIN_ID)
+      const signer = await browserProvider.getSigner()
+      return { signer, provider: browserProvider }
+    }
+    if (typeof window !== "undefined" && window.ethereum) {
+      const browserProvider = new ethers.BrowserProvider(window.ethereum, BASE_CHAIN_ID)
+      const signer = await browserProvider.getSigner()
+      return { signer, provider: browserProvider }
+    }
+    throw new Error("No wallet provider available. Please reconnect your wallet.")
+  }, [connector])
 
   useEffect(() => {
     if (typeof window === "undefined" || process.env.NODE_ENV === "production") {
@@ -298,7 +334,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
       try {
         let info;
         if (isConnected) {
-          const provider = new ethers.JsonRpcProvider(DEFAULT_BASE_RPC)
+        const provider = getBaseProvider()
           info = await getPriceInfo(provider)
           console.log("✅ Got price from RPC provider:", info)
         } else {
@@ -389,7 +425,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     async function recompute() {
       try {
         if (priceInfo.price > 0) {
-          const provider = new ethers.JsonRpcProvider(DEFAULT_BASE_RPC)
+          const provider = getBaseProvider()
           const nextAmount = await calculateVMFAmount(Number(amount), provider)
           if (!cancelled) {
             setVmfAmount(nextAmount.toFixed(4))
@@ -451,7 +487,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     async function estimateGasViaRpc() {
       setIsEstimatingGas(true)
       try {
-        const provider = new ethers.JsonRpcProvider(DEFAULT_BASE_RPC)
+        const provider = getBaseProvider()
         const feeData = await provider.getFeeData()
         if (!feeData.maxFeePerGas && !feeData.gasPrice) {
           setFees(null)
@@ -573,10 +609,6 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
     setCopiedHash(null)
 
     try {
-      if (!window.ethereum) {
-        alert("Please install MetaMask or another Web3 wallet to continue.")
-        return false
-      }
 
       console.log("🔍 Transaction network check - wallet chainId:", connection?.chainId)
       if (!connection || connection.chainId !== BASE_CHAIN_ID) {
@@ -587,8 +619,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
       }
       console.log(`✅ Network verified: Base (${BASE_CHAIN_ID})`)
 
-      const provider = new ethers.BrowserProvider(window.ethereum)
-      const signer = await provider.getSigner()
+      const { signer, provider } = await getConnectedSigner()
       const signerAddress = await signer.getAddress()
       const recipientAddress = connection.address
       const donationContractAddress = HAS_DEDICATED_TWO_STEP_FLOW ? BATCH_TRANSFER_CONTRACT : CONTRACT_ADDRESS
@@ -627,11 +658,13 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
         return ethers.parseUnits(fallbackVmf.toFixed(18), 18)
       })()
 
+      const shouldRunDedicatedFlow =
+        HAS_DEDICATED_TWO_STEP_FLOW &&
+        VMF_DISTRIBUTOR_CONTRACT &&
+        VMF_DISTRIBUTOR_CONTRACT !== donationContractAddress
+
       let vmfDeliveryCallData: string | null = null
-      if (HAS_DEDICATED_TWO_STEP_FLOW) {
-        if (!VMF_DISTRIBUTOR_CONTRACT) {
-          throw new Error("VMF distributor contract is not configured.")
-        }
+      if (shouldRunDedicatedFlow) {
         if (expectedVmfDeliveryAmountWei <= 0n) {
           throw new Error("Calculated VMF delivery amount is zero. Please enter a valid donation amount.")
         }
@@ -641,7 +674,7 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
           const methodName = signature.slice(0, signature.indexOf("("))
           const data = deliveryInterface.encodeFunctionData(methodName, [recipientAddress, expectedVmfDeliveryAmountWei])
           try {
-            await provider.call({ to: VMF_DISTRIBUTOR_CONTRACT, data, from: signerAddress })
+            await provider.call({ to: VMF_DISTRIBUTOR_CONTRACT!, data, from: signerAddress })
             preparedCall = data
             break
           } catch (error) {
@@ -650,9 +683,10 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
           }
         }
         if (!preparedCall) {
-          throw new Error("VMF distributor contract does not support any known delivery methods.")
+          console.warn("No compatible VMF delivery method found. Falling back to single-step distribution.")
+        } else {
+          vmfDeliveryCallData = preparedCall
         }
-        vmfDeliveryCallData = preparedCall
       }
 
       const erc20Abi = [
@@ -670,18 +704,14 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
       await donationTx.wait()
       console.log("✅ USDC batch transfer confirmed:", donationTx.hash)
 
-      if (!HAS_DEDICATED_TWO_STEP_FLOW) {
+      if (!vmfDeliveryCallData || !shouldRunDedicatedFlow) {
         setTransactionHash(donationTx.hash)
         await new Promise((resolve) => setTimeout(resolve, 2000))
         return true
       }
 
-      if (!vmfDeliveryCallData || !VMF_DISTRIBUTOR_CONTRACT) {
-        throw new Error("VMF distributor call data is missing.")
-      }
-
       const vmfDeliveryTx = await signer.sendTransaction({
-        to: VMF_DISTRIBUTOR_CONTRACT,
+        to: VMF_DISTRIBUTOR_CONTRACT!,
         data: vmfDeliveryCallData,
       })
       setTransactionHash(vmfDeliveryTx.hash)
@@ -692,7 +722,11 @@ export function BuyVMFModal({ isOpen, onClose }: BuyVMFModalProps) {
       return true
     } catch (error: any) {
       console.error("Smart contract execution failed:", error)
-      alert(`Transaction failed: ${error.message || "Unknown error"}`)
+      if (error?.code === 4100) {
+        alert("Please approve the wallet connection request to continue.")
+        return false
+      }
+      alert(`Transaction failed: ${error?.message || "Unknown error"}`)
       return false
     } finally {
       setIsProcessing(false)

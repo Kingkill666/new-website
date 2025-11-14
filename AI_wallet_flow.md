@@ -12,7 +12,7 @@
 * Only change the **first step**: when a user clicks **BUY VMF**, open **Reown WalletKit** directly (no custom “Connect Your Wallet” first modal).
 * **Chain:** Base **mainnet** only (`chainId = 8453`).
 * **Payment token:** USDC (Base canonical) — `0x833589fCD6EDb6E08f4c7C32D4f71B54Bda02913`
-* **Token received:** VMF — `0xa3e82aDf6bD3207a1D2470ed7Ad742596Ee81776`
+* **Token received:** VMF — `0xa3e82adf6bd3207a1d2470ed7ad742596ee81776`
 * **Wallet options (Reown WalletKit):** Coinbase (Base), MetaMask, Farcaster, Rainbow, Other WalletConnect.
 * After wallet connection, immediately open the **Amount** modal, then continue unchanged.
 
@@ -39,7 +39,7 @@
 
    * Network: Base.
    * Payment: USDC.
-   * Contract: VMF `0xa3e82aDf6bD3207a1D2470ed7Ad742596Ee81776`
+   * Contract: VMF `0xa3e82adf6bd3207a1d2470ed7ad742596ee81776`
    * 1 confirmation → batch USDC to charities.
    * 1 confirmation → receive VMF.
    * (Two confirmations total.)
@@ -128,7 +128,7 @@ SUCCESS_MODAL
 | Token | Address                                      | Decimals |
 | ----- | -------------------------------------------- | -------- |
 | USDC  | `0x833589fCD6EDb6E08f4c7C32D4f71B54Bda02913` | 6        |
-| VMF   | `0xa3e82aDf6bD3207a1D2470ed7Ad742596Ee81776` | 18       |
+| VMF   | `0xa3e82adf6bd3207a1d2470ed7ad742596ee81776` | 18       |
 
 **Splits:**
 
@@ -148,7 +148,7 @@ or 1:1 if fixed mode.
 ```
 NEXT_PUBLIC_CHAIN_ID=8453
 NEXT_PUBLIC_USDC=0x833589fCD6EDb6E08f4c7C32D4f71B54Bda02913
-NEXT_PUBLIC_VMF_TOKEN=0xa3e82aDf6bD3207a1D2470ed7Ad742596Ee81776
+NEXT_PUBLIC_VMF_TOKEN=0xa3e82adf6bd3207a1d2470ed7ad742596ee81776
 NEXT_PUBLIC_BATCH_TRANSFER=0x...(if used)
 NEXT_PUBLIC_VMF_DISTRIBUTOR=0x...(if used)
 NEXT_PUBLIC_BASE_RPC=https://...
@@ -208,7 +208,7 @@ NEXT_PUBLIC_BASE_RPC=https://...
 
 * **Chain:** Base (8453)
 * **Payment token:** USDC (`0x833589fC...2913`)
-* **Token received:** VMF (`0xa3e82aDf6bD3207a1D2470ed7Ad742596Ee81776`)
+* **Token received:** VMF (`0xa3e82adf6bd3207a1d2470ed7ad742596ee81776`)
 * **Wallet UI:** Reown WalletKit only
 * **Modals unchanged:** Amount → Donate → Verify → Success
 * **Confirmations:** Exactly two (batch USDC + VMF delivery)

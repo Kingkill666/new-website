@@ -2,7 +2,7 @@
 import { cookieStorage, createStorage } from 'wagmi' // Use 'wagmi' directly (Wagmi v2+)
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 import { base } from '@reown/appkit/networks'
-import { coinbaseWallet, metaMask, walletConnect } from '@wagmi/connectors'
+import { coinbaseWallet, walletConnect } from '@wagmi/connectors'
 import type { Chain } from 'viem' // Import Chain type for explicit typing
 
 // WalletConnect / Reown project id used across the app. The value is public by design,so provide a
@@ -38,9 +38,6 @@ export const wagmiAdapter = new WagmiAdapter({
       appName: dappMetadata.name,
       appLogoUrl: dappMetadata.icons[0],
       preference: 'smartWalletOnly', // This enables the embedded wallet experience
-    }),
-    metaMask({
-      dappMetadata,
     }),
     walletConnect({
       projectId,

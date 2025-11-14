@@ -62,6 +62,7 @@ export const useWallet = () => {
 
   return {
     connection,
+    connector,
     isConnected,
     isConnecting: pendingWalletId ?? (accountIsConnecting ? "reown" : null),
     connectWallet,
