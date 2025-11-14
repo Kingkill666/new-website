@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { useAccount } from "wagmi";
 import { readContract } from "@wagmi/core";
 import { GET_USER_STAKES } from "../graphql/queries";

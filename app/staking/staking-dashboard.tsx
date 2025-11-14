@@ -4,7 +4,8 @@ import React from "react"
 import { WagmiProvider } from "wagmi"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { ConnectKitProvider } from "connectkit"
-import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client"
+import { ApolloClient, InMemoryCache } from "@apollo/client"
+import { ApolloProvider } from "@apollo/client/react"
 import { config as stakingConfig } from "./wagmi"
 
 // Create query client

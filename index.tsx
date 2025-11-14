@@ -586,6 +586,24 @@ const Index = () => {
           </div>
         </section>
 
+        {/* Enhanced Partner Charities Section */}
+        <section id="charities" className="pt-4 pb-16 sm:pt-6 sm:pb-20 bg-gray-50" aria-labelledby="charities-heading">
+          <div className="container mx-auto px-2 sm:px-4 lg:px-6">
+            <div className="max-w-6xl mx-auto">
+              <div className="text-center mb-16">
+                <h2 id="charities-heading" className="text-4xl sm:text-5xl font-bold text-slate-900 mb-6">
+                  Our Trusted Partners
+                </h2>
+                <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+                  Every VMF coin purchase supports our verified organizations, putting $$$ into their hands, direct and instantly.
+                </p>
+              </div>
+
+              <CharityGrid />
+            </div>
+          </div>
+        </section>
+
         {/* Enhanced How It Works Section */}
         <section id="how-it-works" className="py-16 sm:py-20 bg-white" aria-labelledby="how-it-works-heading">
           <div className="container mx-auto px-2 sm:px-4 lg:px-6">
@@ -714,25 +732,6 @@ const Index = () => {
                 </p>
               </div>
               <TradingChart tokenAddress="0x2213414893259b0c48066acd1763e7fba97859e5" />
-            </div>
-          </div>
-        </section>
-
-        {/* Enhanced Partner Charities Section */}
-        <section id="charities" className="pt-4 pb-16 sm:pt-6 sm:pb-20 bg-gray-50" aria-labelledby="charities-heading">
-          <div className="container mx-auto px-2 sm:px-4 lg:px-6">
-            <div className="max-w-6xl mx-auto">
-              <div className="text-center mb-16">
-                <h2 id="charities-heading" className="text-4xl sm:text-5xl font-bold text-slate-900 mb-6">
-                  Our Trusted Partners
-                </h2>
-                <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-                  Every VMF coin purchase supports our verified organizations, putting $$$ into their hands, direct and
-                  instantly.
-                </p>
-              </div>
-
-              <CharityGrid />
             </div>
           </div>
         </section>
