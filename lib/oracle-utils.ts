@@ -279,6 +279,16 @@ export async function getPriceInfoNoProvider(): Promise<{price: number, source: 
 export async function getPriceInfo(provider: ethers.Provider): Promise<{price: number, source: string}> {
   console.log("🔍 Starting getPriceInfo with provider...");
   try {
+    // Prefer off-chain aggregated price (Dexscreener/Coingecko/Uniswap quote via API) to avoid stale on-chain static multiple
+    try {
+      console.log("📡 Trying external price sources first...");
+      const externalPrice = await getUniswapPrice();
+      console.log("✅ External price fetched:", externalPrice);
+      return externalPrice;
+    } catch (externalError) {
+      console.warn("⚠️ External price sources failed (will try contract oracle):", externalError);
+    }
+
     // First try to get price from contract oracle (most reliable for VMF)
     try {
       console.log("📡 Checking network...");
