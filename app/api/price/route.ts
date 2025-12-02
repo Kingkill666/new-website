@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     // Try DexScreener with pool address first (most reliable)
     try {
       console.log('📡 [API] Trying DexScreener with pool address...')
-      const SUSHISWAP_POOL = '0x9c83a203133b65982f35d1b00e8283c9fb518cb1'
+      const SUSHISWAP_POOL = '0xa3e82adf6bd3207a1d2470ed7ad742596ee81776'
       const DEXSCREENER_POOL_URL = `https://api.dexscreener.com/latest/dex/pairs/base/${SUSHISWAP_POOL}`
       
       const poolResponse = await fetch(DEXSCREENER_POOL_URL, {
