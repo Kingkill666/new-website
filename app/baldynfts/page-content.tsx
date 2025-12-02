@@ -66,7 +66,7 @@ export default function BaldyNFTsPageContent() {
               Learn About VMF
             </a>
             <a
-              href="/staking"
+              href="https://vmfcoin.com/staking"
               className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
             >
               Stake VMF Tokens

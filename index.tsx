@@ -509,7 +509,7 @@ const Index = () => {
                       <Button
                         size="sm"
                         className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 sm:px-8 sm:py-3 text-base sm:text-lg font-semibold shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-[160px] sm:w-[140px]"
-                        onClick={() => window.location.href = "https://staking.vmfcoin.com/"}
+                        onClick={() => window.location.href = "https://vmfcoin.com/staking"}
                         aria-label="Stake VMF tokens"
                       >
                         Stake VMF
