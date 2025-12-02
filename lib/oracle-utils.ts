@@ -279,92 +279,11 @@ export async function getPriceInfoNoProvider(): Promise<{price: number, source: 
 export async function getPriceInfo(provider: ethers.Provider): Promise<{price: number, source: string}> {
   console.log("🔍 Starting getPriceInfo with provider...");
   try {
-    // Prefer off-chain aggregated price (Dexscreener/Coingecko/Uniswap quote via API) to avoid stale on-chain static multiple
-    try {
-      console.log("📡 Trying external price sources first...");
-      const externalPrice = await getUniswapPrice();
-      console.log("✅ External price fetched:", externalPrice);
-      return externalPrice;
-    } catch (externalError) {
-      console.warn("⚠️ External price sources failed (will try contract oracle):", externalError);
-    }
-
-    // First try to get price from contract oracle (most reliable for VMF)
-    try {
-      console.log("📡 Checking network...");
-      // Check network - MUST be Base (chainId 8453)
-      const network = await provider.getNetwork();
-      console.log("🌐 Network chainId:", network.chainId.toString());
-      
-      if (network.chainId !== BigInt(8453)) {
-        throw new Error(`Wrong network. Expected Base (8453), got ${network.chainId}. Please switch to Base.`);
-      }
-      
-      console.log("📋 Creating VMF contract instance...");
-      const vmfContract = new ethers.Contract(VMF_CONTRACT_ADDRESS, VMF_ABI, provider);
-      
-      let oracleAddress;
-      try {
-        console.log("🔍 Calling priceOracle()...");
-        oracleAddress = await vmfContract.priceOracle();
-        console.log("📍 Oracle address from contract:", oracleAddress);
-        console.log("📍 Zero address:", ethers.ZeroAddress);
-      } catch (contractError) {
-        console.error("❌ Contract method call failed in getPriceInfo:", contractError);
-        throw contractError;
-      }
-      
-      if (oracleAddress !== ethers.ZeroAddress) {
-        console.log("✅ Oracle is set, fetching price...");
-        // Oracle is set, get price from oracle
-        const oracleContract = new ethers.Contract(oracleAddress, ORACLE_ABI, provider);
-        console.log("🔍 Calling spotPriceUSDCPerVMF()...");
-        const priceE18 = await oracleContract.spotPriceUSDCPerVMF();
-        const price = Number(ethers.formatEther(priceE18));
-        
-        // Determine oracle source based on address
-        let source = "Unknown Oracle";
-        if (oracleAddress.toLowerCase() === FIXED_PRICE_ORACLE_ADDRESS.toLowerCase()) {
-          source = "Fixed Price Oracle";
-        } else if (oracleAddress.toLowerCase() === SUSHISWAP_ORACLE_ADDRESS.toLowerCase()) {
-          source = "SushiSwap V3 Oracle";
-        } else {
-          source = `Oracle (${oracleAddress.slice(0, 6)}...)`;
-        }
-        
-        console.log("✅ Contract oracle price fetched:", price, "from", source);
-        return { price, source };
-      } else {
-        console.log("⚠️ No oracle set, trying static multiple...");
-        // No oracle set, using static multiple
-        try {
-          const donationMultipleBps = await vmfContract.donationMultipleBps();
-          const price = Number(donationMultipleBps) / 10000;
-          console.log("✅ Static multiple price fetched:", price);
-          return { price, source: "Static Multiple" };
-        } catch (staticError) {
-          console.error("❌ Static multiple failed:", staticError);
-          throw staticError;
-        }
-      }
-    } catch (oracleError) {
-      console.warn("⚠️ Contract oracle failed, trying external sources:", oracleError);
-    }
-    
-    // Fallback to external price sources
-    try {
-      console.log("📡 Trying external price sources...");
-      const externalPrice = await getUniswapPrice();
-      console.log("✅ External price fetched:", externalPrice);
-      return externalPrice;
-    } catch (externalError) {
-      console.warn("⚠️ External price sources failed:", externalError);
-    }
-    
-    // Ultimate fallback
-    console.log("⚠️ All price sources failed, using fallback");
-    return { price: 1, source: "Fallback" };
-    
+    // Always prefer off-chain aggregated price (Dexscreener/Coingecko/Uniswap quote via API)
+    console.log("📡 Fetching external price via API (wallet-connected path)...");
+    const externalPrice = await getUniswapPrice();
+    console.log("✅ External price fetched:", externalPrice);
+    return externalPrice;
   } catch (error) {
     console.error("❌ Error getting price info:", error);
     return { price: 1, source: "Fallback" };
