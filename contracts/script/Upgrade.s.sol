@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 import {Script} from "forge-std/Script.sol";
 import {console2} from "forge-std/console2.sol";
 import {VMF} from "../src/VMF.sol";
+import {UpgradeInitiator} from "../src/UpgradeInitiator.sol";
 
 contract UpgradeScript is Script {
     function run() external {
@@ -28,23 +29,23 @@ contract UpgradeScript is Script {
         console2.log("Contract owner:", owner);
         require(caller == owner, "Caller must be contract owner");
 
-        // Try to call upgrade() function (for new implementations that have it)
+        // Try to call upgrade() function first (for new implementations that have it)
         (bool upgradeSuccess, ) = proxyAddress.call(
             abi.encodeWithSignature("upgrade(address,bytes)", address(newImplementation), "")
         );
 
-        if (!upgradeSuccess) {
-            // Fallback: Call upgradeToAndCall directly
-            // This will work because we're calling it on the proxy contract itself
-            // and the proxy forwards the call via delegatecall to the implementation
-            (bool success, bytes memory result) = proxyAddress.call(
-                abi.encodeWithSignature("upgradeToAndCall(address,bytes)", address(newImplementation), "")
-            );
-
-            require(success, string(result));
-            console2.log("Upgrade completed via upgradeToAndCall");
-        } else {
+        if (upgradeSuccess) {
             console2.log("Upgrade completed via upgrade() function");
+        } else {
+            // Use UpgradeInitiator to perform upgrade via storage manipulation
+            console2.log("Deploying UpgradeInitiator contract...");
+            UpgradeInitiator initiator = new UpgradeInitiator();
+            console2.log("UpgradeInitiator deployed at:", address(initiator));
+
+            // Call initiator to perform upgrade
+            console2.log("Calling initiator.upgrade()...");
+            initiator.upgrade(proxyAddress, address(newImplementation));
+            console2.log("Upgrade completed via UpgradeInitiator");
         }
 
         vm.stopBroadcast();
