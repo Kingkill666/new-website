@@ -6,9 +6,10 @@ set -e
 # 
 # This script will:
 # 1. Revoke all roles from the compromised wallet
-# 2. Add the wallet to blacklist
-# 3. Check current receiver addresses
-# 4. Provide instructions for updating receivers
+# 2. Check current receiver addresses
+# 3. Provide instructions for updating receivers
+# 
+# Note: Blacklist functionality has been removed from the contract
 
 COMPROMISED_WALLET="0xf521a4fE5910b4fb4A14C9546C2837D33bEc455d"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -38,29 +39,12 @@ echo "🔍 Checking current roles for compromised wallet..."
 ROLE_CHECK=$(cast call $VMF_CONTRACT "hasAllRoles(address,uint256)" "$COMPROMISED_WALLET" "15" --rpc-url "$BASE_RPC_URL" 2>/dev/null || echo "false")
 echo "Has roles: $ROLE_CHECK"
 
-# Check if wallet is blacklisted
-BLACKLIST_CHECK=$(cast call $VMF_CONTRACT "isBlacklisted(address)" "$COMPROMISED_WALLET" --rpc-url "$BASE_RPC_URL" 2>/dev/null || echo "false")
-echo "Is blacklisted: $BLACKLIST_CHECK"
+# Note: Blacklist functionality has been removed from the contract
 
 echo ""
-echo "🔍 Checking current receiver addresses..."
-CHARITY_RECEIVER=$(cast call $VMF_CONTRACT "charityReceiver()" --rpc-url "$BASE_RPC_URL" 2>/dev/null || echo "Failed to get")
-TEAM_RECEIVER=$(cast call $VMF_CONTRACT "teamReceiver()" --rpc-url "$BASE_RPC_URL" 2>/dev/null || echo "Failed to get")
-MINTER_ADDRESS=$(cast call $VMF_CONTRACT "minter()" --rpc-url "$BASE_RPC_URL" 2>/dev/null || echo "Failed to get")
-echo "Charity Receiver: $CHARITY_RECEIVER"
-echo "Team Receiver: $TEAM_RECEIVER"
-echo "Minter Address: $MINTER_ADDRESS"
-
-# Check if compromised wallet is set as any of these critical addresses
-if [ "$CHARITY_RECEIVER" = "$COMPROMISED_WALLET" ]; then
-    echo "🚨 WARNING: Compromised wallet is set as CHARITY_RECEIVER!"
-fi
-if [ "$TEAM_RECEIVER" = "$COMPROMISED_WALLET" ]; then
-    echo "🚨 WARNING: Compromised wallet is set as TEAM_RECEIVER!"
-fi
-if [ "$MINTER_ADDRESS" = "$COMPROMISED_WALLET" ]; then
-    echo "🚨 WARNING: Compromised wallet is set as MINTER!"
-fi
+# Note: charityReceiver, teamReceiver, and minter have been removed from the contract
+# Check allowed receivers instead
+echo "🔍 Checking current contract state..."
 
 echo ""
 echo "🚨 STARTING REVOCATION PROCESS..."
@@ -85,13 +69,7 @@ else
     echo "   ⚠️  Failed to revoke ROLE_SET_CHARITY (may not have had this role)"
 fi
 
-# Revoke ROLE_MINTER (4)
-echo "   Revoking ROLE_MINTER (4)..."
-if cast send $VMF_CONTRACT "revokeRoles(address,uint256)" "$COMPROMISED_WALLET" "4" --private-key "$PRIVATE_KEY" --rpc-url "$BASE_RPC_URL" --gas-limit 100000 2>/dev/null; then
-    echo "   ✅ ROLE_MINTER revoked"
-else
-    echo "   ⚠️  Failed to revoke ROLE_MINTER (may not have had this role)"
-fi
+# Note: ROLE_MINTER has been removed from the contract
 
 # Revoke ROLE_ADMIN (8)
 echo "   Revoking ROLE_ADMIN (8)..."
@@ -101,38 +79,23 @@ else
     echo "   ⚠️  Failed to revoke ROLE_ADMIN (may not have had this role)"
 fi
 
-# Add to blacklist
-echo ""
-echo "2️⃣ Adding compromised wallet to blacklist..."
-if cast send $VMF_CONTRACT "addToBlacklist(address)" "$COMPROMISED_WALLET" --private-key "$PRIVATE_KEY" --rpc-url "$BASE_RPC_URL" --gas-limit 100000 2>/dev/null; then
-    echo "   ✅ Wallet added to blacklist"
-else
-    echo "   ⚠️  Failed to add to blacklist (may already be blacklisted)"
-fi
+# Note: Blacklist functionality has been removed from the contract
 
 echo ""
 echo "🔍 Verifying revocation..."
 FINAL_ROLE_CHECK=$(cast call $VMF_CONTRACT "hasAllRoles(address,uint256)" "$COMPROMISED_WALLET" "15" --rpc-url "$BASE_RPC_URL" 2>/dev/null || echo "false")
-FINAL_BLACKLIST_CHECK=$(cast call $VMF_CONTRACT "isBlacklisted(address)" "$COMPROMISED_WALLET" --rpc-url "$BASE_RPC_URL" 2>/dev/null || echo "false")
 
 echo "Final role check: $FINAL_ROLE_CHECK"
-echo "Final blacklist check: $FINAL_BLACKLIST_CHECK"
 
 echo ""
 echo "✅ REVOCATION COMPLETE!"
 echo ""
 echo "⚠️  CRITICAL NEXT STEPS:"
-echo "1. Update charity and team receiver addresses if they were set to the compromised wallet"
-echo "2. Check if the compromised wallet was set as the minter address"
-echo "3. Remove compromised wallet from tax exempt list if present"
-echo "4. Remove compromised wallet from allowed receivers list if present"
-echo "5. Monitor for any suspicious activity"
-echo "6. Consider transferring any remaining funds from the compromised wallet"
-echo ""
-echo "To update receivers, use the update_receivers.sh script after setting new addresses."
+echo "1. Remove compromised wallet from allowed receivers list if present"
+echo "2. Monitor for any suspicious activity"
+echo "3. Consider transferring any remaining funds from the compromised wallet"
 echo ""
 echo "🔒 Security measures taken:"
 echo "   - All roles revoked from compromised wallet"
-echo "   - Wallet added to blacklist"
+echo "   - Note: Blacklist functionality has been removed from the contract"
 echo "   - Deployment scripts updated to remove compromised addresses"
-echo "   - Wallet removed from holders.json"

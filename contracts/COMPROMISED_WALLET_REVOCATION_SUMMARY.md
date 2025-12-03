@@ -24,14 +24,14 @@ All deployment scripts now use placeholder addresses instead of the compromised 
 
 ### 4. **Roles That Will Be Revoked**
 The scripts will revoke these roles from the compromised wallet:
-- `ROLE_SET_TAX` (1) - Can modify tax rates
 - `ROLE_SET_CHARITY` (2) - Can manage charity settings  
-- `ROLE_MINTER` (4) - Can mint new tokens
 - `ROLE_ADMIN` (8) - Can manage other roles and perform admin functions
 
+**Note:** `ROLE_SET_TAX` and `ROLE_MINTER` have been removed from the contract.
+
 ### 5. **Additional Security Measures**
-- Wallet will be added to blacklist
 - All deployment scripts updated to prevent future use
+- **Note:** Blacklist functionality has been removed from the contract
 
 ## 🔧 How to Execute the Revocation
 
@@ -52,31 +52,34 @@ cd /Users/michaelgray/Downloads/new-website-main/contracts
 ./verify_revocation.sh
 ```
 
-### Step 4: Update Receiver Addresses (if needed)
-1. Edit `update_receivers.sh` to set new charity and team addresses
-2. Run: `./update_receivers.sh`
+### Step 4: Update Allowed Receivers (if needed)
+1. Use the contract's `addAllowedReceivers` and `removeAllowedReceivers` functions
+2. Remove the compromised wallet from the allowed receivers list if present
 
 ## ⚠️ Critical Next Steps
 
 1. **IMMEDIATELY** run the emergency script to revoke all permissions
-2. **Update charity and team receiver addresses** with new secure wallets
-3. **Check if the compromised wallet was set as the minter** and update if necessary
-4. **Remove compromised wallet from tax exempt list** if present
-5. **Remove compromised wallet from allowed receivers list** if present
-6. **Monitor for any suspicious activity** from the compromised wallet
-7. **Consider transferring any remaining funds** from the compromised wallet
+2. **Remove compromised wallet from allowed receivers list** if present
+3. **Monitor for any suspicious activity** from the compromised wallet
+4. **Consider transferring any remaining funds** from the compromised wallet
+
+**Note:** The following features have been removed from the contract:
+- Blacklist functionality
+- Minter address
+- Charity receiver and team receiver (replaced with allowed receivers list)
 
 ## 🔍 Verification Checklist
 
 After running the scripts, verify:
 - [ ] All roles revoked (use `verify_revocation.sh`)
-- [ ] Wallet is blacklisted
-- [ ] Wallet is not set as minter
-- [ ] Wallet is not set as charity receiver
-- [ ] Wallet is not set as team receiver
 - [ ] Wallet is not the contract owner
-- [ ] Wallet removed from tax exempt list
 - [ ] Wallet removed from allowed receivers list
+
+**Note:** The following checks are no longer applicable (features removed):
+- ~~Wallet is blacklisted~~ (blacklist removed)
+- ~~Wallet is not set as minter~~ (minter removed)
+- ~~Wallet is not set as charity/team receiver~~ (replaced with allowed receivers)
+- ~~Wallet removed from tax exempt list~~ (tax functionality removed)
 
 ## 🛡️ Security Status
 

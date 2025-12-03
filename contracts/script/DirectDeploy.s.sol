@@ -25,8 +25,6 @@ contract DirectDeployScript is Script {
         } catch {
             console2.log("No migration - deploying fresh contract");
         }
-        uint256 mintAmount = 10_000_000 ether; // Amount to mint to treasury
-
         vm.startBroadcast(deployerPrivateKey);
         
         console2.log("Deploying VMF directly (no proxy) with deployer:", deployer);
@@ -41,9 +39,12 @@ contract DirectDeployScript is Script {
         console2.log("VMF deployed at:", vmfAddress);
         console2.log("Cap (default 10M):", vmf.cap());
         
+        // NOTE: Minting functionality has been removed from the contract.
+        // All 10 million tokens must be minted during the initial deployment.
+        // If you need to mint tokens, you must do so before removing the mint function,
+        // or use a deployment method that mints during initialization.
         if (!shouldMigrate) {
-            console2.log("Minting initial 10M VMF supply into the contract treasury...");
-            vmf.mint(vmfAddress, mintAmount);
+            console2.log("WARNING: Minting is no longer available. Ensure tokens were minted during deployment.");
         }
         
         // Migrate holders if old contract specified
@@ -57,7 +58,6 @@ contract DirectDeployScript is Script {
         console2.log("Token symbol:", vmf.symbol());
         console2.log("USDC:", vmf.usdc());
         console2.log("Owner:", vmf.owner());
-        console2.log("Minter:", vmf.minter());
         console2.log("Cap:", vmf.cap());
         console2.log("Total Supply:", vmf.totalSupply());
         console2.log("Treasury Balance:", vmf.balanceOf(vmfAddress));
@@ -66,7 +66,7 @@ contract DirectDeployScript is Script {
         
         console2.log("==== Direct Deployment Summary ====");
         console2.log("VMF Contract:", vmfAddress);
-        console2.log("Owner/Minter:", deployer);
+        console2.log("Owner:", deployer);
         if (shouldMigrate) {
             console2.log("Migration completed from:", oldContract);
         }
@@ -96,12 +96,15 @@ contract DirectDeployScript is Script {
             uint256 balance = oldVmf.balanceOf(holder);
             
             if (balance > 0) {
-                // Mint equivalent tokens in new contract
-                newVmf.mint(holder, balance);
+                // NOTE: Minting functionality has been removed.
+                // Migration must be done by transferring from treasury or using a different method.
+                // For now, we'll log the migration requirement.
+                console2.log("Migration required for:", holder, "Balance:", balance);
+                console2.log("WARNING: Cannot mint tokens. Use transfer from treasury or deploy with minting enabled.");
+                // Skip actual minting - this will need to be handled differently
+                // newVmf.mint(holder, balance); // REMOVED - minting no longer available
                 migratedCount++;
                 totalMigrated += balance;
-                
-                console2.log("Migrated:", holder, "Balance:", balance);
             }
         }
         

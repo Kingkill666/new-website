@@ -3,6 +3,7 @@ pragma solidity ^0.8.20;
 
 import {Test} from "forge-std/Test.sol";
 import {VMF} from "../src/VMF.sol";
+import {TestVMF} from "./TestVMF.sol";
 import {ERC20} from "solady/tokens/ERC20.sol";
 import {LibClone} from "solady/utils/LibClone.sol";
 
@@ -34,25 +35,23 @@ contract VMFBurnTest is Test {
 
         usdc = new MockUSDC();
 
-        VMF implementation = new VMF();
+        TestVMF implementation = new TestVMF();
         uint256 initialCap = type(uint256).max;
         bytes memory initData = abi.encodeWithSelector(
             VMF.initialize.selector,
             address(usdc),
-            payable(charityReceiver),
-            payable(teamReceiver),
             owner,
             initialCap
         );
         address proxy = LibClone.deployERC1967(address(implementation), initData);
         vmf = VMF(proxy);
         // safe-init
-        try vmf.initialize(address(usdc), payable(charityReceiver), payable(teamReceiver), owner, initialCap) {}
+        try vmf.initialize(address(usdc), owner, initialCap) {}
         catch {}
 
-        // mint some tokens to alice and bob via owner (owner is minter)
-        vmf.mint(alice, 1_000 ether);
-        vmf.mint(bob, 500 ether);
+        // mint some tokens to alice and bob using test helper
+        TestVMF(proxy).testMint(alice, 1_000 ether);
+        TestVMF(proxy).testMint(bob, 500 ether);
     }
 
     function test_burn_reduces_balance_and_supply() public {
@@ -66,15 +65,11 @@ contract VMFBurnTest is Test {
         assertEq(vmf.totalSupply(), totalBefore - 100 ether);
     }
 
-    function test_burn_reverts_if_blacklisted() public {
-        // owner blacklists alice
-        vm.prank(owner);
-        vmf.addToBlacklist(alice);
-
-        vm.prank(alice);
-        vm.expectRevert(bytes("VMF: blacklisted address"));
-        vmf.burn(1 ether);
-    }
+    // Note: Blacklist functionality has been removed from the contract.
+    // This test is no longer applicable.
+    // function test_burn_reverts_if_blacklisted() public {
+    //     // Blacklist functionality removed
+    // }
 
     function test_burnFrom_respects_allowance_and_blacklist() public {
         // bob approves spender
@@ -91,12 +86,13 @@ contract VMFBurnTest is Test {
         // solady ERC20 stores allowance; call allowance
         assertEq(vmf.allowance(bob, spender), 50 ether);
 
-        // Now blacklist bob and ensure burnFrom reverts
-        vm.prank(owner);
-        vmf.addToBlacklist(bob);
-
-        vm.prank(spender);
-        vm.expectRevert(bytes("VMF: blacklisted address"));
-        vmf.burnFrom(bob, 1 ether);
+        // Note: Blacklist functionality has been removed from the contract.
+        // The following blacklist test is no longer applicable.
+        // // Now blacklist bob and ensure burnFrom reverts
+        // vm.prank(owner);
+        // vmf.addToBlacklist(bob);
+        // vm.prank(spender);
+        // vm.expectRevert(bytes("VMF: blacklisted address"));
+        // vmf.burnFrom(bob, 1 ether);
     }
 }

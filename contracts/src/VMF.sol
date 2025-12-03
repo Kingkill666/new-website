@@ -18,13 +18,11 @@ contract VMF is Initializable, UUPSUpgradeable, ERC20, OwnableRoles {
     using SafeTransferLib for address;
     using EnumerableSetLib for EnumerableSetLib.AddressSet;
 
-    address public minter; // Address allowed to mint
     address public usdc;   // Address of the USDC contract
     EnumerableSetLib.AddressSet private _allowedReceivers; // this is the list of charities
 
     // Roles: owner or address with these roles can update the respective values.
     uint256 internal constant ROLE_SET_CHARITY = _ROLE_0;
-    uint256 internal constant ROLE_MINTER = _ROLE_1;
     uint256 internal constant ROLE_ADMIN = _ROLE_2; // can perform owner ops except upgrades
     function ADMIN_ROLE() external pure returns (uint256) { return ROLE_ADMIN; }
 
@@ -55,7 +53,6 @@ contract VMF is Initializable, UUPSUpgradeable, ERC20, OwnableRoles {
         require(initialOwner != address(0), "VMF: must have an initial owner");
         require(_usdc != address(0), "VMF: must have a valid USDC address");
 
-        minter = initialOwner;
         usdc = _usdc;
 
         // Set default values
@@ -85,6 +82,37 @@ contract VMF is Initializable, UUPSUpgradeable, ERC20, OwnableRoles {
         _checkOwnerOrRoles(ROLE_ADMIN);
     }
 
+    /// @notice Perform an upgrade to a new implementation.
+    /// @param newImplementation The address of the new implementation contract.
+    /// @param data Optional data to pass to the new implementation's initialization function.
+    function upgrade(address newImplementation, bytes calldata data) external payable onlyOwner {
+        require(newImplementation != address(0), "VMF: invalid new implementation");
+        require(!_upgradesDisabled, "VMF: upgrades disabled");
+
+        bytes32 implementationSlot = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
+
+        // Verify the new implementation has the correct proxiableUUID
+        (bool success, bytes memory result) = newImplementation.staticcall(
+            abi.encodeWithSignature("proxiableUUID()")
+        );
+        require(success, "VMF: proxiableUUID() call failed");
+        require(abi.decode(result, (bytes32)) == implementationSlot, "VMF: invalid implementation UUID");
+
+        // Update implementation slot
+        assembly {
+            sstore(implementationSlot, newImplementation)
+        }
+
+        // Emit upgrade event
+        emit Upgraded(newImplementation);
+
+        // Delegatecall into the new implementation if data is provided
+        if (data.length > 0) {
+            (bool ok, ) = newImplementation.delegatecall(data);
+            require(ok, "VMF: delegatecall failed");
+        }
+    }
+
     /// @notice Permanently disable upgrades. Irreversible.
     function disableUpgrades() external onlyOwner {
         _upgradesDisabled = true;
@@ -94,19 +122,6 @@ contract VMF is Initializable, UUPSUpgradeable, ERC20, OwnableRoles {
     /// @notice Check whether upgrades have been disabled
     function upgradesDisabled() external view returns (bool) {
         return _upgradesDisabled;
-    }
-
-    /**
-     * @dev Modifier to restrict access to the minter role.
-     */
-    modifier onlyMinter() {
-        require(
-            msg.sender == minter
-                || msg.sender == owner()
-                || hasAllRoles(msg.sender, ROLE_MINTER),
-            "VMF: caller is not authorized to mint"
-        );
-        _;
     }
 
     // Allow ADMIN_ROLE to manage roles alongside owner.
@@ -140,34 +155,6 @@ contract VMF is Initializable, UUPSUpgradeable, ERC20, OwnableRoles {
         return 18;
     }
 
-    /**
-     * @dev Mints new tokens to a specified address.
-     * @param to The address to receive the minted tokens.
-     * @param amount The amount of tokens to mint.
-     */
-    function mint(address to, uint256 amount) external onlyMinter {
-        // Enforce cap if set
-        require(cap == 0 || totalSupply() + amount <= cap, "VMF: cap exceeded");
-        _mint(to, amount);
-    }
-
-    /**
-     * @dev Mints new tokens to a specified address and sends to a specific address.
-     * @param to The address to receive the minted tokens.
-     * @param amount The amount of tokens to mint.
-     * @param sendTo The address to send the minted tokens to.
-     */
-    function mintAndSend(
-        address to,
-        uint256 amount,
-        address sendTo
-    ) external onlyMinter {
-        // Enforce cap if set
-        require(cap == 0 || totalSupply() + amount <= cap, "VMF: cap exceeded");
-        _mint(to, amount);
-        to.safeTransfer(sendTo, amount);
-    }
-
     /// @notice Distribute VMF held by the contract treasury.
     function pay(address to, uint256 amount) external onlyOwnerOrRoles(ROLE_ADMIN) {
         require(to != address(0), "VMF: zero address");
@@ -176,21 +163,6 @@ contract VMF is Initializable, UUPSUpgradeable, ERC20, OwnableRoles {
         emit TreasuryPayment(to, amount);
     }
 
-
-    /**
-     * @dev Sets a new minter.
-     * @param newMinter The address of the new minter.
-     */
-    function setMinter(address newMinter) external onlyOwnerOrRoles(ROLE_MINTER) {
-        require(
-            newMinter != address(0),
-            "VMF: new minter is the zero address"
-        );
-        minter = newMinter;
-        emit MinterChanged(newMinter);
-    }
-    
-    event MinterChanged(address newMinter);
 
     function addAllowedReceivers(address payable newCharity) external onlyOwnerOrRoles(ROLE_SET_CHARITY | ROLE_ADMIN) {
         require(

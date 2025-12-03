@@ -46,7 +46,6 @@ contract SmartDeployScript is Script {
             console2.log("Token name:", vmfProxy.name());
             console2.log("Token symbol:", vmfProxy.symbol());
             console2.log("Owner:", vmfProxy.owner());
-            console2.log("Minter:", vmfProxy.minter());
             console2.log("");
             console2.log("To upgrade this proxy, run: ./upgrade.sh");
             return;
@@ -68,7 +67,6 @@ contract SmartDeployScript is Script {
                 console2.log("Using existing implementation at:", implementationAddress);
             }
         } catch {}
-        uint256 mintAmount = 10_000_000 ether; // Amount to mint to treasury
 
         // Prepare the initialization data (pass 0 to use default 10M cap)
         bytes memory initData = abi.encodeWithSelector(
@@ -103,13 +101,17 @@ contract SmartDeployScript is Script {
         console2.log("Token symbol:", localVmf.symbol());
         console2.log("USDC:", localVmf.usdc());
         console2.log("Owner:", localVmf.owner());
-        console2.log("Minter:", localVmf.minter());
         console2.log("Cap:", localVmf.cap());
+        
+        // NOTE: Minting functionality has been removed from the contract.
+        // All 10 million tokens must be minted during the initial deployment.
+        // If you need to mint tokens, you must do so before removing the mint function,
+        // or use a deployment method that mints during initialization.
         if (localVmf.totalSupply() == 0) {
-            console2.log("Minting initial 10M VMF supply into the contract treasury...");
-            localVmf.mint(localProxy, mintAmount);
+            console2.log("WARNING: Total supply is zero. Minting is no longer available.");
+            console2.log("Ensure tokens were minted during deployment or use a deployment method that includes minting.");
         } else {
-            console2.log("Total supply already initialized, skipping mint.");
+            console2.log("Total supply already initialized:", localVmf.totalSupply());
         }
         console2.log("Total Supply:", localVmf.totalSupply());
         console2.log("Treasury Balance:", localVmf.balanceOf(localProxy));
@@ -119,7 +121,7 @@ contract SmartDeployScript is Script {
         console2.log("==== New Deployment Summary ====");
         console2.log("Implementation:", implementationAddress);
         console2.log("Proxy (main contract):", localProxy);
-        console2.log("Owner/Minter:", deployer);
+        console2.log("Owner:", deployer);
         console2.log("");
         console2.log("Save these addresses for future operations:");
         console2.log("export PROXY_ADDRESS=", localProxy);

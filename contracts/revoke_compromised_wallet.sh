@@ -29,20 +29,14 @@ cast send $VMF_CONTRACT "revokeRoles(address,uint256)" "$COMPROMISED_WALLET" "1"
 echo "Revoking ROLE_SET_CHARITY (2)..."
 cast send $VMF_CONTRACT "revokeRoles(address,uint256)" "$COMPROMISED_WALLET" "2" --private-key "$PRIVATE_KEY" --rpc-url "$BASE_RPC_URL" || echo "Failed to revoke ROLE_SET_CHARITY"
 
-# Revoke ROLE_MINTER (4)
-echo "Revoking ROLE_MINTER (4)..."
-cast send $VMF_CONTRACT "revokeRoles(address,uint256)" "$COMPROMISED_WALLET" "4" --private-key "$PRIVATE_KEY" --rpc-url "$BASE_RPC_URL" || echo "Failed to revoke ROLE_MINTER"
-
 # Revoke ROLE_ADMIN (8)
 echo "Revoking ROLE_ADMIN (8)..."
 cast send $VMF_CONTRACT "revokeRoles(address,uint256)" "$COMPROMISED_WALLET" "8" --private-key "$PRIVATE_KEY" --rpc-url "$BASE_RPC_URL" || echo "Failed to revoke ROLE_ADMIN"
 
-echo ""
-echo "Adding compromised wallet to blacklist..."
-cast send $VMF_CONTRACT "addToBlacklist(address)" "$COMPROMISED_WALLET" --private-key "$PRIVATE_KEY" --rpc-url "$BASE_RPC_URL" || echo "Failed to add to blacklist"
+# Note: ROLE_MINTER has been removed from the contract
+# Note: Blacklist functionality has been removed from the contract
 
 echo ""
-echo "✅ All roles revoked and wallet blacklisted!"
-echo "⚠️  IMPORTANT: Update charity and team receiver addresses immediately!"
-echo "⚠️  Check if wallet was set as minter and update if necessary!"
+echo "✅ All roles revoked!"
+echo "⚠️  IMPORTANT: Check and update any critical addresses if necessary!"
 

@@ -16,7 +16,7 @@ contract VMFAdminTest is Test {
 
     // Mirror OwnableRoles bit layout used by VMF
     uint256 constant ROLE_SET_CHARITY = 1 << 0; // _ROLE_0
-    uint256 constant ROLE_MINTER = 1 << 1;      // _ROLE_1
+    // Note: ROLE_MINTER has been removed from the contract
 
     function setUp() public {
         vmf = new VMF();
@@ -88,21 +88,11 @@ contract VMFAdminTest is Test {
 
     }
 
-    function test_AdminCanSelfGrantMinterAndMint() public {
-        uint256 ADMIN_ROLE = vmf.ADMIN_ROLE();
-        vmf.grantRoles(admin, ADMIN_ROLE);
-
-        // Admin self-grants ROLE_MINTER
-        vm.prank(admin);
-        vmf.grantRoles(admin, ROLE_MINTER);
-        assertTrue(vmf.hasAllRoles(admin, ROLE_MINTER), "admin should hold ROLE_MINTER");
-
-        // Mint tokens to user1 through admin
-        uint256 amount = 1_000 ether;
-        vm.prank(admin);
-        vmf.mint(user1, amount);
-        assertEq(vmf.balanceOf(user1), amount, "user1 receives minted tokens");
-    }
+    // Note: Minting functionality has been removed from the contract.
+    // This test is no longer applicable as tokens cannot be minted after deployment.
+    // function test_AdminCanSelfGrantMinterAndMint() public {
+    //     // Minting removed - test disabled
+    // }
 
     function test_AdminManagesRolesAfterOwnerRenounce() public {
         uint256 ADMIN_ROLE = vmf.ADMIN_ROLE();
