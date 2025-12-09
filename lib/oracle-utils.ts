@@ -232,12 +232,12 @@ export async function getUniswapPrice(): Promise<{price: number, source: string}
     
     if (response.ok) {
       const data = await response.json();
-      
-      if (data.success && data.price > 0) {
-        console.log("✅ External price fetched via API:", data.price, "from", data.source);
-        return { 
-          price: data.price, 
-          source: data.source 
+
+      if (data.success && data.priceUsd > 0) {
+        console.log("✅ External price fetched via API:", data.priceUsd, "from DexScreener");
+        return {
+          price: data.priceUsd,
+          source: "DexScreener Live"
         };
       }
     }
