@@ -58,18 +58,12 @@ export default function BaldyNFTsPageContent() {
             Every Baldy NFT purchase directly supports Veterans & Military Families.
             Join our community and make a difference.
           </p>
-          <div className="flex justify-center space-x-4">
+          <div className="flex justify-center">
             <a
               href="/"
               className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
             >
               Learn About VMF
-            </a>
-            <a
-              href="https://vmfcoin.com/staking"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
-            >
-              Stake VMF Tokens
             </a>
           </div>
         </div>

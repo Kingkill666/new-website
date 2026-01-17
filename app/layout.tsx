@@ -5,6 +5,7 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { headers } from "next/headers" // Import headers function
 import ContextProvider from "@/context" // Import AppKit ContextProvider
+import { FarcasterProvider } from "@/components/farcaster-provider"
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://vmfcoin.com"
 
@@ -17,6 +18,23 @@ export const metadata: Metadata = {
   generator: "v0.dev",
   icons: {
     icon: "/images/vmf-logo-new-patriotic.png",
+  },
+  // Farcaster Frame metadata
+  other: {
+    "fc:frame": "vNext",
+    "fc:frame:image": "https://i.postimg.cc/rsbzz1n3/star_exact_embedded.jpg",
+    "fc:frame:button:1": "Open mini app",
+    "fc:frame:button:1:action": "launch_frame",
+    "fc:frame:button:1:target": SITE_URL,
+    "of:version": "vNext",
+    "of:accepts:farcaster": "vNext",
+    "of:image": "https://i.postimg.cc/rsbzz1n3/star_exact_embedded.jpg",
+  },
+  openGraph: {
+    title: "VMF - Support Veterans Direct",
+    description: "ALL donations go directly to verified veteran charities. Buy VMF, we match, you pick the charities.",
+    images: ["https://i.postimg.cc/rsbzz1n3/star_exact_embedded.jpg"],
+    type: "website",
   },
 }
 
@@ -35,9 +53,11 @@ export default async function RootLayout({
       <body className={inter.className}>
         {/* Wrap children with ContextProvider, passing cookies */}
         <ContextProvider cookies={cookies}>
-          <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
-            {children}
-          </ThemeProvider>
+          <FarcasterProvider>
+            <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+              {children}
+            </ThemeProvider>
+          </FarcasterProvider>
         </ContextProvider>
       </body>
     </html>
