@@ -1,75 +1,38 @@
 # VMF Coin
 
-*ERC-20 token with donation mechanics and tax features*
+*ERC-20 token with donation mechanics and role-based controls*
 
 [![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/vmf-coin/v0-show-code-in-ui)
 [![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/SbHYLh7hsIH)
+[![E2E Tests](https://github.com/Kingkill666/new-website/actions/workflows/e2e-tests.yml/badge.svg)](https://github.com/Kingkill666/new-website/actions/workflows/e2e-tests.yml)
+[![Lint](https://github.com/Kingkill666/new-website/actions/workflows/lint.yml/badge.svg)](https://github.com/Kingkill666/new-website/actions/workflows/lint.yml)
 
 ## Overview
 
-VMF is an ERC-20 token with built-in donation mechanics, optional transfer taxes, and role-based administration.
+VMF is an ERC-20 token with built-in donation mechanics and role-based administration.
 
 ## Smart Contract Deployment
 
-### Direct Deployment (Recommended)
+Contracts and scripts live in the `contracts/` folder. Start with these docs:
 
-For a clean, immutable deployment that passes honeypot scanners:
+- Fresh deployment (UUPS proxy + implementation): `contracts/DEPLOY_README.md`
+- Upgrade existing proxy: `contracts/UPGRADE_README.md`
 
-```bash
-cd contracts
-./deploy-direct.sh
-```
-
-This deploys the VMF contract without proxy functionality:
-- ✅ No upgrade capability (immutable)
-- ✅ Clean for honeypot scanners
-- ✅ Direct ERC-20 deployment
-- ✅ Role-based administration
-
-### Token Migration
-
-To migrate existing holders from an old contract to a new one:
-
-1. **Deploy New Contract**: First deploy the new contract:
-   ```bash
-   cd contracts
-   ./deploy-direct.sh
-   ```
-
-2. **Set Migration Variables**: Update the migration script with addresses:
-   ```bash
-   # Edit migrate-holders.sh
-   export OLD_VMF_ADDRESS="0x2213414893259b0c48066acd1763e7fba97859e5"  # existing contract
-   export NEW_VMF_ADDRESS="0x..."  # newly deployed contract
-   ```
-
-3. **Run Migration**: Copy all token balances to new contract:
-   ```bash
-   ./migrate-holders.sh
-   ```
-
-The migration process:
-- Reads all known holder addresses from `holders.json`
-- Checks balances in the old contract
-- Mints equivalent tokens in the new contract
-- Preserves all existing balances and ownership
-
-### Legacy Proxy Deployment
-
-For upgradeable contracts (may trigger honeypot flags):
+Quick commands:
 
 ```bash
+# Fresh deploy to Base Sepolia
 cd contracts
-./deploy.sh
-```
+./deploy.sh sepolia
 
-This uses the UUPS proxy pattern with upgrade capabilities.
+# Upgrade existing proxy on Base Sepolia
+./upgrade.sh sepolia
+```
 
 ## Contract Features
 
 - **ERC-20 Token**: Standard token with name "VMF" and symbol "VMF"
 - **Donation Mechanics**: Accept USDC donations and mint VMF tokens
-- **Optional Transfer Tax**: Configurable tax on transfers (disabled by default)
 - **Role-based Access**: Admin roles for operational management
 - **Price Oracle Integration**: Optional on-chain price oracle support
 
@@ -79,20 +42,60 @@ Create `.env` file in the `contracts/` directory:
 
 ```bash
 PRIVATE_KEY=your_private_key
-BASE_RPC_URL=https://mainnet.base.org
+BASE_RPC_URL=https://sepolia.base.org
 BASESCAN_API_KEY=your_basescan_api_key
 ```
 
-## Web App Deployment
+## Wallet Integration
 
-Your project is live at:
+This project supports multiple wallet connection methods for optimal user experience:
 
-**[https://vercel.com/vmf-coin/v0-show-code-in-ui](https://vercel.com/vmf-coin/v0-show-code-in-ui)**
+### Coinbase Smart Wallet (Recommended)
+- **No app installation required** - Works directly in mobile browsers
+- **Passkey authentication** - Secure, biometric login
+- **Cross-device synchronization** - Access wallet from any device
+- **Gasless transactions** - Sponsored transactions where supported
+- **Seamless UX** - Native browser experience without app switching
 
-To run locally:
+### Other Wallets
+- MetaMask, Trust Wallet, Rainbow, and other WalletConnect-compatible wallets
+- Automatic network switching to Base
+- Mobile-optimized connection flows
+
+### Technical Implementation
+- Uses `@wagmi/connectors` with `coinbaseWallet` connector
+- Configured with `preference: 'smartWalletOnly'` for embedded experience
+- Integrated with Reown AppKit for unified wallet management
+
+## Testing
+
+This project includes comprehensive end-to-end tests using Playwright to ensure the buy modal and wallet functionality work correctly.
+
+### Running Tests Locally
+
 ```bash
-npm run dev
+# Run all tests (requires dev server to be running)
+npm run test
+
+# Run end-to-end tests (starts dev server automatically)
+npm run test:e2e
+
+# Run tests with visual UI
+npm run test:ui
+
+# Run tests in browser (headed mode)
+npm run test:headed
 ```
+
+### CI/CD
+
+Tests automatically run on GitHub Actions for:
+- All pushes to `main` and `prod` branches
+- All pull requests targeting these branches
+
+Test results and failure artifacts are automatically uploaded for review.
+
+For detailed testing documentation, see [`TESTING.md`](./TESTING.md).
 
 ## Agent Operations
 
@@ -100,4 +103,4 @@ For detailed operational procedures, see `contracts/AGENT_README.md`:
 - Role management and admin operations
 - Contract configuration and parameters
 - Oracle integration
-- Tax and donation pool management
+- Donation pool management

@@ -9,21 +9,18 @@ contract VMFAdminTest is Test {
 
     address internal owner = address(this);
     address internal usdc = address(0x1234);
-    address internal charity = address(0xCA71);
-    address internal team = address(0x7EAA);
 
     address internal admin;
     address internal user1;
     address internal user2;
 
     // Mirror OwnableRoles bit layout used by VMF
-    uint256 constant ROLE_SET_TAX = 1 << 0;      // _ROLE_0
-    uint256 constant ROLE_SET_CHARITY = 1 << 1;  // _ROLE_1
-    uint256 constant ROLE_MINTER = 1 << 2;       // _ROLE_2
+    uint256 constant ROLE_SET_CHARITY = 1 << 0; // _ROLE_0
+    // Note: ROLE_MINTER has been removed from the contract
 
     function setUp() public {
         vmf = new VMF();
-        vmf.initialize(usdc, payable(charity), payable(team), owner);
+        vmf.initialize(usdc, owner, 0);
         admin = makeAddr("admin");
         user1 = makeAddr("user1");
         user2 = makeAddr("user2");
@@ -41,15 +38,15 @@ contract VMFAdminTest is Test {
         vmf.grantRoles(admin, ADMIN_ROLE);
         assertTrue(vmf.hasAllRoles(admin, ADMIN_ROLE), "admin should have ADMIN_ROLE");
 
-        // Admin grants ROLE_SET_TAX to user1
+        // Admin grants ROLE_SET_CHARITY to user1
         vm.prank(admin);
-        vmf.grantRoles(user1, ROLE_SET_TAX);
-        assertTrue(vmf.hasAllRoles(user1, ROLE_SET_TAX), "user1 should have ROLE_SET_TAX");
+        vmf.grantRoles(user1, ROLE_SET_CHARITY);
+        assertTrue(vmf.hasAllRoles(user1, ROLE_SET_CHARITY), "user1 should have ROLE_SET_CHARITY");
 
-        // Admin revokes ROLE_SET_TAX from user1
+        // Admin revokes ROLE_SET_CHARITY from user1
         vm.prank(admin);
-        vmf.revokeRoles(user1, ROLE_SET_TAX);
-        assertFalse(vmf.hasAnyRole(user1, ROLE_SET_TAX), "user1 role should be revoked");
+        vmf.revokeRoles(user1, ROLE_SET_CHARITY);
+        assertFalse(vmf.hasAnyRole(user1, ROLE_SET_CHARITY), "user1 role should be revoked");
     }
 
     function test_AdminCannotTransferOwnershipOrDisableUpgrades() public {
@@ -72,64 +69,30 @@ contract VMFAdminTest is Test {
         vmf.grantRoles(admin, ADMIN_ROLE);
 
         // setPriceOracle (onlyOwnerOrRoles(ROLE_ADMIN))
-    address newOracle = makeAddr("oracle");
+        address newOracle = makeAddr("oracle");
         vm.prank(admin);
         vmf.setPriceOracle(newOracle);
         assertEq(vmf.priceOracle(), newOracle, "oracle should be updated by admin");
 
-        // setTaxEnabled (onlyOwnerOrRoles(ROLE_ADMIN))
+        // updateDonationPool (onlyOwnerOrRoles(ROLE_ADMIN))
+        uint256 newDonationPool = 500e18;
         vm.prank(admin);
-        vmf.setTaxEnabled(true);
-        assertTrue(vmf.taxEnabled(), "admin should enable tax");
+        vmf.updateDonationPool(newDonationPool);
+        assertEq(vmf.donationPool(), newDonationPool, "donation pool updated by admin");
 
-        // setTeamAddress and setCharityPoolAddress (| ROLE_ADMIN)
-        address payable newTeam = payable(address(0x7EA7));
-        address payable newCharity = payable(address(0xC4A7));
-
+        // updateDonationMultipleBps (onlyOwnerOrRoles(ROLE_ADMIN))
+        uint256 newMultiple = 8_000;
         vm.prank(admin);
-        vmf.setTeamAddress(newTeam);
-        assertEq(vmf.teamReceiver(), newTeam, "team address updated by admin");
+        vmf.updateDonationMultipleBps(newMultiple);
+        assertEq(vmf.donationMultipleBps(), newMultiple, "donation multiple updated by admin");
 
-        vm.prank(admin);
-        vmf.setCharityPoolAddress(newCharity);
-        assertEq(vmf.charityReceiver(), newCharity, "charity address updated by admin");
     }
 
-    function test_AdminCanSelfGrantTaxRoleAndSetRates() public {
-        uint256 ADMIN_ROLE = vmf.ADMIN_ROLE();
-        vmf.grantRoles(admin, ADMIN_ROLE);
-
-        // Admin self-grants ROLE_SET_TAX
-        vm.prank(admin);
-        vmf.grantRoles(admin, ROLE_SET_TAX);
-        assertTrue(vmf.hasAllRoles(admin, ROLE_SET_TAX), "admin should hold ROLE_SET_TAX");
-
-        // With ROLE_SET_TAX, admin can set rates and we validate via transfer behavior
-        vm.prank(admin);
-        vmf.setTeamRateBps(10);      // 0.10%
-        vm.prank(admin);
-        vmf.setCharityRateBps(20);   // 0.20%
-
-        // Enable tax (admin has ROLE_ADMIN)
-        vm.prank(admin);
-        vmf.setTaxEnabled(true);
-
-        // Mint to user1 and transfer to user2 to observe taxes
-        vmf.mint(user1, 1000 ether);
-
-        uint256 amount = 100 ether;
-        // Expected taxes: team 0.1% = 0.1, charity 0.2% = 0.2
-        uint256 expectedTeam = (amount * 10) / 10_000;      // 0.1 ether
-        uint256 expectedCharity = (amount * 20) / 10_000;   // 0.2 ether
-        uint256 expectedNet = amount - expectedTeam - expectedCharity;
-
-        vm.prank(user1);
-        vmf.transfer(user2, amount);
-
-        assertEq(vmf.balanceOf(user2), expectedNet, "recipient receives net after tax");
-        assertEq(vmf.balanceOf(team), expectedTeam, "team receives team tax");
-        assertEq(vmf.balanceOf(charity), expectedCharity, "charity receives charity tax");
-    }
+    // Note: Minting functionality has been removed from the contract.
+    // This test is no longer applicable as tokens cannot be minted after deployment.
+    // function test_AdminCanSelfGrantMinterAndMint() public {
+    //     // Minting removed - test disabled
+    // }
 
     function test_AdminManagesRolesAfterOwnerRenounce() public {
         uint256 ADMIN_ROLE = vmf.ADMIN_ROLE();
@@ -199,22 +162,23 @@ contract VMFAdminTest is Test {
 
     function test_AdminRolePersistsThroughHandover() public {
         uint256 ADMIN_ROLE = vmf.ADMIN_ROLE();
+
+        // Owner grants admin role to admin address
         vmf.grantRoles(admin, ADMIN_ROLE);
 
-        // Handover to user1
-        vm.prank(user1);
+        // Owner initiates handover to admin
+        vm.prank(admin);
         vmf.requestOwnershipHandover();
-        vmf.completeOwnershipHandover(user1);
-        assertEq(vmf.owner(), user1, "user1 now owner");
+        vmf.completeOwnershipHandover(admin);
+        assertEq(vmf.owner(), admin, "ownership should transfer to admin");
 
-        // Admin still has ADMIN_ROLE and can call admin-gated functions
-        vm.prank(admin);
-        vmf.setTaxEnabled(true);
-        assertTrue(vmf.taxEnabled(), "admin still effective after handover");
-
-        // Admin still cannot transfer ownership
-        vm.prank(admin);
+        // Previous owner (this contract) should no longer be able to grant roles
         vm.expectRevert(_unauthorizedSelector());
-        vmf.transferOwnership(owner);
+        vmf.grantRoles(user1, ROLE_SET_CHARITY);
+
+        // New owner (admin) can still manage roles
+        vm.prank(admin);
+        vmf.grantRoles(user1, ROLE_SET_CHARITY);
+        assertTrue(vmf.hasAllRoles(user1, ROLE_SET_CHARITY), "user1 should receive ROLE_SET_CHARITY");
     }
 }

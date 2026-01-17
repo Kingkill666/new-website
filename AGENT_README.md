@@ -33,7 +33,7 @@ cast call --rpc-url "$BASE_RPC_URL" $PROXY_ADDRESS 'rolesOf(address)(uint256)' $
 ```
 
 Before you start
-- Network: Base mainnet (env: `BASE_RPC_URL`, `PRIVATE_KEY`, `BASESCAN_API_KEY`).
+- Network: Base Sepolia (env: `BASE_RPC_URL`, `PRIVATE_KEY`, `BASESCAN_API_KEY`).
 - Set `PROXY_ADDRESS` to the live VMF proxy.
 - If the proxy was deployed earlier, upgrade first to an implementation that includes:
   - `upgradesDisabled()`, `disableUpgrades()`
@@ -65,10 +65,10 @@ cast call --rpc-url "$BASE_RPC_URL" $PROXY_ADDRESS 'owner()(address)'
 cast call --rpc-url "$BASE_RPC_URL" $PROXY_ADDRESS 'name()(string)'
 ```
 
-Base mainnet example
+Base Sepolia example
 ```bash
-# Known VMF proxy (Base):
-export PROXY_ADDRESS=0x2213414893259b0c48066acd1763e7fba97859e5
+# Known VMF proxy (Base Sepolia):
+export PROXY_ADDRESS=0x8157B303a10609C50e332717D70e53B09ebDb045
 
 # Check current owner and upgrade fuse
 cast call --rpc-url "$BASE_RPC_URL" $PROXY_ADDRESS 'owner()(address)'
@@ -82,7 +82,7 @@ cast call --rpc-url "$BASE_RPC_URL" $ORACLE 'spotPriceUSDCPerVMF()(uint256)'
 
 ## Disable Upgrades (Keep Owner) — Preferred
 
-Purpose: Permanently disable upgrades via one-way fuse while keeping contract ownership for operations. This avoids proxy honeypot flags without losing admin features like roles or tax toggles.
+Purpose: Permanently disable upgrades via one-way fuse while keeping contract ownership for operations. This avoids proxy honeypot flags without losing admin features like roles or donation controls.
 
 Prerequisites
 - Base RPC and keys in `.env`: `BASE_RPC_URL`, `PRIVATE_KEY`, `BASESCAN_API_KEY`.
@@ -90,8 +90,8 @@ Prerequisites
 
 Quick Run
 ```bash
-# Set the proxy address (example: VMF on Base mainnet)
-export PROXY_ADDRESS=0x2213414893259b0c48066acd1763e7fba97859e5
+# Set the proxy address (example: VMF on Base Sepolia)
+export PROXY_ADDRESS=0x8157B303a10609C50e332717D70e53B09ebDb045
 
 # Ensure .env contains BASE_RPC_URL, PRIVATE_KEY, BASESCAN_API_KEY
 ./contracts/disable-upgrades.sh
@@ -117,12 +117,12 @@ cast call --rpc-url "$BASE_RPC_URL" $PROXY_ADDRESS 'owner()(address)'
 
 Important Notes
 - Irreversible: Once disabled, upgrades are blocked forever.
-- Ownership is retained for operational controls (roles, tax, minter, etc.).
+- Ownership is retained for operational controls (roles, minting, donation settings, etc.).
 - VMF enforces this in `_authorizeUpgrade` with `require(!upgradesDisabled)`.
 
 ## Admin Role (Owner Replacement for Ops)
 
-Purpose: Delegate day-to-day owner operations to a role while keeping upgrades owner-only. Admin can change tax settings, price oracle, team/charity addresses, allowed receivers, tax-exempts, donation pool/multiple, etc.
+Purpose: Delegate day-to-day owner operations to a role while keeping upgrades owner-only. Admin can change price oracle, manage allowed receivers, update donation pool/multiple, distribute treasury funds, etc.
 
 Grant Admin
 ```bash
@@ -149,7 +149,7 @@ forge script contracts/script/AdminRoles.s.sol:RevokeAdminRole \
 Notes
 - Admin can now grant/revoke roles in VMF (owner or `ADMIN_ROLE`).
 - Admin cannot upgrade or disable/enable the upgrade fuse — those remain owner-only.
-- You can combine `ROLE_ADMIN` with other roles as needed (e.g., `ROLE_SET_TAX`).
+- You can combine `ROLE_ADMIN` with other roles as needed (e.g., `ROLE_SET_CHARITY` or `ROLE_MINTER`).
 
 Alternative using cast (no script)
 ```bash
@@ -163,23 +163,20 @@ cast send --rpc-url "$BASE_RPC_URL" --private-key "$PRIVATE_KEY" \
 # Verify roles bitmask (non-zero indicates some role(s) set)
 cast call --rpc-url "$BASE_RPC_URL" $PROXY_ADDRESS 'rolesOf(address)(uint256)' $ADMIN_ADDRESS
 
-# As admin, grant another role (example: ROLE_SET_TAX)
-ROLE_SET_TAX=$(cast call --rpc-url "$BASE_RPC_URL" $PROXY_ADDRESS 'rolesOf(address)(uint256)' 0x0000000000000000000000000000000000000000 >/dev/null 2>&1; echo $((1<<0)))
+# As admin, grant another role (example: ROLE_SET_CHARITY)
+ROLE_SET_CHARITY=$((1<<0))
 cast send --rpc-url "$BASE_RPC_URL" --private-key "$PRIVATE_KEY" \
-  $PROXY_ADDRESS 'grantRoles(address,uint256)' 0xAnotherAddress $ROLE_SET_TAX -vvvv
+  $PROXY_ADDRESS 'grantRoles(address,uint256)' 0xAnotherAddress $ROLE_SET_CHARITY -vvvv
 ```
 
 Function reference for ops (admin-capable)
 - setPriceOracle(address): `cast send $PROXY 'setPriceOracle(address)' 0xOracle`
-- setTaxEnabled(bool): `cast send $PROXY 'setTaxEnabled(bool)' true`
-- setTeamAddress(address): `cast send $PROXY 'setTeamAddress(address)' 0xTeam`
-- setCharityPoolAddress(address): `cast send $PROXY 'setCharityPoolAddress(address)' 0xCharity`
 - addAllowedReceivers(address): `cast send $PROXY 'addAllowedReceivers(address)' 0xCharity`
 - removeAllowedReceivers(address): `cast send $PROXY 'removeAllowedReceivers(address)' 0xCharity`
-- addAllowedTaxExempt(address): `cast send $PROXY 'addAllowedTaxExempt(address)' 0xUser`
-- removeAllowedTaxExempt(address): `cast send $PROXY 'removeAllowedTaxExempt(address)' 0xUser`
 - updateDonationPool(uint256): `cast send $PROXY 'updateDonationPool(uint256)' 1000000000000000000000000`
 - updateDonationMultipleBps(uint256): `cast send $PROXY 'updateDonationMultipleBps(uint256)' 10000`
+- pay(address,uint256): `cast send $PROXY 'pay(address,uint256)' 0xRecipient 1000000000000000000`
+- setSushiSwapReceiver(address): `cast send $PROXY 'setSushiSwapReceiver(address)' 0xSushi`
 
 Owner-only (not admin)
 - disableUpgrades(): `cast send $PROXY 'disableUpgrades()'`

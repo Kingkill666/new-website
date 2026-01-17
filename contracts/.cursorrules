@@ -1,0 +1,149 @@
+# Cursor Rules for VMF Contracts
+
+## Project Context
+
+This is the smart contracts directory for the VMF (VikingMuskFund) token project on Base blockchain. It uses Foundry for development and deployment.
+
+## Vanity Address Generation
+
+### Available Script
+
+**Location:** `./generate_vanity_1776.sh`
+
+**Purpose:** Generate CREATE2 vanity proxy addresses containing "1776"
+
+**Quick Usage:**
+```bash
+# From contracts directory
+./generate_vanity_1776.sh mainnet start  # Address starting with 0x1776
+./generate_vanity_1776.sh mainnet end    # Address ending with ...1776
+```
+
+### When User Asks to Generate Vanity Address
+
+1. Run the appropriate command from contracts directory
+2. Parse the output for the address and salt
+3. Inform user of the results
+4. Suggest adding the salt to `.env` if they want to deploy
+
+### Script Output Location
+
+- Console output with colorized display
+- File output: `./vanity_address_1776.txt`
+
+## Deployment Scripts
+
+### Main Deployment
+
+**Script:** `./deploy.sh`
+
+**Purpose:** Deploy VMF token with ERC1967 proxy pattern
+
+**Usage:**
+```bash
+./deploy.sh mainnet  # Base mainnet
+./deploy.sh sepolia  # Base Sepolia testnet
+```
+
+### Other Important Scripts
+
+- `upgrade.sh` - Upgrade proxy implementation
+- `grant_roles.sh` - Grant roles to addresses
+- `migrate-holders.sh` - Migrate token holders
+- `deploy_oracle.sh` - Deploy price oracle
+
+## Environment Setup
+
+### Required .env Variables
+
+```bash
+PRIVATE_KEY=<deployer_private_key>
+BASE_RPC_URL=<base_mainnet_rpc>
+BASE_SEPOLIA_RPC_URL=<base_sepolia_rpc>
+BASESCAN_API_KEY=<basescan_api_key>
+PROXY_ADDRESS=<deployed_proxy_address>
+```
+
+### Optional Variables for Vanity Deployment
+
+```bash
+CREATE2_SALT=<salt_for_vanity_address>
+```
+
+## Foundry Commands
+
+### Compilation
+```bash
+forge build
+```
+
+### Testing
+```bash
+forge test
+forge test -vvv  # Verbose output
+```
+
+### Deployment (alternative to scripts)
+```bash
+forge script script/Deploy.s.sol --rpc-url $BASE_RPC_URL --broadcast --verify
+```
+
+## Network Information
+
+### Base Mainnet
+- Chain ID: 8453
+- RPC: https://mainnet.base.org
+- Explorer: https://basescan.org
+
+### Base Sepolia
+- Chain ID: 84532
+- RPC: https://sepolia.base.org
+- Explorer: https://sepolia.basescan.org
+
+## Common Tasks
+
+### Generate Vanity Address
+```bash
+cd contracts
+./generate_vanity_1776.sh mainnet start
+```
+
+### Deploy New Contract
+```bash
+cd contracts
+./deploy.sh mainnet
+```
+
+### Upgrade Existing Contract
+```bash
+cd contracts
+./upgrade.sh mainnet
+```
+
+### Verify Contract
+```bash
+forge verify-contract <address> <contract_name> --chain-id 8453
+```
+
+## Code Style
+
+- Use Solidity ^0.8.20
+- Follow OpenZeppelin patterns for upgradeable contracts
+- Use UUPS proxy pattern (ERC1967)
+- Include natspec comments for all public functions
+- Write comprehensive tests in Foundry
+
+## Security Considerations
+
+- Always use `.env` for private keys (never commit)
+- Test on Sepolia before mainnet deployment
+- Verify contracts on block explorers
+- Use multisig for admin operations in production
+- Review CREATE2 salt security for vanity addresses
+
+## Documentation
+
+- Main README: `./README.md`
+- Deployment guide: `./DEPLOYMENT.md`
+- Vanity address guide: `./VANITY_ADDRESS_GENERATION.md`
+- Upgrade guide: `./UPGRADE_README.md`

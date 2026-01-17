@@ -1,22 +1,22 @@
 // context/index.tsx
 'use client'
 
-import React, { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { WagmiProvider, cookieToInitialState, type Config } from 'wagmi'
 import { createAppKit } from '@reown/appkit/react'
 // Import config, networks, projectId, and wagmiAdapter from your config file
 import { config, networks, projectId, wagmiAdapter } from '@/config'
 // Import the default network separately if needed
-import { mainnet } from '@reown/appkit/networks'
+import { base } from '@reown/appkit/networks'
 
 const queryClient = new QueryClient()
 
 const metadata = {
-  name: 'VMF Website',
-  description: 'VMF Token Website',
-  url: typeof window !== 'undefined' ? window.location.origin : 'https://your-app-url.com', // Replace with your actual URL
-  icons: ['/favicon.png'], // Replace with your actual icon URL
+  name: 'VMF - Veterans & Military Families',
+  description: 'Supporting those who served through blockchain technology',
+  url: typeof window !== 'undefined' ? window.location.origin : 'https://vmfcoin.com',
+  icons: ['https://vmfcoin.com/favicon.png'],
 }
 
 // Initialize AppKit *outside* the component render cycle
@@ -27,13 +27,19 @@ if (!projectId) {
 } else {
   createAppKit({
     adapters: [wagmiAdapter],
-    // Use non-null assertion `!` as projectId is checked runtime, needed for TypeScript
-    projectId: projectId!,
+    // Project ID is required and already checked above
+    projectId: projectId,
     // Pass networks directly (type is now correctly inferred from config)
     networks: networks,
-    defaultNetwork: mainnet, // Or your preferred default
+    defaultNetwork: base, // Base network for VMF - REQUIRED
     metadata,
-    features: { analytics: true }, // Optional features
+    features: {
+      analytics: true,
+      email: false, // Disable email features
+      socials: [], // Disable social login features
+      emailShowWallets: false, // Disable email wallet options
+    },
+    coinbasePreference: 'smartWalletOnly', // Enable Coinbase Smart Wallet
   })
 }
 
@@ -48,9 +54,10 @@ export default function ContextProvider({
   const initialState = cookieToInitialState(config as Config, cookies)
 
   return (
-    // Cast config as Config for WagmiProvider
-    <WagmiProvider config={config as Config} initialState={initialState}>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    </WagmiProvider>
+    <QueryClientProvider client={queryClient}>
+      <WagmiProvider config={config as Config} initialState={initialState}>
+        {children}
+      </WagmiProvider>
+    </QueryClientProvider>
   )
 }

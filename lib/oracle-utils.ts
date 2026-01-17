@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
+import { VMF_CONTRACT_ADDRESS } from "./vmf-contract";
 
 // Contract addresses
-const VMF_CONTRACT_ADDRESS = "0x2213414893259b0C48066Acd1763e7fbA97859E5";
 const FIXED_PRICE_ORACLE_ADDRESS = "0x9444b5Cf6f89ab72C6173bF0dd13c7F7bec809D2";
 const SUSHISWAP_ORACLE_ADDRESS = "0xB660c01d6502091555731cD1B3E04fdfDBF83944"; // Accurate SushiSwap oracle
 
@@ -80,16 +80,16 @@ export async function getVMFPriceFromOracle(provider: ethers.Provider): Promise<
     console.log("🔍 Testing VMF contract call...");
     console.log("📍 Contract address:", VMF_CONTRACT_ADDRESS);
     
-    // Check network - MUST be Base mainnet (chainId 8453)
+    // Check network - MUST be Base (chainId 8453)
     const network = await provider.getNetwork();
     console.log("🌐 Provider network:", network);
     
     if (network.chainId !== BigInt(8453)) {
-      console.error("❌ Wrong network! Expected Base mainnet (8453), got:", network.chainId);
-      throw new Error(`Wrong network. Expected Base mainnet (8453), got ${network.chainId}. Please switch to Base mainnet.`);
+      console.error("❌ Wrong network! Expected Base (8453), got:", network.chainId);
+      throw new Error(`Wrong network. Expected Base (8453), got ${network.chainId}. Please switch to Base.`);
     }
     
-    console.log("✅ Network verified: Base mainnet");
+    console.log("✅ Network verified: Base");
     
     // First check if oracle is set
     const vmfContract = new ethers.Contract(VMF_CONTRACT_ADDRESS, VMF_ABI, provider);
@@ -186,7 +186,7 @@ export async function testContractOracle(provider: ethers.Provider): Promise<voi
     console.log("🌐 Network:", network.name, "ChainId:", network.chainId.toString());
     
     if (network.chainId !== BigInt(8453)) {
-      console.log("❌ Wrong network! Expected Base mainnet (8453)");
+      console.log("❌ Wrong network! Expected Base (8453)");
       return;
     }
     
@@ -232,12 +232,12 @@ export async function getUniswapPrice(): Promise<{price: number, source: string}
     
     if (response.ok) {
       const data = await response.json();
-      
-      if (data.success && data.price > 0) {
-        console.log("✅ External price fetched via API:", data.price, "from", data.source);
-        return { 
-          price: data.price, 
-          source: data.source 
+
+      if (data.success && data.priceUsd > 0) {
+        console.log("✅ External price fetched via API:", data.priceUsd, "from DexScreener");
+        return {
+          price: data.priceUsd,
+          source: "DexScreener Live"
         };
       }
     }
@@ -279,82 +279,11 @@ export async function getPriceInfoNoProvider(): Promise<{price: number, source: 
 export async function getPriceInfo(provider: ethers.Provider): Promise<{price: number, source: string}> {
   console.log("🔍 Starting getPriceInfo with provider...");
   try {
-    // First try to get price from contract oracle (most reliable for VMF)
-    try {
-      console.log("📡 Checking network...");
-      // Check network - MUST be Base mainnet (chainId 8453)
-      const network = await provider.getNetwork();
-      console.log("🌐 Network chainId:", network.chainId.toString());
-      
-      if (network.chainId !== BigInt(8453)) {
-        throw new Error(`Wrong network. Expected Base mainnet (8453), got ${network.chainId}. Please switch to Base mainnet.`);
-      }
-      
-      console.log("📋 Creating VMF contract instance...");
-      const vmfContract = new ethers.Contract(VMF_CONTRACT_ADDRESS, VMF_ABI, provider);
-      
-      let oracleAddress;
-      try {
-        console.log("🔍 Calling priceOracle()...");
-        oracleAddress = await vmfContract.priceOracle();
-        console.log("📍 Oracle address from contract:", oracleAddress);
-        console.log("📍 Zero address:", ethers.ZeroAddress);
-      } catch (contractError) {
-        console.error("❌ Contract method call failed in getPriceInfo:", contractError);
-        throw contractError;
-      }
-      
-      if (oracleAddress !== ethers.ZeroAddress) {
-        console.log("✅ Oracle is set, fetching price...");
-        // Oracle is set, get price from oracle
-        const oracleContract = new ethers.Contract(oracleAddress, ORACLE_ABI, provider);
-        console.log("🔍 Calling spotPriceUSDCPerVMF()...");
-        const priceE18 = await oracleContract.spotPriceUSDCPerVMF();
-        const price = Number(ethers.formatEther(priceE18));
-        
-        // Determine oracle source based on address
-        let source = "Unknown Oracle";
-        if (oracleAddress.toLowerCase() === FIXED_PRICE_ORACLE_ADDRESS.toLowerCase()) {
-          source = "Fixed Price Oracle";
-        } else if (oracleAddress.toLowerCase() === SUSHISWAP_ORACLE_ADDRESS.toLowerCase()) {
-          source = "SushiSwap V3 Oracle";
-        } else {
-          source = `Oracle (${oracleAddress.slice(0, 6)}...)`;
-        }
-        
-        console.log("✅ Contract oracle price fetched:", price, "from", source);
-        return { price, source };
-      } else {
-        console.log("⚠️ No oracle set, trying static multiple...");
-        // No oracle set, using static multiple
-        try {
-          const donationMultipleBps = await vmfContract.donationMultipleBps();
-          const price = Number(donationMultipleBps) / 10000;
-          console.log("✅ Static multiple price fetched:", price);
-          return { price, source: "Static Multiple" };
-        } catch (staticError) {
-          console.error("❌ Static multiple failed:", staticError);
-          throw staticError;
-        }
-      }
-    } catch (oracleError) {
-      console.warn("⚠️ Contract oracle failed, trying external sources:", oracleError);
-    }
-    
-    // Fallback to external price sources
-    try {
-      console.log("📡 Trying external price sources...");
-      const externalPrice = await getUniswapPrice();
-      console.log("✅ External price fetched:", externalPrice);
-      return externalPrice;
-    } catch (externalError) {
-      console.warn("⚠️ External price sources failed:", externalError);
-    }
-    
-    // Ultimate fallback
-    console.log("⚠️ All price sources failed, using fallback");
-    return { price: 1, source: "Fallback" };
-    
+    // Always prefer off-chain aggregated price (Dexscreener/Coingecko/Uniswap quote via API)
+    console.log("📡 Fetching external price via API (wallet-connected path)...");
+    const externalPrice = await getUniswapPrice();
+    console.log("✅ External price fetched:", externalPrice);
+    return externalPrice;
   } catch (error) {
     console.error("❌ Error getting price info:", error);
     return { price: 1, source: "Fallback" };
@@ -374,10 +303,10 @@ export async function getOracleInfo(provider: ethers.Provider): Promise<{
   reason: string;
 }> {
   try {
-    // Check network - MUST be Base mainnet (chainId 8453)
+    // Check network - MUST be Base (chainId 8453)
     const network = await provider.getNetwork();
     if (network.chainId !== BigInt(8453)) {
-      throw new Error(`Wrong network. Expected Base mainnet (8453), got ${network.chainId}. Please switch to Base mainnet.`);
+      throw new Error(`Wrong network. Expected Base (8453), got ${network.chainId}. Please switch to Base.`);
     }
     
     const vmfContract = new ethers.Contract(VMF_CONTRACT_ADDRESS, VMF_ABI, provider);

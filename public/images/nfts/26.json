@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #26",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/26.png",
+  "dna": "83ee1a5ab4b1810c36de6b0f1aa8f473316f2433",
+  "edition": 26,
+  "date": 1759205555312,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Fireworks"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Football"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Presidential Hair"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

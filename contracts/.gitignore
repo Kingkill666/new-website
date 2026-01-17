@@ -11,4 +11,5 @@ broadcast/**
 docs/
 
 # Dotenv file
-.env
+PRIVATE_KEY=0x8f672fab4b02315b530468376fc2d1efc7a2178be8b0eac5394ff8e18f299343 
+

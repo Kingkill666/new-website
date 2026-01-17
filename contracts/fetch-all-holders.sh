@@ -4,7 +4,7 @@
 # Usage: ./fetch-all-holders.sh
 
 VMF_CONTRACT="0x2213414893259b0c48066acd1763e7fba97859e5"
-BASE_RPC_URL=${BASE_RPC_URL:-"https://mainnet.base.org"}
+BASE_RPC_URL=${BASE_RPC_URL:-"https://sepolia.base.org"}
 BASESCAN_API_KEY=${BASESCAN_API_KEY}
 
 echo "Fetching all VMF token holders..."

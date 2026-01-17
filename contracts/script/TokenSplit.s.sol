@@ -4,33 +4,50 @@ pragma solidity ^0.8.20;
 import "forge-std/Script.sol";
 import "forge-std/console.sol";
 import "solady/tokens/ERC20.sol";
+import "../src/addresses/VMFAddresses.sol";
 
 /**
  * @title TokenSplitScript
  * @author Your Name
- * @notice This script performs a 100-to-1 token split by minting new tokens to existing holders.
- * It reads a list of holder addresses from a JSON file and mints 99x their current balance to each.
+ * @notice DEPRECATED: This script is no longer functional as minting has been removed from the VMF contract.
+ * 
+ * This script was designed to perform a 100-to-1 token split by minting new tokens to existing holders.
+ * However, the VMF contract no longer supports minting after deployment.
+ * 
+ * If you need to perform a token split, you must:
+ * 1. Use a contract version that still has minting enabled, OR
+ * 2. Transfer tokens from the treasury to holders instead of minting, OR
+ * 3. Deploy a new contract with the split already applied
  *
- * PRE-REQUISITES:
- * 1. Your token contract MUST have a public `mint(address to, uint256 amount)` function.
- * 2. The wallet executing this script MUST have the necessary permissions to call `mint`.
+ * PRE-REQUISITES (NO LONGER APPLICABLE):
+ * 1. Your token contract MUST have a public `mint(address to, uint256 amount)` function. ❌ REMOVED
+ * 2. The wallet executing this script MUST have the necessary permissions to call `mint`. ❌ REMOVED
  * 3. You must have a `holders.json` file in the root of your Foundry project.
- * This file should contain a single JSON array of holder addresses.
- * You can generate this file using the 'CSV to JSON Array Converter' tool.
  *
  * HOW TO RUN:
+ * ⚠️ DO NOT RUN - This script will fail as minting is no longer available.
  * forge script script/TokenSplit.s.sol:TokenSplitScript --rpc-url <YOUR_RPC_URL> --private-key <YOUR_PRIVATE_KEY> --broadcast
  */
 contract TokenSplitScript is Script {
 
     // The address of your ERC20 token contract.
     // IMPORTANT: Replace this with your actual token address before running.
-    address public tokenContractAddress = 0x2213414893259b0C48066Acd1763e7fbA97859E5;
+    address public tokenContractAddress = VMFAddresses.PROXY;
 
     // The path to the JSON file containing the holder addresses.
     string public constant HOLDERS_FILE = "holders.json";
 
     function run() external {
+        // DEPRECATED: Minting has been removed from the VMF contract.
+        // This script will revert if executed.
+        console.log("ERROR: This script is deprecated. Minting functionality has been removed from VMF.");
+        console.log("The VMF contract no longer supports minting after deployment.");
+        console.log("All 10 million tokens were minted during initial deployment.");
+        console.log("To perform a token split, you must use a different approach.");
+        revert("TokenSplitScript: Minting no longer available. Script deprecated.");
+        
+        // OLD CODE (commented out for reference):
+        /*
         // Load the array of holder addresses from the JSON file.
         string memory json = vm.readFile(HOLDERS_FILE);
         address[] memory holders = vm.parseJsonAddressArray(json, "$");
@@ -78,12 +95,13 @@ contract TokenSplitScript is Script {
         vm.stopBroadcast();
 
         console.log("Script finished successfully!");
+        */
     }
 }
 
 // Minimal ERC20 interface needed for the script.
-// Your actual token contract must have these functions.
+// NOTE: The mint function is no longer available in VMF contract.
 interface IERC20 {
     function balanceOf(address account) external view returns (uint256);
-    function mint(address to, uint256 amount) external;
+    // function mint(address to, uint256 amount) external; // REMOVED - no longer available
 }

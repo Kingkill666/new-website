@@ -36,7 +36,6 @@ contract VmfCoinBatchTest is Test {
     address public unauthorizedCharity;
     address public donor;
     address public charityReceiver;
-    address public teamReceiver;
     
     uint256 constant INITIAL_DONATION_POOL = 1_000_000e18;
     uint256 constant DONATION_MULTIPLE_BPS = 10000; // 1:1 ratio
@@ -52,7 +51,6 @@ contract VmfCoinBatchTest is Test {
         unauthorizedCharity = makeAddr("unauthorizedCharity");
         donor = makeAddr("donor");
         charityReceiver = makeAddr("charityReceiver");
-        teamReceiver = makeAddr("teamReceiver");
         
         // Deploy mock USDC
         usdc = new MockUSDC();
@@ -64,9 +62,8 @@ contract VmfCoinBatchTest is Test {
         bytes memory initData = abi.encodeWithSelector(
             VMF.initialize.selector,
             address(usdc),
-            payable(charityReceiver),
-            payable(teamReceiver),
-            owner // initial owner
+            owner, // initial owner
+            0
         );
         
         // Deploy the ERC1967 proxy pointing to the implementation (just like in deploy script)
@@ -76,9 +73,8 @@ contract VmfCoinBatchTest is Test {
         // Explicitly call initialize to ensure proper setup (in case proxy init didn't work)
         try vmfCoin.initialize(
             address(usdc),
-            payable(charityReceiver),
-            payable(teamReceiver),
-            owner
+            owner,
+            0
         ) {
             // Initialize succeeded
         } catch {

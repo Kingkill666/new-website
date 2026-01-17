@@ -219,6 +219,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
+      {/* Debug component - remove in production */}
       {/* Skip to main content link for screen readers */}
       <a
         href="#main-content"
@@ -319,8 +320,8 @@ const Index = () => {
                   BUY VMF
                 </Button>
 
-                {/* Compact Officers Club Button */}
-                <a href="https://farcaster.xyz/miniapps/28-g7Plt7iqO/pizza-party" target="_blank" rel="noopener noreferrer">
+                {/* Pizza Party Mini-app Button */}
+                <a href="https://pizza-party-game.vmfcoin.com/" target="_blank" rel="noopener noreferrer">
                   <Button
                     className="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-1.5 text-xs shadow-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                     size="sm"
@@ -430,10 +431,6 @@ const Index = () => {
                     </span>
                   </Link>
                   
-                  {/* Mobile Wallet Connection Button */}
-                  <div className="w-full">
-                    <appkit-button />
-                  </div>
                   
                   <Button
                     className="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
@@ -446,8 +443,8 @@ const Index = () => {
                     Buy VMF
                   </Button>
 
-                  {/* Mobile Officers Club Button */}
-                  <a href="https://farcaster.xyz/miniapps/28-g7Plt7iqO/pizza-party" target="_blank" rel="noopener noreferrer">
+                  {/* Mobile Pizza Party Button */}
+                  <a href="https://pizza-party-game.vmfcoin.com/" target="_blank" rel="noopener noreferrer">
                     <Button
                       className="w-full bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-3 shadow-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                       size="sm"
@@ -500,10 +497,10 @@ const Index = () => {
                       With VMF, your purchase supports Veterans.
                     </p>
 
-                    <div className="flex flex-col items-center gap-4 mb-8">
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-3 lg:gap-4 mb-8 w-full">
                       <Button
                         size="sm"
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-14 py-2 sm:px-16 sm:py-4 text-base sm:text-lg font-semibold shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-[160px] sm:w-[180px]"
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 sm:px-8 sm:py-3 text-base sm:text-lg font-semibold shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-[160px] sm:w-[140px]"
                         onClick={() => setIsBuyModalOpen(true)}
                         aria-label="Buy VMF coins to support veterans"
                       >
@@ -511,11 +508,11 @@ const Index = () => {
                       </Button>
                       <Button
                         size="sm"
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-14 py-2 sm:px-16 sm:py-4 text-base sm:text-lg font-semibold shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-[160px] sm:w-[180px]"
-                        onClick={() => window.location.href = '/staking'}
-                        aria-label="Stake VMF tokens"
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 sm:px-8 sm:py-3 text-base sm:text-lg font-semibold shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-[160px] sm:w-[140px]"
+                        onClick={() => window.location.href = '/baldynfts'}
+                        aria-label="View Baldy NFT collection"
                       >
-                        Stake VMF
+                        Baldy NFTs
                       </Button>
                     </div>
 
@@ -564,7 +561,7 @@ const Index = () => {
                       <div className="flex justify-between items-center p-2 sm:p-3 bg-blue-50 rounded-lg" role="listitem">
                         <span className="text-slate-700 font-medium text-xs sm:text-base">Amount Given</span>
                         <span className="text-xl sm:text-2xl font-bold text-blue-600" aria-label="Amount given">
-                          $7,200+
+                          $13,000+
                         </span>
                       </div>
                       <div className="flex justify-between items-center p-2 sm:p-3 bg-red-50 rounded-lg" role="listitem">
@@ -577,6 +574,24 @@ const Index = () => {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Enhanced Partner Charities Section */}
+        <section id="charities" className="pt-4 pb-16 sm:pt-6 sm:pb-20 bg-gray-50" aria-labelledby="charities-heading">
+          <div className="container mx-auto px-2 sm:px-4 lg:px-6">
+            <div className="max-w-6xl mx-auto">
+              <div className="text-center mb-16">
+                <h2 id="charities-heading" className="text-4xl sm:text-5xl font-bold text-slate-900 mb-6">
+                  Our Trusted Partners
+                </h2>
+                <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+                  Every VMF coin purchase supports our verified organizations, putting $$$ into their hands, direct and instantly.
+                </p>
+              </div>
+
+              <CharityGrid />
             </div>
           </div>
         </section>
@@ -709,25 +724,6 @@ const Index = () => {
                 </p>
               </div>
               <TradingChart tokenAddress="0x2213414893259b0c48066acd1763e7fba97859e5" />
-            </div>
-          </div>
-        </section>
-
-        {/* Enhanced Partner Charities Section */}
-        <section id="charities" className="pt-4 pb-16 sm:pt-6 sm:pb-20 bg-gray-50" aria-labelledby="charities-heading">
-          <div className="container mx-auto px-2 sm:px-4 lg:px-6">
-            <div className="max-w-6xl mx-auto">
-              <div className="text-center mb-16">
-                <h2 id="charities-heading" className="text-4xl sm:text-5xl font-bold text-slate-900 mb-6">
-                  Our Trusted Partners
-                </h2>
-                <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-                  Every VMF coin purchase supports our verified organizations, putting $$$ into their hands, direct and
-                  instantly.
-                </p>
-              </div>
-
-              <CharityGrid />
             </div>
           </div>
         </section>

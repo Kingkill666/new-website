@@ -1,0 +1,35 @@
+{
+  "frame": {
+    "name": "VMF",
+    "version": "1",
+    "iconUrl": "https://i.postimg.cc/rsbzz1n3/star_exact_embedded.jpg",
+    "homeUrl": "https://vmfcoin.com",
+    "imageUrl": "https://i.postimg.cc/rsbzz1n3/star_exact_embedded.jpg",
+    "splashImageUrl": "https://i.postimg.cc/cJzZM9mF/favicon.png",
+    "splashBackgroundColor": "#0000ff",
+    "webhookUrl": "https://vmfcoin.com/api/webhook",
+    "subtitle": "Support Veterans Directly",
+    "description": "All of your purchase goes directly to verified veteran organizations. You buy VMF, we match, you pick the charities. Empowering change, one transaction at a time.",
+    "primaryCategory": "social",
+    "screenshotUrls": [
+      "https://i.postimg.cc/rsbzz1n3/star_exact_embedded.jpg"
+    ],
+    "heroImageUrl": "https://i.postimg.cc/rsbzz1n3/star_exact_embedded.jpg",
+    "tags": [
+      "social",
+      "charity",
+      "veterans",
+      "donate"
+    ],
+    "tagline": "Direct Donation For Veterans.",
+    "ogTitle": "VMF - Support Veterans Direct",
+    "ogDescription": "ALL donations go directly to verified veteran charities. Buy VMF, we match, you pick the charities.",
+    "ogImageUrl": "https://i.postimg.cc/rsbzz1n3/star_exact_embedded.jpg",
+    "castShareUrl": "https://vmfcoin.com"
+  },
+  "accountAssociation": {
+    "header": "eyJmaWQiOjEwMTM0OTEsInR5cGUiOiJhdXRoIiwia2V5IjoiMHgyNTdDYmU4OTk2ODQ5NUMzYUU4QzgxQmNjQjhCRTdmMjU3Q0Q1ZjY2In0",
+    "payload": "eyJkb21haW4iOiJ2bWZjb2luLmNvbSJ9",
+    "signature": "YsClKAlAJlnoGKREP9XJeyqNrZYVft+TK/oY3mFc1UFkBMqkAK6tdUATb9XFZ5BvLvjv9iOLxNBDfqrQZNpfjRs="
+  }
+}

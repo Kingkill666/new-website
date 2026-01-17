@@ -33,15 +33,13 @@ The VMF Coin contract is now upgradeable using Solady's UUPS (Universal Upgradea
 ```bash
 # In your .env file
 PRIVATE_KEY="your_private_key"
-BASE_RPC_URL="https://mainnet.base.org"  # or your preferred RPC
+BASE_RPC_URL="https://sepolia.base.org"  # or your preferred RPC
 BASESCAN_API_KEY="your_basescan_api_key"
 ```
 
 ### Set in deployment scripts:
 ```bash
 USDC_ADDRESS="0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"  # Base mainnet USDC
-CHARITY_RECEIVER="0xf521a4fE5910b4fb4A14C9546C2837D33bEc455d"
-TEAM_RECEIVER="0xf521a4fE5910b4fb4A14C9546C2837D33bEc455d"
 ```
 
 ### Optional (for advanced usage):

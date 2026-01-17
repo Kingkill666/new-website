@@ -1,0 +1,34 @@
+{
+  "name": "Baldy NFT #16",
+  "description": "Baldy NFT",
+  "image": "https://baldy.wtf/api/img/16.png",
+  "dna": "f0cb6c3add03b6c2fcdf70c569ce9c7bc4f8b1e5",
+  "edition": 16,
+  "date": 1759205555129,
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "American Flag"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Eagle"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Revolutionary"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Baldy"
+    },
+    {
+      "trait_type": "Headgear",
+      "value": "Nothing"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Nothing"
+    }
+  ]
+}

@@ -13,8 +13,6 @@ contract SmartDeployScript is Script {
         
         // Get environment variables
         address usdcAddress = vm.envAddress("USDC_ADDRESS");
-        address charityReceiver = vm.envAddress("CHARITY_RECEIVER");
-        address teamReceiver = vm.envAddress("TEAM_RECEIVER");
         
         // Check if proxy already exists
         address existingProxy;
@@ -48,7 +46,6 @@ contract SmartDeployScript is Script {
             console2.log("Token name:", vmfProxy.name());
             console2.log("Token symbol:", vmfProxy.symbol());
             console2.log("Owner:", vmfProxy.owner());
-            console2.log("Minter:", vmfProxy.minter());
             console2.log("");
             console2.log("To upgrade this proxy, run: ./upgrade.sh");
             return;
@@ -59,8 +56,6 @@ contract SmartDeployScript is Script {
         
         console2.log("Deploying new proxy with deployer:", deployer);
         console2.log("USDC Address:", usdcAddress);
-        console2.log("Charity Receiver:", charityReceiver);
-        console2.log("Team Receiver:", teamReceiver);
         
         // Check if we have an existing implementation to reuse
         address implementationAddress;
@@ -72,14 +67,13 @@ contract SmartDeployScript is Script {
                 console2.log("Using existing implementation at:", implementationAddress);
             }
         } catch {}
-        
-        // Prepare the initialization data
+
+        // Prepare the initialization data (pass 0 to use default 10M cap)
         bytes memory initData = abi.encodeWithSelector(
             VMF.initialize.selector,
             usdcAddress,
-            payable(charityReceiver),
-            payable(teamReceiver),
-            deployer // initial owner
+            deployer, // initial owner
+            0 // 0 means use default cap (10M)
         );
         
         // Deploy implementation if not provided or invalid
@@ -92,21 +86,42 @@ contract SmartDeployScript is Script {
         // Deploy the ERC1967 proxy pointing to the implementation
         address localProxy = LibClone.deployERC1967(implementationAddress, initData);
         console2.log("Proxy deployed at:", localProxy);
-        
+
+        // Ensure initialization (in case deployERC1967 did not call it)
+        // This is safe due to the `initializer` modifier reverting on second call.
+        try VMF(localProxy).initialize(usdcAddress, deployer, 0) {
+            // initialized explicitly
+        } catch {
+            // already initialized via initData or other means
+        }
+
         // Verify the proxy is working
         VMF localVmf = VMF(localProxy);
         console2.log("Token name:", localVmf.name());
         console2.log("Token symbol:", localVmf.symbol());
         console2.log("USDC:", localVmf.usdc());
         console2.log("Owner:", localVmf.owner());
-        console2.log("Minter:", localVmf.minter());
+        console2.log("Cap:", localVmf.cap());
+        
+        // NOTE: Minting functionality has been removed from the contract.
+        // All 10 million tokens must be minted during the initial deployment.
+        // If you need to mint tokens, you must do so before removing the mint function,
+        // or use a deployment method that mints during initialization.
+        if (localVmf.totalSupply() == 0) {
+            console2.log("WARNING: Total supply is zero. Minting is no longer available.");
+            console2.log("Ensure tokens were minted during deployment or use a deployment method that includes minting.");
+        } else {
+            console2.log("Total supply already initialized:", localVmf.totalSupply());
+        }
+        console2.log("Total Supply:", localVmf.totalSupply());
+        console2.log("Treasury Balance:", localVmf.balanceOf(localProxy));
 
         vm.stopBroadcast();
         
         console2.log("==== New Deployment Summary ====");
         console2.log("Implementation:", implementationAddress);
         console2.log("Proxy (main contract):", localProxy);
-        console2.log("Owner/Minter:", deployer);
+        console2.log("Owner:", deployer);
         console2.log("");
         console2.log("Save these addresses for future operations:");
         console2.log("export PROXY_ADDRESS=", localProxy);

@@ -1,0 +1,28 @@
+VANITY ADDRESS SCRIPT USAGE
+===========================
+
+LOCATION: /home/colinbellmore/Documents/mikes-website/contracts
+
+MAIN SCRIPT: generate_vanity_1776.sh
+
+QUICK COMMANDS:
+  cd contracts
+  ./generate_vanity_1776.sh mainnet start    # 0x1776...
+  ./generate_vanity_1776.sh mainnet end      # ...1776
+
+OUTPUT: vanity_address_1776.txt
+
+DOCUMENTATION:
+  Primary: VANITY_ADDRESS_GENERATION.md (complete guide)
+  Quick:   VANITY_QUICK_START.md (commands only)
+  Index:   AI_DOCUMENTATION_INDEX.md (for AI assistants)
+  Config:  .cursorrules (Cursor settings)
+
+TESTED: ✅ Working (2025-11-02)
+  - Start: 0x1776f2fcA2854C511Db2948BF306473d4CAc3a22 (19ms)
+  - End:   0x59Fd7Ea20648a9dF6a4CF21770c6CA520D941776 (20ms)
+
+REQUIRES: Foundry (cast command)
+
+NEXT STEP AFTER GENERATION:
+  Add to .env: CREATE2_SALT=0x[generated_salt]
